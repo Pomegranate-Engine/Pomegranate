@@ -1,5 +1,0 @@
-"E:\Program Files\JetBrains\CLion 2023.3.2\bin\cmake\win\x64\bin\cmake.exe" -G "Visual Studio 17 2022" -S C:\Users\rlebg\CLionProjects\Pomegranate-Engine -B C:\Users\rlebg\CLionProjects\Pomegranate-Engine\cmake-build-debug
--- Selecting Windows SDK version 10.0.19041.0 to target Windows 10.0.22621.
--- Configuring done (0.0s)
--- Generating done (0.0s)
--- Build files have been written to: C:/Users/rlebg/CLionProjects/Pomegranate-Engine/cmake-build-debug
