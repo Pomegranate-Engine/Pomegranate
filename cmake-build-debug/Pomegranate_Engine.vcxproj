@@ -646,8 +646,12 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\main.cpp" />
-    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine.cpp" />
-    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\standard_ecs.cpp" />
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\engine.cpp" />
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\standard_ecs.cpp" />
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\ecs.cpp" />
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\input_manager.cpp" />
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\vec_math.cpp" />
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\cmake-build-debug\ZERO_CHECK.vcxproj">

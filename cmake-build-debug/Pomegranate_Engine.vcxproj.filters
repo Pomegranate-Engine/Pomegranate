@@ -4,10 +4,22 @@
     <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine.cpp">
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\standard_ecs.cpp">
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\standard_ecs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\ecs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\input_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\vec_math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\rlebg\CLionProjects\Pomegranate-Engine\src\engine\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

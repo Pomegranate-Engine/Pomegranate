@@ -4,8 +4,8 @@
 #include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_ttf.h"
-#include"engine.h"
-#include"standard_ecs.h"
+#include "engine/pomegranate.h"
+#include"engine/standard_ecs.h"
 #include <omp.h>
 
 unsigned int FRAME;

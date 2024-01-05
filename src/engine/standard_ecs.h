@@ -1,6 +1,10 @@
 #ifndef POMEGRANATE_ENGINE_STANDARD_ECS_H
 #define POMEGRANATE_ENGINE_STANDARD_ECS_H
+#include "ecs.h"
+#include "vec_math.h"
+#include <SDL_ttf.h>
 #include "engine.h"
+#include "window.h"
 
 class Transform : public Component
 {

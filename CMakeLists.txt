@@ -8,7 +8,11 @@ set(SDL_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/Lib/x64)
 include_directories("Include/")
 
 # Source files
-set(SOURCE_FILES src/main.cpp src/engine.cpp src/standard_ecs.cpp)
+set(SOURCE_FILES src/main.cpp src/engine/engine.cpp src/engine/standard_ecs.cpp
+        src/engine/ecs.cpp
+        src/engine/input_manager.cpp
+        src/engine/vec_math.cpp
+        src/engine/window.cpp)
 
 # Add the following lines to enable OpenMP
 find_package(OpenMP REQUIRED)
