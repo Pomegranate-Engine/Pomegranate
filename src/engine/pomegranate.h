@@ -6,5 +6,6 @@
 #include "ecs.h"
 #include "input_manager.h"
 #include "window.h"
+#include "event_system.h"
 
 #endif //POMEGRANATE_ENGINE_POMEGRANATE_H

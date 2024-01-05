@@ -12,7 +12,8 @@ set(SOURCE_FILES src/main.cpp src/engine/engine.cpp src/engine/standard_ecs.cpp
         src/engine/ecs.cpp
         src/engine/input_manager.cpp
         src/engine/vec_math.cpp
-        src/engine/window.cpp)
+        src/engine/window.cpp
+        src/engine/event_system.cpp)
 
 # Add the following lines to enable OpenMP
 find_package(OpenMP REQUIRED)
