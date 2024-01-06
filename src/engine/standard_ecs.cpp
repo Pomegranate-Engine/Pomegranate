@@ -7,114 +7,6 @@ Transform::Transform()
     this->rot = 0.0;
 }
 
-
-SDL_Texture* texture;
-Sprite::Sprite()
-{
-    this->texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), "res/none.png");
-}
-
-void Sprite::load_texture(const char *path) {
-    this->texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), path);
-}
-
-void Move::tick(Entity* entity)
-{
-    auto* t = entity->get_component<Transform>();
-    t->pos.x = 256.0f + cos(t->rot)*196;
-    t->pos.y = 256.0f + sin(t->rot)*196;
-    t->scale = vec2(1.0, 1.0) * 2.0;
-    t->rot += 0.016*3.14159*0.5;
-}
-
-
-void Render::draw(Entity* entity)
-{
-    if(entity->has_component<Sprite>())
-    {
-        Render::sprite(entity);
-    }
-    if(entity->has_component<Text>())
-    {
-        Render::text(entity);
-    }
-    if(entity->has_component<DebugCircle>())
-    {
-        Render::debug_circle(entity);
-    }
-}
-
-void Render::text(Entity*e) {
-    auto text = e->get_component<Text>();
-    auto trans = e->get_component<Transform>();
-
-    SDL_Color textColor = {255, 255, 255, 255}; // White color
-
-    // Create an SDL surface from the text
-    SDL_Surface* surface = TTF_RenderText_Blended(text->font, text->text.c_str(), textColor);
-    if (!surface) {
-        // Handle error
-        return;
-    }
-
-    // Create an SDL texture from the surface
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(Window::current->get_sdl_renderer(), surface);
-    if (!tex) {
-        // Handle error
-        SDL_FreeSurface(surface);
-        return;
-    }
-
-    // Set the position and dimensions of the text
-    SDL_Rect destinationRect = {static_cast<int>(trans->pos.x-Camera::current->get_component<Transform>()->pos.x), static_cast<int>(trans->pos.y-Camera::current->get_component<Transform>()->pos.y), surface->w, surface->h};
-
-    // Render the text to the screen
-    SDL_RenderCopy(Window::current->get_sdl_renderer(), tex, nullptr, &destinationRect);
-
-    // Clean up
-    SDL_DestroyTexture(tex);
-    SDL_FreeSurface(surface);
-}
-
-void Render::sprite(Entity*e) {
-    auto t = e->get_component<Transform>();
-    auto s = e->get_component<Sprite>();
-    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), 255, 255, 255, SDL_ALPHA_OPAQUE);
-    SDL_Rect r;
-    SDL_QueryTexture(s->texture, nullptr, nullptr, &r.w, &r.h);
-    r.w *= (int)t->scale.x;
-    r.h *= (int)t->scale.y;
-    r.x = (int)t->pos.x-r.w/2-(int)Camera::current->get_component<Transform>()->pos.x;
-    r.y = (int)t->pos.y-r.h/2-(int)Camera::current->get_component<Transform>()->pos.y;
-    auto* center = new SDL_Point();
-    center->x = r.w/2;
-    center->y = r.h/2;
-    SDL_RenderCopyEx(Window::current->get_sdl_renderer(), s->texture, nullptr, &r, t->rot*180.0/3.14159, center, SDL_FLIP_NONE);
-}
-
-void Render::debug_circle(Entity* entity)
-{
-    auto* t = entity->get_component<Transform>();
-    auto* dc = entity->get_component<DebugCircle>();
-    // Calculate angle step for each segment
-    double angleStep = 2.0 * M_PI / 32;
-
-    // Draw the circle outline
-    for (int i = 0; i < 32; ++i) {
-        double angle1 = i * angleStep;
-        double angle2 = (i + 1) * angleStep;
-
-        // Calculate the coordinates of the two points on the circle
-        int x1 = (int)t->pos.x-Camera::current->get_component<Transform>()->pos.x + static_cast<int>(dc->radius * cos(angle1));
-        int y1 = (int)t->pos.y-Camera::current->get_component<Transform>()->pos.y + static_cast<int>(dc->radius * sin(angle1));
-        int x2 = (int)t->pos.x-Camera::current->get_component<Transform>()->pos.x + static_cast<int>(dc->radius * cos(angle2));
-        int y2 = (int)t->pos.y-Camera::current->get_component<Transform>()->pos.y + static_cast<int>(dc->radius * sin(angle2));
-
-        // Draw a line between the two points to create the circle outline
-        SDL_RenderDrawLine(Window::current->get_sdl_renderer(), x1, y1, x2, y2);
-    }
-}
-
 PhysicsObject::PhysicsObject()
 {
     this->linear_velocity = vec2(0.0, 0.0);
@@ -140,8 +32,8 @@ void RigidBody::tick(Entity *entity)
         {
             float delta = 0.016/RigidBody::substeps;
             auto *t = entity->get_component<Transform>();
-            int x = 0;
-            int y = 0;
+            float x = 0;
+            float y = 0;
             SDL_GetMouseState(&x, &y);
 
 
@@ -173,7 +65,7 @@ void RigidBody::tick(Entity *entity)
         }
     }
 }
-int RigidBody::substeps = 64;
+int RigidBody::substeps = 12;
 
 CollisionShape::CollisionShape()
 {
@@ -243,23 +135,4 @@ void RigidBody::resolve_collision(Entity* a, Entity* b) {
     }
 
     // Move the circles away from each other by a small distance to eliminate overlap
-}
-
-Text::Text()
-{
-    this->font = TTF_OpenFont("res/sans.ttf", 16);
-    this->text = "text";
-}
-
-Camera::Camera()=default;
-
-void Camera::make_current(Entity*entity)
-{
-    current = entity;
-}
-Entity* Camera::current = nullptr;
-
-DebugCircle::DebugCircle()
-{
-    this->radius = 16.0;
 }

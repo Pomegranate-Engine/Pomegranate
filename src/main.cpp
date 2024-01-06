@@ -1,11 +1,12 @@
 #include <iostream>
 #include<cstdint>
 #include<vector>
-#include "SDL.h"
-#include "SDL_image.h"
-#include "SDL_ttf.h"
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 #include "engine/pomegranate.h"
 #include"engine/standard_ecs.h"
+#include"engine/standard_ecs_rendering.h"
 #include <omp.h>
 
 unsigned int FRAME;
@@ -18,6 +19,7 @@ class Drag : public System
     bool clicked = false;
     void tick(Entity* entity) override
     {
+        vec2 mousepos = InputManager::get_mouse_position()+Camera::current->get_component<Transform>()->pos;
         if(currently_dragged== nullptr)
         {
             if (entity->has_component<PhysicsObject>() && entity->has_component<Transform>()) {
@@ -25,7 +27,6 @@ class Drag : public System
                 auto *t = entity->get_component<Transform>();
                 auto *c = entity->get_component<CollisionShape>();
                 if (p->body_type == PHYSICS_BODY_TYPE_RIGID) {
-                    vec2 mousepos = InputManager::get_mouse_position();
                     if (mousepos.distance_to(t->pos) < c->radius*t->scale.x) {
                         if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
                         {
@@ -40,7 +41,6 @@ class Drag : public System
         {
             auto* p = currently_dragged->get_component<PhysicsObject>();
             auto* t = currently_dragged->get_component<Transform>();
-            vec2 mousepos = InputManager::get_mouse_position();
             p->linear_velocity = t->pos.direction_to(mousepos) * t->pos.distance_to(mousepos) * 10.0;
             p->angular_velocity = 0.0;
         }
@@ -58,7 +58,6 @@ class Drag : public System
                 if (entity->has_component<PhysicsObject>() && entity->has_component<Transform>()) {
                     auto *p = entity->get_component<PhysicsObject>();
                     auto* t = entity->get_component<Transform>();
-                    vec2 mousepos = InputManager::get_mouse_position();
                     p->linear_velocity = t->pos.direction_to(mousepos) * 10000.0;
                 }
             }
@@ -71,13 +70,16 @@ class Drag : public System
     }
 };
 
-Window main_window("Window", 512, 488);
+Window main_window("Window", 1024, 720);
 
 int main(int argc, char* argv[])
 {
     print_log("Opening Test Window");
+    SDL_version* compiled = (SDL_version*)malloc(sizeof(SDL_version));
+    SDL_GetVersion(compiled);
+    print_log(std::to_string(compiled->major) + "." + std::to_string(compiled->minor) + "." + std::to_string(compiled->patch));
     InputManager::init();
-    main_window = Window("Window",512, 512);
+    main_window = Window("Window",1024, 720);
     main_window.open();
     main_window.make_current();
     print_log("Window opened: " + std::string(main_window.get_title()) + " with resolution of " + std::to_string(main_window.get_width()) + "x" + std::to_string(main_window.get_height()));
@@ -147,7 +149,7 @@ int main(int argc, char* argv[])
         InputManager::update();
         while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT) {
+            if (event.type == SDL_EVENT_QUIT) {
                 is_running = false;
             }
         }

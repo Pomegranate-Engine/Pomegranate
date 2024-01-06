@@ -5,6 +5,7 @@
 #include <SDL_ttf.h>
 #include "engine.h"
 #include "window.h"
+#include "color.h"
 
 class Transform : public Component
 {
@@ -51,35 +52,6 @@ public:
     CollisionShape();
 };
 
-class DebugCircle : public Component
-{
-public:
-    float radius;
-    DebugCircle();
-};
-
-class Sprite : public Component
-{
-public:
-    SDL_Texture* texture;
-    Sprite();
-    void load_texture(const char* path);
-};
-
-class Text : public Component
-{
-public:
-    TTF_Font* font;
-    std::string text;
-    Text();
-};
-
-class Move: public System
-{
-public:
-    void tick(Entity* entity) override;
-};
-
 class KinematicBody: public System
 {
 public:
@@ -93,22 +65,5 @@ public:
     static bool check_collision(Entity* a, Entity* b);
     static void resolve_collision(Entity* a, Entity* b);
     static int substeps;
-};
-
-class Render: public System
-{
-public:
-    void draw(Entity* entity) override;
-    static void sprite(Entity*);
-    static void text(Entity*);
-    static void debug_circle(Entity*);
-};
-
-class Camera: public Component
-{
-public:
-    Camera();
-    static void make_current(Entity*entity);
-    static Entity* current;
 };
 #endif //POMEGRANATE_ENGINE_STANDARD_ECS_H

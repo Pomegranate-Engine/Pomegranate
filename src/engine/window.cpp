@@ -41,8 +41,7 @@ int Window::open()
         print_error("Failed to initialize the SDL2 library");
         return -1;
     }
-
-    this->window = SDL_CreateWindow(this->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width, this->height, 0);
+    this->window = SDL_CreateWindow(this->title, this->width, this->height, 0);
 
     if (!this->window)
     {
@@ -50,7 +49,7 @@ int Window::open()
         return -1;
     }
 
-    this->renderer = SDL_CreateRenderer(this->window, -1, SDL_RENDERER_ACCELERATED);
+    this->renderer = SDL_CreateRenderer(this->window,NULL, SDL_RENDERER_ACCELERATED);
 
     if (!this->renderer)
     {

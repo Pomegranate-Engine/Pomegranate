@@ -7,5 +7,6 @@
 #include "input_manager.h"
 #include "window.h"
 #include "event_system.h"
+#include "color.h"
 
 #endif //POMEGRANATE_ENGINE_POMEGRANATE_H

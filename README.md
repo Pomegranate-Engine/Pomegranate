@@ -27,7 +27,6 @@ A graphical editor will be created in the future.
 - ECS Standard Library Tilemaps
 - ECS Standard Library Audio
 - ECS Standard Library Navigation
-- ECS Standard Library Frame Animation
 - ECS Standard Library UI
 - Documentation
 - Event System

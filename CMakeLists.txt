@@ -8,29 +8,20 @@ set(SDL_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/Lib/x64)
 include_directories("Include/")
 
 # Source files
-set(SOURCE_FILES src/main.cpp src/engine/engine.cpp src/engine/standard_ecs.cpp
-        src/engine/ecs.cpp
-        src/engine/input_manager.cpp
-        src/engine/vec_math.cpp
-        src/engine/window.cpp
-        src/engine/event_system.cpp)
+set(SOURCE_FILES src/main.cpp)
 
-# Add the following lines to enable OpenMP
-find_package(OpenMP REQUIRED)
-if(OpenMP_CXX_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-endif()
+include("src/engine/CMakeLists.txt")
 
 # Add executable
-add_executable(Pomegranate_Engine ${SOURCE_FILES})
+add_executable(Pomegranate_Engine ${SOURCE_FILES} ${POMEGRANATE_SOURCES})
+
 # Link SDL2 libraries
 target_link_libraries(Pomegranate_Engine PRIVATE
-        ${SDL_LIBRARY_DIR}/SDL2.lib
-        ${SDL_LIBRARY_DIR}/SDL2main.lib
-        ${SDL_LIBRARY_DIR}/SDL2_ttf.lib
-        ${SDL_LIBRARY_DIR}/SDL2_image.lib
+        ${SDL_LIBRARY_DIR}/SDL3.lib
+        ${SDL_LIBRARY_DIR}/SDL3_ttf.lib
+        ${SDL_LIBRARY_DIR}/SDL3_image.lib
 )
+
 
 # Set the output directory for the executable
 set_target_properties(Pomegranate_Engine PROPERTIES

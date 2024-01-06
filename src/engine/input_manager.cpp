@@ -17,24 +17,24 @@ void InputManager::update() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
-            case SDL_KEYDOWN:
+            case SDL_EVENT_KEY_DOWN:
                 InputManager::keys[event.key.keysym.scancode] = true;
                 break;
-            case SDL_KEYUP:
+            case SDL_EVENT_KEY_UP:
                 InputManager::keys[event.key.keysym.scancode] = false;
                 break;
-            case SDL_MOUSEBUTTONDOWN:
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
                 InputManager::mouse_buttons[event.button.button] = true;
                 break;
-            case SDL_MOUSEBUTTONUP:
+            case SDL_EVENT_MOUSE_BUTTON_UP:
                 InputManager::mouse_buttons[event.button.button] = false;
                 break;
-            case SDL_MOUSEMOTION:
+            case SDL_EVENT_MOUSE_MOTION:
                 InputManager::mouse_position = vec2(event.motion.x, event.motion.y);
                 InputManager::mouse_delta = vec2(event.motion.xrel, event.motion.yrel);
                 InputManager::mouse_moved = true;
                 break;
-            case SDL_MOUSEWHEEL:
+            case SDL_EVENT_MOUSE_WHEEL:
                 InputManager::mouse_scroll = vec2(event.wheel.x, event.wheel.y);
                 InputManager::mouse_scrolled = true;
                 break;
