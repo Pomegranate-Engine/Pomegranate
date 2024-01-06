@@ -20,6 +20,7 @@ target_link_libraries(Pomegranate_Engine PRIVATE
         ${SDL_LIBRARY_DIR}/SDL3.lib
         ${SDL_LIBRARY_DIR}/SDL3_ttf.lib
         ${SDL_LIBRARY_DIR}/SDL3_image.lib
+        ${SDL_LIBRARY_DIR}/SDL3_mixer.lib
 )
 
 

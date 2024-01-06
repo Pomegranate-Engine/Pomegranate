@@ -6,6 +6,7 @@ Entity::Entity()
     Entity::entities.push_back(this);
     this->id = Entity::entity_count++;
     print_log("Added entity: " + std::to_string(this->id));
+    this->components = std::map<const std::type_info*,Component*>();
 }
 
 uint64_t Entity::get_id() const {
@@ -26,8 +27,12 @@ Entity::~Entity()
 
 void Entity::add_component(Component* component)
 {
-    this->components.push_back(component);
+    // Insert the component into the components map
+
+    std::pair<const std::type_info*,Component*> pair(&typeid(*component),component);
+    this->components.insert(pair);
 }
+
 
 void Entity::remove_component(Component* component)
 {

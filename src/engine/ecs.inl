@@ -1,23 +1,16 @@
 template <typename T> inline T* Entity::get_component()
 {
-    for (auto & component : this->components)
+    if(this->has_component<T>())
     {
-        if (typeid(*(T*)component).name() == typeid(T).name())
-        {
-            return dynamic_cast<T*>(component);
-        }
+        return (T*)this->components[&typeid(T)];
     }
-    return nullptr;
+    else
+    {
+        return nullptr;
+    }
 }
 template <typename T> inline bool Entity::has_component() {
-    for (auto & component : this->components)
-    {
-        if (typeid(*(T*)component).name() == typeid(T).name())
-        {
-            return true;
-        }
-    }
-    return false;
+    return this->components.find(&typeid(T)) != this->components.end();
 }
 
 template<typename T> inline T *Entity::require_component()

@@ -15,5 +15,5 @@ set(POMEGRANATE_SOURCES
         src/engine/event_system.cpp
         src/engine/color.cpp
         src/engine/standard_ecs_rendering.cpp
-        #src/engine/standard_ecs_audio.cpp
+        src/engine/standard_ecs_audio.cpp
 )

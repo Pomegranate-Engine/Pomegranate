@@ -97,9 +97,9 @@ int main(int argc, char* argv[])
     camera->add_component(new Transform());
     Camera::make_current(camera);
     group.add_entity(camera);
-    for(int z = -1; z <= 1; z++)
+    for(int z = -0; z <= 0; z++)
     {
-        for (int i = -2; i <= 2; i++) {
+        for (int i = -0; i <= 0; i++) {
             auto* physics_body = new Entity();
             physics_body->add_component(new PhysicsObject());
             physics_body->add_component(new Transform());
@@ -161,19 +161,19 @@ int main(int argc, char* argv[])
             group.tick();
             if(InputManager::get_key(SDL_SCANCODE_LEFT))
             {
-                camera->get_component<Transform>()->pos.x -= 1.0;
+                camera->get_component<Transform>()->pos.x -= 10.0;
             }
             if(InputManager::get_key(SDL_SCANCODE_RIGHT))
             {
-                camera->get_component<Transform>()->pos.x += 1.0;
+                camera->get_component<Transform>()->pos.x += 10.0;
             }
             if(InputManager::get_key(SDL_SCANCODE_UP))
             {
-                camera->get_component<Transform>()->pos.y -= 1.0;
+                camera->get_component<Transform>()->pos.y -= 10.0;
             }
             if(InputManager::get_key(SDL_SCANCODE_DOWN))
             {
-                camera->get_component<Transform>()->pos.y += 1.0;
+                camera->get_component<Transform>()->pos.y += 10.0;
             }
         }
 

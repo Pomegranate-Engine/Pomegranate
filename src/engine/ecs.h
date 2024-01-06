@@ -1,10 +1,12 @@
 #ifndef POMEGRANATE_ENGINE_ECS_H
 #define POMEGRANATE_ENGINE_ECS_H
 #include <typeinfo>
+#include <iostream>
 #include <vector>
 #include <omp.h>
 #include<string>
 #include "engine.h"
+#include <map>
 
 
 class Entity;
@@ -35,7 +37,7 @@ class Entity
 {
 private:
     /* data */
-    std::vector<Component*> components;
+    std::map<const std::type_info*,Component*> components;
     std::vector<EntityGroup*> parents;
 public:
     uint64_t id;
