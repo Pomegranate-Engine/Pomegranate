@@ -36,11 +36,6 @@ SDL_Renderer* Window::get_sdl_renderer() const
 
 int Window::open()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        print_error("Failed to initialize the SDL2 library");
-        return -1;
-    }
     this->window = SDL_CreateWindow(this->title, this->width, this->height, 0);
 
     if (!this->window)

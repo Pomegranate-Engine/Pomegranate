@@ -7,6 +7,7 @@
 #include "engine/pomegranate.h"
 #include"engine/standard_ecs.h"
 #include"engine/standard_ecs_rendering.h"
+#include"engine/standard_ecs_audio.h"
 #include <omp.h>
 
 unsigned int FRAME;
@@ -74,23 +75,18 @@ Window main_window("Window", 1024, 720);
 
 int main(int argc, char* argv[])
 {
+    print_log("Initializing Pomegranate");
+    pomegranate_init();
+
     print_log("Opening Test Window");
-    SDL_version* compiled = (SDL_version*)malloc(sizeof(SDL_version));
-    SDL_GetVersion(compiled);
-    print_log(std::to_string(compiled->major) + "." + std::to_string(compiled->minor) + "." + std::to_string(compiled->patch));
-    InputManager::init();
-    main_window = Window("Window",1024, 720);
     main_window.open();
     main_window.make_current();
     print_log("Window opened: " + std::string(main_window.get_title()) + " with resolution of " + std::to_string(main_window.get_width()) + "x" + std::to_string(main_window.get_height()));
 
-    int imgFlags = IMG_INIT_PNG;
-    if( !( IMG_Init( imgFlags ) & imgFlags ) )
-    {
-        print_error("SDL_image could not initialize! SDL_image Error: " + std::string(IMG_GetError()));
-    }
-    TTF_Init();
+    //Load test sound
+    Sample sample = Sample("res/sound test.wav");
 
+    //Create basic physics test scene
     EntityGroup group = EntityGroup();
     auto camera = new Entity();
     camera->add_component(new Camera());
@@ -139,6 +135,8 @@ int main(int argc, char* argv[])
         Entity::entities[i]->id = i;
     }
 
+
+
     float tick_time = 0.0;
     bool is_running = true;
     SDL_Event event;
@@ -175,6 +173,10 @@ int main(int argc, char* argv[])
             {
                 camera->get_component<Transform>()->pos.y += 10.0;
             }
+            if(InputManager::get_key(SDL_SCANCODE_SPACE))
+            {
+                sample.play();
+            }
         }
 
         //- - - - - # DRAW # - - - - -
@@ -189,10 +191,9 @@ int main(int argc, char* argv[])
 
         float secondsElapsed = (float)(end - start) / (float)SDL_GetPerformanceFrequency();
         DELTA = secondsElapsed;
-        //print_info("FPS: " + std::to_string(1.0f / DELTA));
         tick_time += DELTA;
     }
 
-    SDL_Quit();
+    pomegranate_quit();
     return 0;
 }

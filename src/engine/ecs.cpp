@@ -113,12 +113,12 @@ void EntityGroup::tick()
             system->tick(this->entities[i]);
         }
     }
-#pragma omp parallel for
+//#pragma omp parallel for
     for(int i = 0; i < this->child_groups.size(); ++i)
     {
         this->child_groups[i].tick();
     }
-#pragma omp barrier
+//#pragma omp barrier
 }
 
 void EntityGroup::draw()
