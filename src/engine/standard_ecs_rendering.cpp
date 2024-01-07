@@ -174,30 +174,33 @@ void Render::tilemap(Entity* entity)
 
     SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), map->color.r,map->color.g,map->color.b, map->color.a);
     // Calculate angle step for each segment
-    int i = 0;
-    for (int y = 0; y < map->height; ++y)
+    for (int z = 0; z < map->get_layer_count(); ++z)
     {
-        for (int x = 0; x < map->width; ++x)
-        {
-            if(map->get_tile(i).x!=-1)
-            {
-                vec2i tile = map->get_tile(i);
-                SDL_FRect src = {(float)tile.x*(float)map->tileset_tile_width,(float)tile.y*(float)map->tileset_tile_height, (float)map->tileset_tile_width, (float)map->tileset_tile_height};
-                SDL_FRect dst = {(float)(x*map->tileset_tile_width),(float)(y*map->tileset_tile_height),(float)map->tileset_tile_width,(float)map->tileset_tile_height};
-                dst.x*=t->scale.x;
-                dst.y*=t->scale.y;
-                dst.w*=t->scale.x;
-                dst.h*=t->scale.y;
-                dst.x-=camera_transform->pos.x;
-                dst.y-=camera_transform->pos.y;
-                dst.x+=t->pos.x;
-                dst.y+=t->pos.y;
+        int i = 0;
+        for (int y = 0; y < map->height; ++y) {
+            for (int x = 0; x < map->width; ++x) {
+                if (map->get_tile(i, z).x != -1) {
+                    vec2i tile = map->get_tile(i,z);
+                    SDL_FRect src = {(float) tile.x * (float) map->tileset_tile_width,
+                                     (float) tile.y * (float) map->tileset_tile_height, (float) map->tileset_tile_width,
+                                     (float) map->tileset_tile_height};
+                    SDL_FRect dst = {(float) (x * map->tileset_tile_width), (float) (y * map->tileset_tile_height),
+                                     (float) map->tileset_tile_width, (float) map->tileset_tile_height};
+                    dst.x *= t->scale.x;
+                    dst.y *= t->scale.y;
+                    dst.w *= t->scale.x;
+                    dst.h *= t->scale.y;
+                    dst.x -= camera_transform->pos.x;
+                    dst.y -= camera_transform->pos.y;
+                    dst.x += t->pos.x;
+                    dst.y += t->pos.y;
 
-                SDL_RenderTexture(Window::current->get_sdl_renderer(), map->tileset_texture, &src, &dst);
+                    SDL_RenderTexture(Window::current->get_sdl_renderer(), map->tileset_texture, &src, &dst);
+                }
+                i++;
             }
             i++;
         }
-        i++;
     }
 }
 
@@ -210,10 +213,11 @@ Tilemap::Tilemap()
     this->tileset_tile_width=0;
     this->tileset_tile_height=0;
     this->color = Color(255, 255, 255, 255);
-    this->tiles = new vec2i[width*height];
+    this->tiles = std::vector<vec2i*>();
+    tiles.push_back(new vec2i[width*height]);
     for(int i = 0; i < width*height; i++)
     {
-        tiles[i] = vec2i(-1,-1);
+        tiles[0][i] = vec2i(-1,-1);
     }
     this->tileset_texture = nullptr;
 }
@@ -223,12 +227,12 @@ void Tilemap::load_texture(const char *path)
     this->tileset_texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), path);
 }
 
-void Tilemap::set_tile(vec2i pos, vec2i tile)
+void Tilemap::set_tile(vec2i pos, vec2i tile, int layer)
 {
     int p = pos.x+pos.y*(width+1);
     if(p<width*height)
     {
-        tiles[p] = tile;
+        tiles[layer][p] = tile;
     }
     else
     {
@@ -236,12 +240,12 @@ void Tilemap::set_tile(vec2i pos, vec2i tile)
     }
 }
 
-vec2i Tilemap::get_tile(vec2i pos)
+vec2i Tilemap::get_tile(vec2i pos, int layer)
 {
     int p = pos.x+pos.y*(width+1);
     if(p<width*height)
     {
-        return tiles[p];
+        return tiles[layer][p];
     }
     else
     {
@@ -260,29 +264,43 @@ void Tilemap::set_tileset_tile_size(int w, int h)
     this->tileset_vertical_tiles = 8;
 }
 
-vec2i Tilemap::get_tile(int index)
+vec2i Tilemap::get_tile(int index, int layer)
 {
-    return tiles[index];
+    return (tiles[layer])[index];
 }
 
-void Tilemap::fill_tile(vec2i a, vec2i b, vec2i tile)
+void Tilemap::fill_tile(vec2i a, vec2i b, vec2i tile, int layer)
 {
     for (int y = a.y; y <= b.y; ++y)
     {
         for (int x = a.x; x <= b.x; ++x)
         {
-            set_tile(vec2i(x,y), tile);
+            set_tile(vec2i(x,y), tile, layer);
         }
     }
 }
 
-void Tilemap::place_multitile(vec2i pos, vec2i tile_a, vec2i tile_b)
+void Tilemap::place_multitile(vec2i pos, vec2i tile_a, vec2i tile_b, int layer)
 {
     for (int y = tile_a.y; y <= tile_b.y; ++y)
     {
         for (int x = tile_a.x; x <= tile_b.x; ++x)
         {
-            set_tile(vec2i(x-tile_a.x,y-tile_a.y), vec2i(x,y));
+            set_tile(vec2i(x-tile_a.x+pos.x,y-tile_a.y+pos.y), vec2i(x,y),layer);
         }
     }
+}
+
+void Tilemap::add_layer()
+{
+    tiles.push_back(new vec2i[width*height]);
+    for(int i = 0; i < width*height; i++)
+    {
+        tiles[tiles.size()-1][i] = vec2i(-1,-1);
+    }
+}
+
+int Tilemap::get_layer_count()
+{
+    return this->tiles.size();
 }

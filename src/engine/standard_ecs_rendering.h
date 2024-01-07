@@ -70,7 +70,7 @@ public:
 class Tilemap : public Component
 {
 private:
-    vec2i* tiles;
+    std::vector<vec2i*> tiles;
 public:
     SDL_Texture* tileset_texture;
     int tileset_horizontal_tiles;
@@ -82,12 +82,14 @@ public:
     int height;
     Tilemap();
     void load_texture(const char* path);
+    void add_layer();
+    int get_layer_count();
     void set_tileset_tile_size(int width, int height);
-    void set_tile(vec2i pos, vec2i tile);
-    void fill_tile(vec2i a, vec2i b, vec2i tile);
-    void place_multitile(vec2i pos, vec2i tile_a, vec2i tile_b);
-    vec2i get_tile(vec2i pos);
-    vec2i get_tile(int index);
+    void set_tile(vec2i pos, vec2i tile, int layer=0);
+    void fill_tile(vec2i a, vec2i b, vec2i tile,int layer=0);
+    void place_multitile(vec2i pos, vec2i tile_a, vec2i tile_b,int layer=0);
+    vec2i get_tile(vec2i pos,int layer=0);
+    vec2i get_tile(int index,int layer=0);
 };
 
 
