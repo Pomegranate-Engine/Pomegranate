@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
             t->set_tile(vec2i(i,9),vec2i(16,6),1);
         }
     }
-    t->place_multitile(vec2i(6,2),vec2i(2,0),vec2i(6,7),0);
+    t->place_multitile(vec2i(rand()%10+3,2),vec2i(2,0),vec2i(6,7),0);
     print_log("Tiles done");
     tilemap->add_component(t);
     tilemap->add_component(new Transform());
@@ -231,19 +231,19 @@ int main(int argc, char* argv[])
             world.tick();
             if(InputManager::get_key(SDL_SCANCODE_LEFT))
             {
-                camera->get_component<Transform>()->pos.x -= 10.0;
+                camera->get_component<Transform>()->pos.x -= 8.0f;
             }
             if(InputManager::get_key(SDL_SCANCODE_RIGHT))
             {
-                camera->get_component<Transform>()->pos.x += 10.0;
+                camera->get_component<Transform>()->pos.x += 8.0f;
             }
             if(InputManager::get_key(SDL_SCANCODE_UP))
             {
-                camera->get_component<Transform>()->pos.y -= 10.0;
+                camera->get_component<Transform>()->pos.y -= 8.0f;
             }
             if(InputManager::get_key(SDL_SCANCODE_DOWN))
             {
-                camera->get_component<Transform>()->pos.y += 10.0;
+                camera->get_component<Transform>()->pos.y += 8.0f;
             }
             if(InputManager::get_key(SDL_SCANCODE_SPACE))
             {
