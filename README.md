@@ -3,6 +3,8 @@ A simple customizable 2D Game Engine. Currently very WIP.
 
 # About
 
+![Tilemap Demo](img/tilemap_demo.png) *Tilemap Demo*
+
 Pomegranate Engine is a 2D Game Engine written in C++ and SDL2. It is designed to be simple, easy to use, and highly customizable. 
 It is currently in a very early stage of development and is not recommended for use in production.
 
@@ -12,20 +14,34 @@ because there are no windows-specific dependencies. (Although some stuff will ha
 Currently, it is being developed as a non-graphical, headless engine, in order to make sure that all features are working correctly, and are easy to use.
 A graphical editor will be created in the future.
 
+![Tilemap Demo](img/physics_demo.png) *Physics Demo*
+
 ## Features
 - Hybrid Gameobject-ECS System
-- Builtin Multithreading
-- Standard ECS library
-- 2D Rendering
-- 2D Physics
+- Builtin Multithreading (Disabled ATM)
 - Neat Debugging Tools
+- <details>
+  <summary>Standard ECS library</summary>
+
+    - [x] Transform
+    - [x] Transform Links
+    - [x] Sprite Renderer
+    - [x] Frame Animation Sprite Renderer
+    - [x] Collision (Circle Only WIP)
+    - [x] Rigidbody
+    - [x] Tilemap (No Collision)
+    - [x] Debug Circles
+    - [x] Text
+
+</details>
+
 ## Planned Features
 - Graphical Editor
 - Optimizations
 - Scripting Languages Support ([Lua](https://github.com/lua/lua), [Teascript](https://github.com/RevengerWizard/teascript))
 - Shaders/Post Processing
-- ECS Standard Library Tilemaps
-- ECS Standard Library Audio
+- 2D Lighting
+- ECS Standard Library Audio (In Progress)
 - ECS Standard Library Navigation
 - ECS Standard Library UI
 - Documentation

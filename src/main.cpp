@@ -95,9 +95,9 @@ int main(int argc, char* argv[])
     camera->add_component(new Transform());
     Camera::make_current(camera);
     group.add_entity(camera);
-    for(int z = -0; z <= 0; z++)
+    for(int z = -1; z <= 1; z++)
     {
-        for (int i = -0; i <= 0; i++) {
+        for (int i = -1; i <= 1; i++) {
             auto* physics_body = new Entity();
             physics_body->add_component(new PhysicsObject());
             physics_body->add_component(new Transform());
@@ -145,18 +145,18 @@ int main(int argc, char* argv[])
     t->load_texture("res/tilesheet.png");
     t->set_tileset_tile_size(16,16);
     for (int i = 1; i < 15; ++i) {
-        t->set_tile(i,1,vec2i(8,0));
+        t->set_tile(vec2i(i,1),vec2i(8,0));
     }
-    t->set_tile(0,1,vec2i(8,1));
-    t->set_tile(15,1,vec2i(9,1));
+    t->set_tile(vec2i(0,1),vec2i(8,1));
+    t->set_tile(vec2i(15,1),vec2i(9,1));
 
     for(int i = 1; i < 7; ++i)
     {
-        t->set_tile(0,i+1,vec2i(10,1));
-        t->set_tile(15,i+1,vec2i(12,1));
+        t->set_tile(vec2i(0,i+1),vec2i(10,1));
+        t->set_tile(vec2i(15,i+1),vec2i(12,1));
         for (int j = 1; j < 15; ++j)
         {
-            t->set_tile(j,i+1,vec2i(11,1));
+            t->set_tile(vec2i(j,i+1),vec2i(11,1));
         }
     }
     srand(time(nullptr));
@@ -164,34 +164,36 @@ int main(int argc, char* argv[])
         int r = rand()%10;
         if(r == 0)
         {
-            t->set_tile(i,0,vec2i(11,3));
+            t->set_tile(vec2i(i,0),vec2i(11,3));
         }
         else if(r == 1)
         {
-            t->set_tile(i,0,vec2i(14,5));
+            t->set_tile(vec2i(i,0),vec2i(14,5));
         }
         else if(r == 2)
         {
-            t->set_tile(i,0,vec2i(15,5));
+            t->set_tile(vec2i(i,0),vec2i(15,5));
         }
         else if(r == 3)
         {
-            t->set_tile(i,0,vec2i(14,6));
+            t->set_tile(vec2i(i,0),vec2i(14,6));
         }
         else if(r == 4)
         {
-            t->set_tile(i,0,vec2i(15,6));
+            t->set_tile(vec2i(i,0),vec2i(15,6));
         }
         else if(r == 5)
         {
-            t->set_tile(i,0,vec2i(16,5));
+            t->set_tile(vec2i(i,0),vec2i(16,5));
         }
         else if(r == 6)
         {
-            t->set_tile(i,0,vec2i(16,6));
+            t->set_tile(vec2i(i,0),vec2i(16,6));
         }
     }
 
+    t->fill_tile(vec2i(1,1),vec2i(3,3),vec2i(8,4));
+    t->place_multitile(vec2i(0,16),vec2i(2,0),vec2i(6,7));
     tilemap->add_component(t);
     tilemap->add_component(new Transform());
     tilemap->get_component<Transform>()->scale*=3.0;

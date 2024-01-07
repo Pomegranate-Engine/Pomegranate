@@ -223,9 +223,9 @@ void Tilemap::load_texture(const char *path)
     this->tileset_texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), path);
 }
 
-void Tilemap::set_tile(int x, int y, vec2i tile)
+void Tilemap::set_tile(vec2i pos, vec2i tile)
 {
-    int p = x+y*(width+1);
+    int p = pos.x+pos.y*(width+1);
     if(p<width*height)
     {
         tiles[p] = tile;
@@ -236,9 +236,9 @@ void Tilemap::set_tile(int x, int y, vec2i tile)
     }
 }
 
-vec2i Tilemap::get_tile(int x, int y)
+vec2i Tilemap::get_tile(vec2i pos)
 {
-    int p = x+y*(width+1);
+    int p = pos.x+pos.y*(width+1);
     if(p<width*height)
     {
         return tiles[p];
@@ -263,4 +263,26 @@ void Tilemap::set_tileset_tile_size(int w, int h)
 vec2i Tilemap::get_tile(int index)
 {
     return tiles[index];
+}
+
+void Tilemap::fill_tile(vec2i a, vec2i b, vec2i tile)
+{
+    for (int y = a.y; y <= b.y; ++y)
+    {
+        for (int x = a.x; x <= b.x; ++x)
+        {
+            set_tile(vec2i(x,y), tile);
+        }
+    }
+}
+
+void Tilemap::place_multitile(vec2i pos, vec2i tile_a, vec2i tile_b)
+{
+    for (int y = tile_a.y; y <= tile_b.y; ++y)
+    {
+        for (int x = tile_a.x; x <= tile_b.x; ++x)
+        {
+            set_tile(vec2i(x-tile_a.x,y-tile_a.y), vec2i(x,y));
+        }
+    }
 }
