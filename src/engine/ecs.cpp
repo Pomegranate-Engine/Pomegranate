@@ -5,7 +5,6 @@ Entity::Entity()
 {
     Entity::entities.push_back(this);
     this->id = Entity::entity_count++;
-    print_log("Added entity: " + std::to_string(this->id));
     this->components = std::map<const std::type_info*,Component*>();
 }
 
@@ -49,6 +48,47 @@ System::~System() = default;
 void System::init(Entity*) {}
 void System::tick(Entity*) {}
 void System::draw(Entity*) {}
+
+std::vector<System*> System::global_systems = std::vector<System*>();
+
+void System::global_system_tick()
+{
+    for(auto & system : System::global_systems)
+    {
+        for(auto & entity : Entity::entities)
+        {
+            system->tick(entity);
+        }
+    }
+}
+
+void System::add_global_system(System * system)
+{
+    System::global_systems.push_back(system);
+}
+
+void System::remove_global_system(System * system)
+{
+    for (int i = 0; i < System::global_systems.size(); ++i)
+    {
+        if (System::global_systems[i] == system)
+        {
+            System::global_systems.erase(System::global_systems.begin() + i);
+            return;
+        }
+    }
+}
+
+void System::global_system_draw()
+{
+    for(auto & system : System::global_systems)
+    {
+        for(auto & entity : Entity::entities)
+        {
+            system->draw(entity);
+        }
+    }
+}
 
 EntityGroup::EntityGroup()
 {

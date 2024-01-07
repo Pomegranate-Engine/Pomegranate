@@ -26,12 +26,17 @@ class System
 {
 private:
     /* data */
+    static std::vector<System*> global_systems;
 public:
     System();
     ~System();
     virtual void init(Entity*);
     virtual void tick(Entity*);
     virtual void draw(Entity*);
+    static void add_global_system(System*);
+    static void remove_global_system(System*);
+    static void global_system_tick();
+    static void global_system_draw();
 };
 class Entity
 {

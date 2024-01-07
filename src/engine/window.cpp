@@ -44,7 +44,7 @@ int Window::open()
         return -1;
     }
 
-    this->renderer = SDL_CreateRenderer(this->window,NULL, SDL_RENDERER_ACCELERATED);
+    this->renderer = SDL_CreateRenderer(this->window,NULL, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
 
     if (!this->renderer)
     {

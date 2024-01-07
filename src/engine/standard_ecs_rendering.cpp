@@ -3,7 +3,7 @@
 Sprite::Sprite()
 {
     this->texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), "res/none.png");
-    this->color = new Color(255, 255, 255, 255);
+    this->color = Color(255, 255, 255, 255);
 }
 
 void Sprite::load_texture(const char *path) {
@@ -18,7 +18,7 @@ AnimatedSprite::AnimatedSprite()
     this->vertical_frames = 1;
     this->x_offset = 0;
     this->y_offset = 0;
-    this->color = new Color(255, 255, 255, 255);
+    this->color = Color(255, 255, 255, 255);
 }
 
 void AnimatedSprite::load_texture(const char *path)
@@ -30,7 +30,7 @@ Text::Text()
 {
     this->font = TTF_OpenFont("res/sans.ttf", 16);
     this->text = "text";
-    this->color = new Color(255, 255, 255, 255);
+    this->color = Color(255, 255, 255, 255);
 }
 
 Camera::Camera()=default;
@@ -44,7 +44,7 @@ Entity* Camera::current = nullptr;
 DebugCircle::DebugCircle()
 {
     this->radius = 16.0;
-    this->color = new Color(255, 255, 255, 255);
+    this->color = Color(255, 255, 255, 255);
 }
 
 void Render::draw(Entity* entity)
@@ -65,13 +65,17 @@ void Render::draw(Entity* entity)
     {
         Render::animated_sprite(entity);
     }
+    if(entity->has_component<Tilemap>())
+    {
+        Render::tilemap(entity);
+    }
 }
 
 void Render::text(Entity*e) {
     auto text = e->get_component<Text>();
     auto trans = e->get_component<Transform>();
 
-    SDL_Color textColor = {(Uint8)text->color->r,(Uint8)text->color->g,(Uint8)text->color->b,(Uint8)text->color->a}; // White color
+    SDL_Color textColor = {(Uint8)text->color.r,(Uint8)text->color.g,(Uint8)text->color.b,(Uint8)text->color.a}; // White color
 
     // Create an SDL surface from the text
     SDL_Surface* surface = TTF_RenderText_Blended(text->font, text->text.c_str(), textColor);
@@ -102,7 +106,7 @@ void Render::text(Entity*e) {
 void Render::sprite(Entity*e) {
     auto t = e->get_component<Transform>();
     auto s = e->get_component<Sprite>();
-    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), s->color->r,s->color->g,s->color->b, s->color->a);
+    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), s->color.r,s->color.g,s->color.b, s->color.a);
     SDL_FRect r;
     int w = 0;
     int h = 0;
@@ -120,7 +124,7 @@ void Render::sprite(Entity*e) {
 void Render::animated_sprite(Entity*e) {
     auto t = e->get_component<Transform>();
     auto s = e->get_component<AnimatedSprite>();
-    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), s->color->r,s->color->g,s->color->b, s->color->a);
+    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), s->color.r,s->color.g,s->color.b, s->color.a);
     SDL_FRect r = {};
     int w = 0;
     int h = 0;
@@ -141,7 +145,7 @@ void Render::debug_circle(Entity* entity)
     auto* t = entity->get_component<Transform>();
     auto* dc = entity->get_component<DebugCircle>();
 
-    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), dc->color->r,dc->color->g,dc->color->b, dc->color->a);
+    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), dc->color.r,dc->color.g,dc->color.b, dc->color.a);
     // Calculate angle step for each segment
     double angleStep = 2.0 * 3.14159 / 32;
 
@@ -159,4 +163,104 @@ void Render::debug_circle(Entity* entity)
         // Draw a line between the two points to create the circle outline
         SDL_RenderLine(Window::current->get_sdl_renderer(), x1, y1, x2, y2);
     }
+}
+
+void Render::tilemap(Entity* entity)
+{
+    auto* t = entity->get_component<Transform>();
+    auto* map = entity->get_component<Tilemap>();
+
+    auto* camera_transform = Camera::current->get_component<Transform>();
+
+    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), map->color.r,map->color.g,map->color.b, map->color.a);
+    // Calculate angle step for each segment
+    int i = 0;
+    for (int y = 0; y < map->height; ++y)
+    {
+        for (int x = 0; x < map->width; ++x)
+        {
+            if(map->get_tile(i).x!=-1)
+            {
+                vec2i tile = map->get_tile(i);
+                SDL_FRect src = {(float)tile.x*(float)map->tileset_tile_width,(float)tile.y*(float)map->tileset_tile_height, (float)map->tileset_tile_width, (float)map->tileset_tile_height};
+                SDL_FRect dst = {(float)(x*map->tileset_tile_width),(float)(y*map->tileset_tile_height),(float)map->tileset_tile_width,(float)map->tileset_tile_height};
+                dst.x*=t->scale.x;
+                dst.y*=t->scale.y;
+                dst.w*=t->scale.x;
+                dst.h*=t->scale.y;
+                dst.x-=camera_transform->pos.x;
+                dst.y-=camera_transform->pos.y;
+                dst.x+=t->pos.x;
+                dst.y+=t->pos.y;
+
+                SDL_RenderTexture(Window::current->get_sdl_renderer(), map->tileset_texture, &src, &dst);
+            }
+            i++;
+        }
+        i++;
+    }
+}
+
+Tilemap::Tilemap()
+{
+    this->width = 256;
+    this->height = 256;
+    this->tileset_horizontal_tiles=0;
+    this->tileset_vertical_tiles=0;
+    this->tileset_tile_width=0;
+    this->tileset_tile_height=0;
+    this->color = Color(255, 255, 255, 255);
+    this->tiles = new vec2i[width*height];
+    for(int i = 0; i < width*height; i++)
+    {
+        tiles[i] = vec2i(-1,-1);
+    }
+    this->tileset_texture = nullptr;
+}
+
+void Tilemap::load_texture(const char *path)
+{
+    this->tileset_texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), path);
+}
+
+void Tilemap::set_tile(int x, int y, vec2i tile)
+{
+    int p = x+y*(width+1);
+    if(p<width*height)
+    {
+        tiles[p] = tile;
+    }
+    else
+    {
+        print_error("Tilemap index out of bounds");
+    }
+}
+
+vec2i Tilemap::get_tile(int x, int y)
+{
+    int p = x+y*(width+1);
+    if(p<width*height)
+    {
+        return tiles[p];
+    }
+    else
+    {
+        return {-1,-1};
+    }
+}
+
+void Tilemap::set_tileset_tile_size(int w, int h)
+{
+    this->tileset_tile_width = 16;
+    this->tileset_tile_height = 16;
+    int wid = 0;
+    int hei = 0;
+    SDL_QueryTexture(this->tileset_texture, nullptr, nullptr, &wid, &hei);
+    this->tileset_horizontal_tiles = 17;
+    this->tileset_vertical_tiles = 8;
+}
+
+vec2i Tilemap::get_tile(int index)
+{
+    return tiles[index];
 }

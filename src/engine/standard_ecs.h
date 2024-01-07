@@ -16,54 +16,35 @@ public:
     Transform();
 };
 
-enum PhysicsBodyType
-{
-    PHYSICS_BODY_TYPE_KINEMATIC,
-    PHYSICS_BODY_TYPE_RIGID,
-    PHYSICS_BODY_TYPE_STATIC
-};
-enum CollisionShapeType
-{
-    COLLISION_SHAPE_TYPE_RECTANGLE,
-    COLLISION_SHAPE_TYPE_CIRCLE
-};
-
-class PhysicsObject : public Component
+class PositionLink : public Component
 {
 public:
-    vec2 linear_velocity;
-    float angular_velocity;
-    float mass;
-    float gravity_scale;
-    float drag;
-    bool continuous_collision_detection;
-    bool use_collision;
-    PhysicsBodyType body_type;
-    PhysicsObject();
+    Transform* link;
+    vec2 offset;
+    PositionLink();
 };
 
-class CollisionShape : public Component
+class RotationLink : public Component
 {
 public:
-    CollisionShapeType shape_type;
-    float radius;
-    vec2 size;
-    float restitution;
-    CollisionShape();
+    Transform* link;
+    float offset;
+    RotationLink();
 };
 
-class KinematicBody: public System
+class ScaleLink : public Component
+{
+public:
+    Transform* link;
+    vec2 offset;
+    ScaleLink();
+};
+
+class TransformLinkages : public System
 {
 public:
     void tick(Entity* entity) override;
 };
 
-class RigidBody: public System
-{
-public:
-    void tick(Entity* entity) override;
-    static bool check_collision(Entity* a, Entity* b);
-    static void resolve_collision(Entity* a, Entity* b);
-    static int substeps;
-};
+
 #endif //POMEGRANATE_ENGINE_STANDARD_ECS_H

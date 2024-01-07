@@ -36,5 +36,38 @@ struct vec2
     float angle_to(const vec2& other) const;
 };
 
+struct vec2i
+{
+    int x;
+    int y;
+
+    vec2i();
+    vec2i(int x, int y);
+    vec2i operator+(const vec2i& other) const;
+    vec2i operator-(const vec2i& other) const;
+    vec2i operator*(const vec2i& other) const;
+    vec2i operator*(const float& other) const;
+    vec2i operator/(const vec2i& other) const;
+    vec2i operator/(const float& other) const;
+    vec2i operator+=(const vec2i& other);
+    vec2i operator-=(const vec2i& other);
+    vec2i operator*=(const vec2i& other);
+    vec2i operator*=(const float& other);
+    vec2i operator/=(const vec2i& other);
+    vec2i operator/=(const float& other);
+    bool operator==(const vec2i& other) const;
+    bool operator!=(const vec2i& other) const;
+    float dot(const vec2i& other) const;
+    float cross(const vec2i& other) const;
+    float length() const;
+    vec2i normalized() const;
+    vec2i rotate(float angle) const;
+    vec2i lerp(const vec2i& other, float t) const;
+    vec2i slerp(const vec2i& other, float t) const;
+    vec2i direction_to(const vec2i& other) const;
+    float distance_to(const vec2i& other) const;
+    float angle_to(const vec2i& other) const;
+};
+
 
 #endif //POMEGRANATE_ENGINE_VEC_MATH_H

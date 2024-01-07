@@ -8,7 +8,9 @@
 #include"engine/standard_ecs.h"
 #include"engine/standard_ecs_rendering.h"
 #include"engine/standard_ecs_audio.h"
+#include"engine/standard_ecs_physics.h"
 #include <omp.h>
+#include <chrono>
 
 unsigned int FRAME;
 float DELTA = 0.0;
@@ -108,10 +110,11 @@ int main(int argc, char* argv[])
             c->restitution = 0.0;
             physics_body->add_component(c);
             physics_body->get_component<Transform>()->pos = vec2(256 + z*32, 16 + i * 32);
-            print_log(std::to_string(physics_body->get_id()));
             group.add_entity(physics_body);
         }
     }
+
+    EntityGroup world = EntityGroup();
 
     for (int i = -32; i <= 32; ++i)
     {
@@ -122,14 +125,78 @@ int main(int argc, char* argv[])
         p->body_type = PHYSICS_BODY_TYPE_STATIC;
         collision_body->add_component(p);
         collision_body->get_component<Transform>()->pos = vec2(256+8*i, 256+196-(abs(i)*abs(i))*0.2);
-        collision_body->add_component(new DebugCircle());
-        group.add_entity(collision_body);
+        auto* d = new DebugCircle();
+        d->color = Color(34,221,255,255);
+        collision_body->add_component(d);
+        world.add_entity(collision_body);
     }
 
 
-    group.add_system(new Render());
     group.add_system(new RigidBody());
     group.add_system(new Drag());
+
+    System::add_global_system(new TransformLinkages());
+    System::add_global_system(new Render());
+
+    auto* tilemap = new Entity();
+    auto* t = new Tilemap();
+    auto* s = new Sprite();
+    s->load_texture("res/tilesheet.png");
+    t->load_texture("res/tilesheet.png");
+    t->set_tileset_tile_size(16,16);
+    for (int i = 1; i < 15; ++i) {
+        t->set_tile(i,1,vec2i(8,0));
+    }
+    t->set_tile(0,1,vec2i(8,1));
+    t->set_tile(15,1,vec2i(9,1));
+
+    for(int i = 1; i < 7; ++i)
+    {
+        t->set_tile(0,i+1,vec2i(10,1));
+        t->set_tile(15,i+1,vec2i(12,1));
+        for (int j = 1; j < 15; ++j)
+        {
+            t->set_tile(j,i+1,vec2i(11,1));
+        }
+    }
+    srand(time(nullptr));
+    for (int i = 1; i < 15; ++i) {
+        int r = rand()%10;
+        if(r == 0)
+        {
+            t->set_tile(i,0,vec2i(11,3));
+        }
+        else if(r == 1)
+        {
+            t->set_tile(i,0,vec2i(14,5));
+        }
+        else if(r == 2)
+        {
+            t->set_tile(i,0,vec2i(15,5));
+        }
+        else if(r == 3)
+        {
+            t->set_tile(i,0,vec2i(14,6));
+        }
+        else if(r == 4)
+        {
+            t->set_tile(i,0,vec2i(15,6));
+        }
+        else if(r == 5)
+        {
+            t->set_tile(i,0,vec2i(16,5));
+        }
+        else if(r == 6)
+        {
+            t->set_tile(i,0,vec2i(16,6));
+        }
+    }
+
+    tilemap->add_component(t);
+    tilemap->add_component(new Transform());
+    tilemap->get_component<Transform>()->scale*=3.0;
+    tilemap->get_component<Transform>()->pos+= vec2(720,0);
+    world.add_entity(tilemap);
 
     for (int i = 0; i < Entity::entities.size(); ++i) {
         Entity::entities[i]->id = i;
@@ -156,7 +223,9 @@ int main(int argc, char* argv[])
         if (tick_time > 0.016)
         {
             tick_time = 0.0;
+            System::global_system_tick();
             group.tick();
+            world.tick();
             if(InputManager::get_key(SDL_SCANCODE_LEFT))
             {
                 camera->get_component<Transform>()->pos.x -= 10.0;
@@ -180,11 +249,13 @@ int main(int argc, char* argv[])
         }
 
         //- - - - - # DRAW # - - - - -
-        SDL_SetRenderDrawColor(main_window.get_sdl_renderer(), 128, 128, 128, SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(main_window.get_sdl_renderer(), 7, 14, 14, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(main_window.get_sdl_renderer());
         SDL_SetRenderDrawColor(main_window.get_sdl_renderer(), 255, 255, 255, 255);
 
+        System::global_system_draw();
         group.draw();
+        world.draw();
 
         SDL_RenderPresent(main_window.get_sdl_renderer());
         Uint64 end = SDL_GetPerformanceCounter();
