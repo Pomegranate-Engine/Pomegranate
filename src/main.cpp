@@ -13,9 +13,7 @@
 #include <omp.h>
 #include <chrono>
 
-unsigned int FRAME;
-float DELTA = 0.0;
-
+//Example system that allows you to draw the physics objects
 class Drag : public System
 {
     public:
@@ -74,24 +72,30 @@ class Drag : public System
     }
 };
 
+//A test function for the button
 void button_pressed(Entity* entity)
 {
     print_debug("Button pressed!");
 }
 
+//Deltatime
+float DELTA = 0.0;
+
+//Main window
 Window main_window("Window", 1024, 720);
 
 int main(int argc, char* argv[])
 {
+    //Initialization stuff
     print_log("Initializing Pomegranate");
     pomegranate_init();
 
     print_log("Opening Test Window");
     main_window.open();
-    main_window.make_current();
+    main_window.make_current(); // This makes the window the current rendering target
     print_log("Window opened: " + std::string(main_window.get_title()) + " with resolution of " + std::to_string(main_window.get_width()) + "x" + std::to_string(main_window.get_height()));
 
-    //Create basic physics test scene
+//region Physics Example
     EntityGroup group = EntityGroup();
     auto camera = new Entity();
     camera->add_component<Camera>();
@@ -141,6 +145,9 @@ int main(int argc, char* argv[])
     group.add_system(new RigidBody());
     group.add_system(new Drag());
 
+//endregion
+
+//region Tilemap Example
     auto* tilemap = new Entity();
     tilemap->add_component<Tilemap>();
     tilemap->add_component<Transform>();
@@ -208,8 +215,9 @@ int main(int argc, char* argv[])
         Entity::entities[i]->id = i;
     }
 
+//endregion
 
-    //UI
+//region UI Example
     EntityGroup UI = EntityGroup();
     auto* text = new Entity();
     text->add_component<UIText>();
@@ -283,7 +291,9 @@ int main(int argc, char* argv[])
 
     UI.add_system(new UIController());
 
+//endregion
 
+    //Add global systems
     System::add_global_system(new TransformLinkages());
     System::add_global_system(new Render());
 
@@ -294,7 +304,8 @@ int main(int argc, char* argv[])
 
     while (is_running)
     {
-        Uint64 start = SDL_GetPerformanceCounter();
+        Uint64 start = SDL_GetPerformanceCounter(); //For delta time
+
         InputManager::update();
         while (SDL_PollEvent(&event))
         {
@@ -302,15 +313,22 @@ int main(int argc, char* argv[])
                 is_running = false;
             }
         }
+
+
         PhysicsObject::gravity = Vec2(0.0, 980.0)*slider->get_component<UISlider>()->value;
+
         //- - - - - # UPDATE # - - - - -
         if (tick_time > 0.016)
         {
             tick_time = 0.0;
+
+            //tick systems
             System::global_system_tick();
             group.tick();
             world.tick();
             UI.tick();
+
+            //Move camera (Not correct way to do this)
             if(InputManager::get_key(SDL_SCANCODE_LEFT))
             {
                 camera->get_component<Transform>()->pos.x -= 8.0f;
@@ -330,23 +348,27 @@ int main(int argc, char* argv[])
         }
 
         //- - - - - # DRAW # - - - - -
-        SDL_SetRenderDrawColor(main_window.get_sdl_renderer(), 7, 14, 14, SDL_ALPHA_OPAQUE);
-        SDL_RenderClear(main_window.get_sdl_renderer());
-        SDL_SetRenderDrawColor(main_window.get_sdl_renderer(), 255, 255, 255, 255);
 
+        //Clear
+        SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), 7, 14, 14, SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(Window::current->get_sdl_renderer());
+        SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), 255, 255, 255, 255);
+
+        //Draw
         System::global_system_draw(Transform::draw_sort);
         group.draw(Transform::draw_sort);
         world.draw(Transform::draw_sort);
         UI.draw(UITransform::draw_sort);
 
-        SDL_RenderPresent(main_window.get_sdl_renderer());
-        Uint64 end = SDL_GetPerformanceCounter();
+        SDL_RenderPresent(Window::current->get_sdl_renderer()); //Present
 
+        //Calculate delta time
+        Uint64 end = SDL_GetPerformanceCounter();
         float secondsElapsed = (float)(end - start) / (float)SDL_GetPerformanceFrequency();
         DELTA = secondsElapsed;
         tick_time += DELTA;
     }
 
-    pomegranate_quit();
+    pomegranate_quit(); //Cleanup
     return 0;
 }
