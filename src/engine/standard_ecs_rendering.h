@@ -61,7 +61,7 @@ public:
 class Tilemap : public Component
 {
 private:
-    std::vector<vec2i*> tiles;
+    std::vector<Vec2i*> tiles;
 public:
     SDL_Texture* tileset_texture;
     int tileset_horizontal_tiles;
