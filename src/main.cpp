@@ -9,6 +9,7 @@
 #include"engine/standard_ecs_rendering.h"
 #include"engine/standard_ecs_audio.h"
 #include"engine/standard_ecs_physics.h"
+#include"engine/standard_ecs_ui.h"
 #include <omp.h>
 #include <chrono>
 
@@ -22,7 +23,7 @@ class Drag : public System
     bool clicked = false;
     void tick(Entity* entity) override
     {
-        vec2 mousepos = InputManager::get_mouse_position()+Camera::current->get_component<Transform>()->pos;
+        Vec2 mousepos = InputManager::get_mouse_position() + Camera::current->get_component<Transform>()->pos;
         if(currently_dragged== nullptr)
         {
             if (entity->has_component<PhysicsObject>() && entity->has_component<Transform>()) {
@@ -73,6 +74,11 @@ class Drag : public System
     }
 };
 
+void button_pressed(Entity* entity)
+{
+    print_debug("Button pressed!");
+}
+
 Window main_window("Window", 1024, 720);
 
 int main(int argc, char* argv[])
@@ -85,31 +91,30 @@ int main(int argc, char* argv[])
     main_window.make_current();
     print_log("Window opened: " + std::string(main_window.get_title()) + " with resolution of " + std::to_string(main_window.get_width()) + "x" + std::to_string(main_window.get_height()));
 
-    //Load test sound
-    Sample sample = Sample("res/sound test.wav");
-
     //Create basic physics test scene
     EntityGroup group = EntityGroup();
     auto camera = new Entity();
-    camera->add_component(new Camera());
-    camera->add_component(new Transform());
+    camera->add_component<Camera>();
+    camera->add_component<Transform>();
     Camera::make_current(camera);
     group.add_entity(camera);
     for(int z = -1; z <= 1; z++)
     {
         for (int i = -1; i <= 1; i++) {
             auto* physics_body = new Entity();
-            physics_body->add_component(new PhysicsObject());
-            physics_body->add_component(new Transform());
-            physics_body->get_component<Transform>()->scale = vec2(1.0,1.0);
-            auto* s = new Sprite();
+            physics_body->add_component<PhysicsObject>();
+            physics_body->add_component<Transform>();
+            physics_body->get_component<Transform>()->scale = Vec2(1.0, 1.0);
+            physics_body->add_component<Sprite>();
+            auto* s = physics_body->get_component<Sprite>();
             s->load_texture("res/circle_none.png");
-            physics_body->add_component(s);
-            auto* c = new CollisionShape();
+
+            physics_body->add_component<CollisionShape>();
+            auto* c = physics_body->get_component<CollisionShape>();
             c->radius = 16.0;
             c->restitution = 0.0;
-            physics_body->add_component(c);
-            physics_body->get_component<Transform>()->pos = vec2(256 + z*32, 16 + i * 32);
+
+            physics_body->get_component<Transform>()->pos = Vec2(256 + z * 32, 16 + i * 32);
             group.add_entity(physics_body);
         }
     }
@@ -119,15 +124,16 @@ int main(int argc, char* argv[])
     for (int i = -32; i <= 32; ++i)
     {
         auto* collision_body = new Entity();
-        collision_body->add_component(new CollisionShape());
-        collision_body->add_component(new Transform());
-        auto* p = new PhysicsObject();
+        collision_body->add_component<CollisionShape>();
+        collision_body->add_component<Transform>();
+        collision_body->add_component<PhysicsObject>();
+        auto* p = collision_body->get_component<PhysicsObject>();
         p->body_type = PHYSICS_BODY_TYPE_STATIC;
-        collision_body->add_component(p);
-        collision_body->get_component<Transform>()->pos = vec2(256+8*i, 256+196-(abs(i)*abs(i))*0.2);
-        auto* d = new DebugCircle();
+        collision_body->get_component<Transform>()->pos = Vec2(256 + 8 * i, 256 + 196 - (abs(i) * abs(i)) * 0.2);
+        collision_body->add_component<DebugCircle>();
+        auto* d = collision_body->get_component<DebugCircle>();
         d->color = Color(34,221,255,255);
-        collision_body->add_component(d);
+
         world.add_entity(collision_body);
     }
 
@@ -135,11 +141,10 @@ int main(int argc, char* argv[])
     group.add_system(new RigidBody());
     group.add_system(new Drag());
 
-    System::add_global_system(new TransformLinkages());
-    System::add_global_system(new Render());
-
     auto* tilemap = new Entity();
-    auto* t = new Tilemap();
+    tilemap->add_component<Tilemap>();
+    tilemap->add_component<Transform>();
+    auto* t = tilemap->get_component<Tilemap>();
     auto* s = new Sprite();
     s->load_texture("res/tilesheet.png");
     t->load_texture("res/tilesheet.png");
@@ -195,16 +200,92 @@ int main(int argc, char* argv[])
     }
     t->place_multitile(vec2i(rand()%10+3,2),vec2i(2,0),vec2i(6,7),0);
     print_log("Tiles done");
-    tilemap->add_component(t);
-    tilemap->add_component(new Transform());
     tilemap->get_component<Transform>()->scale*=3.0;
-    tilemap->get_component<Transform>()->pos+= vec2(720,0);
+    tilemap->get_component<Transform>()->pos+= Vec2(720, 0);
     world.add_entity(tilemap);
 
     for (int i = 0; i < Entity::entities.size(); ++i) {
         Entity::entities[i]->id = i;
     }
 
+
+    //UI
+    EntityGroup UI = EntityGroup();
+    auto* text = new Entity();
+    text->add_component<UIText>();
+    text->add_component<UITransform>();
+    text->add_component<UIInteraction>();
+    //Set the text to something
+    text->get_component<UIText>()->text = "Hello UI!";
+    text->get_component<UITransform>()->pos = Vec2(0.5, 0.05);
+    UI.add_entity(text);
+
+
+    auto* image = new Entity();
+    image->add_component<UIImage>();
+    image->add_component<UITransform>();
+    image->add_component<UIInteraction>();
+    image->get_component<UITransform>()->pos = Vec2(0.25, 0.1);
+    image->get_component<UITransform>()->size = Vec2(0.1, 0.1);
+    image->get_component<UIImage>()->load_texture("res/9sliced.png");
+    UI.add_entity(image);
+
+    auto* button = new Entity();
+    button->add_component<UIButton>();
+    button->add_component<UIImage>();
+    button->add_component<UIText>();
+    button->add_component<UIInteraction>();
+    button->add_component<UITransform>();
+    button->get_component<UITransform>()->pos = Vec2(0.75, 0.1);
+    button->get_component<UITransform>()->size = Vec2(0.1, 0.1);
+    button->get_component<UIText>()->text = "Click me!";
+    button->get_component<UIButton>()->callback = button_pressed;
+    button->get_component<UIImage>()->load_texture("res/9sliced.png");
+    UI.add_entity(button);
+
+    auto* text_field = new Entity();
+    text_field->add_component<UITextField>();
+    text_field->add_component<UIText>();
+    text_field->add_component<UIImage>();
+    text_field->add_component<UITransform>();
+    text_field->get_component<UITransform>()->pos = Vec2(0.5, 0.1);
+    text_field->get_component<UITransform>()->size = Vec2(0.33, 0.025);
+    text_field->get_component<UIImage>()->load_texture("res/9sliced.png");
+    UI.add_entity(text_field);
+
+    auto* slider = new Entity();
+    slider->add_component<UISlider>();
+    slider->add_component<UITransform>();
+    slider->add_component<UIInteraction>();
+    slider->add_component<UIImage>();
+    slider->get_component<UITransform>()->pos = Vec2(0.5, 0.2);
+    slider->get_component<UITransform>()->size = Vec2(0.33, 0.025);
+    slider->get_component<UIImage>()->load_texture("res/9sliced.png");
+    slider->get_component<UIInteraction>()->ignore_input = true;
+    slider->add_component<UIText>();
+    slider->get_component<UIText>()->text = "Gravity Multiplier";
+
+    UI.add_entity(slider);
+
+
+    auto* slider_handle = new Entity();
+    slider_handle->add_component<UIImage>();
+    slider_handle->add_component<UITransform>();
+    slider_handle->add_component<UIInteraction>();
+    slider_handle->get_component<UITransform>()->pos = Vec2(0.5, 0.2);
+    slider_handle->get_component<UITransform>()->size = Vec2(0.05, 0.05);
+    slider->get_component<UISlider>()->slider_handle = slider_handle;
+    slider_handle->get_component<UIImage>()->load_texture("res/9sliced.png");
+    slider_handle->get_component<UITransform>()->z_index = 1;
+
+    UI.add_entity(slider_handle);
+
+
+    UI.add_system(new UIController());
+
+
+    System::add_global_system(new TransformLinkages());
+    System::add_global_system(new Render());
 
 
     float tick_time = 0.0;
@@ -221,7 +302,7 @@ int main(int argc, char* argv[])
                 is_running = false;
             }
         }
-
+        PhysicsObject::gravity = Vec2(0.0, 980.0)*slider->get_component<UISlider>()->value;
         //- - - - - # UPDATE # - - - - -
         if (tick_time > 0.016)
         {
@@ -229,6 +310,7 @@ int main(int argc, char* argv[])
             System::global_system_tick();
             group.tick();
             world.tick();
+            UI.tick();
             if(InputManager::get_key(SDL_SCANCODE_LEFT))
             {
                 camera->get_component<Transform>()->pos.x -= 8.0f;
@@ -245,10 +327,6 @@ int main(int argc, char* argv[])
             {
                 camera->get_component<Transform>()->pos.y += 8.0f;
             }
-            if(InputManager::get_key(SDL_SCANCODE_SPACE))
-            {
-                sample.play();
-            }
         }
 
         //- - - - - # DRAW # - - - - -
@@ -256,9 +334,10 @@ int main(int argc, char* argv[])
         SDL_RenderClear(main_window.get_sdl_renderer());
         SDL_SetRenderDrawColor(main_window.get_sdl_renderer(), 255, 255, 255, 255);
 
-        System::global_system_draw();
-        group.draw();
-        world.draw();
+        System::global_system_draw(Transform::draw_sort);
+        group.draw(Transform::draw_sort);
+        world.draw(Transform::draw_sort);
+        UI.draw(UITransform::draw_sort);
 
         SDL_RenderPresent(main_window.get_sdl_renderer());
         Uint64 end = SDL_GetPerformanceCounter();

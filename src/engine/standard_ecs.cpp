@@ -2,15 +2,29 @@
 
 Transform::Transform()
 {
-    this->pos = vec2(0.0, 0.0);
-    this->scale = vec2(1.0, 1.0);
+    this->pos = Vec2(0.0, 0.0);
+    this->scale = Vec2(1.0, 1.0);
     this->rot = 0.0;
+    this->z_index = 0;
+
+}
+
+bool Transform::draw_sort(Entity* a, Entity* b)
+{
+    if(a->has_component<Transform>() && b->has_component<Transform>())
+    {
+        return a->get_component<Transform>()->z_index < b->get_component<Transform>()->z_index;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 PositionLink::PositionLink()
 {
     this->link = nullptr;
-    this->offset = vec2(0.0, 0.0);
+    this->offset = Vec2(0.0, 0.0);
 }
 
 RotationLink::RotationLink()
@@ -22,7 +36,7 @@ RotationLink::RotationLink()
 ScaleLink::ScaleLink()
 {
     this->link = nullptr;
-    this->offset = vec2(0.0, 0.0);
+    this->offset = Vec2(0.0, 0.0);
 }
 
 void TransformLinkages::tick(Entity *entity)

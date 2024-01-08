@@ -21,8 +21,23 @@ template<typename T> inline T *Entity::require_component()
     }
     else
     {
-        auto* component = new T();
-        this->add_component(component);
-        return component;
+        this->add_component<T>();
+        return this->get_component<T>();
+    }
+}
+
+template<typename T> inline void Entity::add_component()
+{
+    // Insert the component into the components map
+    if(!has_component<T>())
+    {
+        T* component = new T();
+        component->init(this);
+        std::pair<const std::type_info *, Component *> pair(&typeid(*(new T)), component);
+        this->components.insert(pair);
+    }
+    else
+    {
+        print_warn("Entity already has component of type " + std::string(typeid(T).name()) + "! Component not added.");
     }
 }

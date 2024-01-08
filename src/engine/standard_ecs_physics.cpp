@@ -2,15 +2,17 @@
 
 PhysicsObject::PhysicsObject()
 {
-    this->linear_velocity = vec2(0.0, 0.0);
+    this->linear_velocity = Vec2(0.0, 0.0);
     this->angular_velocity = 0.0;
     this->mass = 1.0;
-    this->gravity_scale = 100.0;
+    this->gravity_scale = 1.0;
     this->continuous_collision_detection = false;
     this->use_collision = true;
     this->drag = 0.0;
     this->body_type = PHYSICS_BODY_TYPE_RIGID;
 }
+
+Vec2 PhysicsObject::gravity = Vec2(0.0, 980.0);
 
 void KinematicBody::tick(Entity *entity)
 {
@@ -32,8 +34,8 @@ void RigidBody::tick(Entity *entity)
 
             auto *p = entity->get_component<PhysicsObject>();
 
-            vec2 acceleration = vec2(0.0, 0.0);
-            acceleration += vec2(0.0, 1.0) * 9.8 * p->gravity_scale;
+            Vec2 acceleration = Vec2(0.0, 0.0);
+            acceleration += PhysicsObject::gravity*p->gravity_scale;
             acceleration += p->linear_velocity * -p->drag;
             p->linear_velocity += acceleration * delta;
 
@@ -65,7 +67,7 @@ CollisionShape::CollisionShape()
     this->shape_type = COLLISION_SHAPE_TYPE_CIRCLE;
     this->radius = 16.0;
     this->restitution = 0.0;
-    this->size = vec2(32.0, 32.0);
+    this->size = Vec2(32.0, 32.0);
 }
 
 bool RigidBody::check_collision(Entity* a, Entity* b)

@@ -38,15 +38,6 @@ public:
     void load_texture(const char* path);
 };
 
-class Text : public Component
-{
-public:
-    TTF_Font* font;
-    std::string text;
-    Color color;
-    Text();
-};
-
 class Render: public System
 {
 public:

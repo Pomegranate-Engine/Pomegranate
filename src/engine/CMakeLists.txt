@@ -17,4 +17,5 @@ set(POMEGRANATE_SOURCES
         src/engine/standard_ecs_rendering.cpp
         src/engine/standard_ecs_audio.cpp
         src/engine/standard_ecs_physics.cpp
+        src/engine/standard_ecs_ui.cpp
 )

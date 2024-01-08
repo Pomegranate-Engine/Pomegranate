@@ -10,11 +10,12 @@ private:
     /* data */
     static bool* keys;
     static bool* mouse_buttons;
-    static vec2 mouse_position;
-    static vec2 mouse_delta;
+    static Vec2 mouse_position;
+    static Vec2 mouse_delta;
     static bool mouse_moved;
     static bool mouse_scrolled;
-    static vec2 mouse_scroll;
+    static Vec2 mouse_scroll;
+    static int press;
 public:
     InputManager();
     ~InputManager();
@@ -22,11 +23,12 @@ public:
     static void update();
     static bool get_key(int);
     static bool get_mouse_button(int);
-    static vec2 get_mouse_position();
-    static vec2 get_mouse_delta();
+    static Vec2 get_mouse_position();
+    static Vec2 get_mouse_delta();
     static bool get_mouse_moved();
     static bool get_mouse_scrolled();
-    static vec2 get_mouse_scroll();
+    static Vec2 get_mouse_scroll();
+    static int get_text();
 };
 
 #endif //POMEGRANATE_ENGINE_INPUT_MANAGER_H

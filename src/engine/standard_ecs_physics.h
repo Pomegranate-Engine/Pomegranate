@@ -21,7 +21,7 @@ enum CollisionShapeType
 class PhysicsObject : public Component
 {
 public:
-    vec2 linear_velocity;
+    Vec2 linear_velocity;
     float angular_velocity;
     float mass;
     float gravity_scale;
@@ -30,6 +30,7 @@ public:
     bool use_collision;
     PhysicsBodyType body_type;
     PhysicsObject();
+    static Vec2 gravity;
 };
 
 class CollisionShape : public Component
@@ -37,7 +38,7 @@ class CollisionShape : public Component
 public:
     CollisionShapeType shape_type;
     float radius;
-    vec2 size;
+    Vec2 size;
     float restitution;
     CollisionShape();
 };

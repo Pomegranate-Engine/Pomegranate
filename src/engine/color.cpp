@@ -16,14 +16,6 @@ Color::Color(int r, int g, int b, int a)
     this->a = a;
 }
 
-Color::Color(int r, int g, int b)
-{
-    this->r = r;
-    this->g = g;
-    this->b = b;
-    this->a = 255;
-}
-
 Color::Color(int hex)
 {
     this->r = (hex & 0xFF000000) >> 24;
@@ -38,14 +30,6 @@ Color::Color(float r, float g, float b, float a)
     this->g = (int)(g*255);
     this->b = (int)(b*255);
     this->a = (int)(a*255);
-}
-
-Color::Color(float r, float g, float b)
-{
-    this->r = (int)(r*255);
-    this->g = (int)(g*255);
-    this->b = (int)(b*255);
-    this->a = 255;
 }
 
 Color Color::operator+(const Color &other)

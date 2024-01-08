@@ -7,6 +7,8 @@
 #include<string>
 #include "engine.h"
 #include <map>
+#include <algorithm>
+#include <functional>
 
 
 class Entity;
@@ -20,6 +22,7 @@ private:
     /* data */
 public:
     virtual ~Component()=default;
+    virtual void init(Entity*);
 };
 
 class System
@@ -36,7 +39,7 @@ public:
     static void add_global_system(System*);
     static void remove_global_system(System*);
     static void global_system_tick();
-    static void global_system_draw();
+    static void global_system_draw(std::function<bool(Entity*, Entity*)> sortingFunction);
 };
 class Entity
 {
@@ -46,7 +49,7 @@ private:
     std::vector<EntityGroup*> parents;
 public:
     uint64_t id;
-    void add_component(Component*);
+    template <typename T> void add_component();
     void remove_component(Component*);
     void add_to_group(EntityGroup*);
     void remove_from_group(EntityGroup*);
@@ -78,7 +81,7 @@ public:
     void add_group(EntityGroup);
     void remove_group(EntityGroup);
     void tick();
-    void draw();
+    void draw(std::function<bool(Entity*, Entity*)> sortingFunction);
 };
 
 #include "ecs.inl"

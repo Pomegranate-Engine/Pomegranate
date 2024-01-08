@@ -10,17 +10,19 @@
 class Transform : public Component
 {
 public:
-    vec2 pos;
-    vec2 scale;
+    Vec2 pos;
+    Vec2 scale;
     float rot;
+    int z_index;
     Transform();
+    static bool draw_sort(Entity* a, Entity* b);
 };
 
 class PositionLink : public Component
 {
 public:
     Transform* link;
-    vec2 offset;
+    Vec2 offset;
     PositionLink();
 };
 
@@ -36,7 +38,7 @@ class ScaleLink : public Component
 {
 public:
     Transform* link;
-    vec2 offset;
+    Vec2 offset;
     ScaleLink();
 };
 

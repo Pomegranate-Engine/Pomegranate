@@ -1,5 +1,7 @@
 #include "ecs.h"
 
+#include <utility>
+
 
 Entity::Entity()
 {
@@ -21,15 +23,6 @@ Entity::~Entity()
             Entity::entities.erase(Entity::entities.begin() + i);
         }
     }
-}
-
-
-void Entity::add_component(Component* component)
-{
-    // Insert the component into the components map
-
-    std::pair<const std::type_info*,Component*> pair(&typeid(*component),component);
-    this->components.insert(pair);
 }
 
 
@@ -79,11 +72,14 @@ void System::remove_global_system(System * system)
     }
 }
 
-void System::global_system_draw()
+void System::global_system_draw(std::function<bool(Entity*, Entity*)> sortingFunction)
 {
-    for(auto & system : System::global_systems)
+    // Sort entities using the provided sorting function
+    std::sort(Entity::entities.begin(), Entity::entities.end(), std::move(sortingFunction));
+
+    for (auto& system : System::global_systems)
     {
-        for(auto & entity : Entity::entities)
+        for (auto& entity : Entity::entities)
         {
             system->draw(entity);
         }
@@ -161,8 +157,11 @@ void EntityGroup::tick()
 //#pragma omp barrier
 }
 
-void EntityGroup::draw()
+void EntityGroup::draw(std::function<bool(Entity*, Entity*)> sortingFunction)
 {
+    // Sort entities using the provided sorting function
+    std::sort(this->entities.begin(), this->entities.end(), sortingFunction);
+
     for(auto & entity : this->entities)
     {
         for(auto & system : this->systems)
@@ -172,7 +171,7 @@ void EntityGroup::draw()
     }
     for(auto & group : this->child_groups)
     {
-        group.draw();
+        group.draw(sortingFunction);
     }
 }
 
@@ -198,4 +197,8 @@ void Entity::remove_from_group(EntityGroup * group)
 std::vector<EntityGroup*> Entity::get_parent_groups()
 {
     return this->parents;
+}
+
+void Component::init(Entity *) {
+
 }

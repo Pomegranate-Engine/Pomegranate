@@ -6,11 +6,9 @@ class Color
 public:
     int r,g,b,a;
     Color();
-    Color(int r, int g, int b, int a);
-    Color(int r, int g, int b);
+    Color(int r, int g, int b, int a=255);
     explicit Color(int hex);
-    Color(float r, float g, float b, float a);
-    Color(float r, float g, float b);
+    Color(float r, float g, float b, float a=1);
     Color operator+(const Color& other);
     Color operator-(const Color& other);
     Color operator*(float other);
