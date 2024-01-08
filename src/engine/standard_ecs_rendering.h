@@ -76,11 +76,11 @@ public:
     void add_layer();
     int get_layer_count();
     void set_tileset_tile_size(int width, int height);
-    void set_tile(vec2i pos, vec2i tile, int layer=0);
-    void fill_tile(vec2i a, vec2i b, vec2i tile,int layer=0);
-    void place_multitile(vec2i pos, vec2i tile_a, vec2i tile_b,int layer=0);
-    vec2i get_tile(vec2i pos,int layer=0);
-    vec2i get_tile(int index,int layer=0);
+    void set_tile(Vec2i pos, Vec2i tile, int layer=0);
+    void fill_tile(Vec2i a, Vec2i b, Vec2i tile, int layer=0);
+    void place_multitile(Vec2i pos, Vec2i tile_a, Vec2i tile_b, int layer=0);
+    Vec2i get_tile(Vec2i pos, int layer=0);
+    Vec2i get_tile(int index, int layer=0);
 };
 
 

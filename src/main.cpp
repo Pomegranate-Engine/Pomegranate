@@ -152,18 +152,18 @@ int main(int argc, char* argv[])
     t->add_layer();
     print_log("Added layer");
     for (int i = 1; i < 15; ++i) {
-        t->set_tile(vec2i(i,10),vec2i(8,0),1);
+        t->set_tile(Vec2i(i, 10), Vec2i(8, 0), 1);
     }
-    t->set_tile(vec2i(0,10),vec2i(8,1),1);
-    t->set_tile(vec2i(15,10),vec2i(9,1),1);
+    t->set_tile(Vec2i(0, 10), Vec2i(8, 1), 1);
+    t->set_tile(Vec2i(15, 10), Vec2i(9, 1), 1);
 
     for(int i = 1; i < 7; ++i)
     {
-        t->set_tile(vec2i(0,i+10),vec2i(10,1),1);
-        t->set_tile(vec2i(15,i+10),vec2i(12,1),1);
+        t->set_tile(Vec2i(0, i + 10), Vec2i(10, 1), 1);
+        t->set_tile(Vec2i(15, i + 10), Vec2i(12, 1), 1);
         for (int j = 1; j < 15; ++j)
         {
-            t->set_tile(vec2i(j,i+10),vec2i(11,1),1);
+            t->set_tile(Vec2i(j, i + 10), Vec2i(11, 1), 1);
         }
     }
     srand(time(nullptr));
@@ -171,34 +171,34 @@ int main(int argc, char* argv[])
         int r = rand()%10;
         if(r == 0)
         {
-            t->set_tile(vec2i(i,9),vec2i(11,3),1);
+            t->set_tile(Vec2i(i, 9), Vec2i(11, 3), 1);
         }
         else if(r == 1)
         {
-            t->set_tile(vec2i(i,9),vec2i(14,5),1);
+            t->set_tile(Vec2i(i, 9), Vec2i(14, 5), 1);
         }
         else if(r == 2)
         {
-            t->set_tile(vec2i(i,9),vec2i(15,5),1);
+            t->set_tile(Vec2i(i, 9), Vec2i(15, 5), 1);
         }
         else if(r == 3)
         {
-            t->set_tile(vec2i(i,9),vec2i(14,6),1);
+            t->set_tile(Vec2i(i, 9), Vec2i(14, 6), 1);
         }
         else if(r == 4)
         {
-            t->set_tile(vec2i(i,9),vec2i(15,6),1);
+            t->set_tile(Vec2i(i, 9), Vec2i(15, 6), 1);
         }
         else if(r == 5)
         {
-            t->set_tile(vec2i(i,9),vec2i(16,5),1);
+            t->set_tile(Vec2i(i, 9), Vec2i(16, 5), 1);
         }
         else if(r == 6)
         {
-            t->set_tile(vec2i(i,9),vec2i(16,6),1);
+            t->set_tile(Vec2i(i, 9), Vec2i(16, 6), 1);
         }
     }
-    t->place_multitile(vec2i(rand()%10+3,2),vec2i(2,0),vec2i(6,7),0);
+    t->place_multitile(Vec2i(rand() % 10 + 3, 2), Vec2i(2, 0), Vec2i(6, 7), 0);
     print_log("Tiles done");
     tilemap->get_component<Transform>()->scale*=3.0;
     tilemap->get_component<Transform>()->pos+= Vec2(720, 0);

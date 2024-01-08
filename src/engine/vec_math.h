@@ -36,37 +36,37 @@ struct Vec2
     float angle_to(const Vec2& other) const;
 };
 
-struct vec2i
+struct Vec2i
 {
     int x;
     int y;
 
-    vec2i();
-    vec2i(int x, int y);
-    vec2i operator+(const vec2i& other) const;
-    vec2i operator-(const vec2i& other) const;
-    vec2i operator*(const vec2i& other) const;
-    vec2i operator*(const float& other) const;
-    vec2i operator/(const vec2i& other) const;
-    vec2i operator/(const float& other) const;
-    vec2i operator+=(const vec2i& other);
-    vec2i operator-=(const vec2i& other);
-    vec2i operator*=(const vec2i& other);
-    vec2i operator*=(const float& other);
-    vec2i operator/=(const vec2i& other);
-    vec2i operator/=(const float& other);
-    bool operator==(const vec2i& other) const;
-    bool operator!=(const vec2i& other) const;
-    float dot(const vec2i& other) const;
-    float cross(const vec2i& other) const;
+    Vec2i();
+    Vec2i(int x, int y);
+    Vec2i operator+(const Vec2i& other) const;
+    Vec2i operator-(const Vec2i& other) const;
+    Vec2i operator*(const Vec2i& other) const;
+    Vec2i operator*(const float& other) const;
+    Vec2i operator/(const Vec2i& other) const;
+    Vec2i operator/(const float& other) const;
+    Vec2i operator+=(const Vec2i& other);
+    Vec2i operator-=(const Vec2i& other);
+    Vec2i operator*=(const Vec2i& other);
+    Vec2i operator*=(const float& other);
+    Vec2i operator/=(const Vec2i& other);
+    Vec2i operator/=(const float& other);
+    bool operator==(const Vec2i& other) const;
+    bool operator!=(const Vec2i& other) const;
+    float dot(const Vec2i& other) const;
+    float cross(const Vec2i& other) const;
     float length() const;
-    vec2i normalized() const;
-    vec2i rotate(float angle) const;
-    vec2i lerp(const vec2i& other, float t) const;
-    vec2i slerp(const vec2i& other, float t) const;
-    vec2i direction_to(const vec2i& other) const;
-    float distance_to(const vec2i& other) const;
-    float angle_to(const vec2i& other) const;
+    Vec2i normalized() const;
+    Vec2i rotate(float angle) const;
+    Vec2i lerp(const Vec2i& other, float t) const;
+    Vec2i slerp(const Vec2i& other, float t) const;
+    Vec2i direction_to(const Vec2i& other) const;
+    float distance_to(const Vec2i& other) const;
+    float angle_to(const Vec2i& other) const;
 };
 
 
