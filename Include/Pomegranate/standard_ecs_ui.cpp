@@ -30,7 +30,8 @@ Vec2 UITransform::get_pos(int width, int height) const
     }
 }
 
-Vec2 UITransform::get_screen_size(int width, int height) const {
+Vec2 UITransform::get_screen_size(int width, int height) const
+{
     float aspect_ratio = (float)width / (float)height;
 
     float adjusted_size_x = this->size.x * (float)width;
@@ -38,9 +39,12 @@ Vec2 UITransform::get_screen_size(int width, int height) const {
 
     float element_aspect_ratio = this->size.x / this->size.y;
 
-    if (element_aspect_ratio > aspect_ratio) {
+    if (element_aspect_ratio > aspect_ratio)
+    {
         adjusted_size_x = adjusted_size_y * element_aspect_ratio;
-    } else {
+    }
+    else
+    {
         adjusted_size_y = adjusted_size_x / element_aspect_ratio;
     }
 
@@ -49,7 +53,8 @@ Vec2 UITransform::get_screen_size(int width, int height) const {
 
 
 
-Vec2 UITransform::get_size(int width, int height) const {
+Vec2 UITransform::get_size(int width, int height) const
+{
     if(screen_space)
     {
         return get_screen_size(width, height);
@@ -60,7 +65,8 @@ Vec2 UITransform::get_size(int width, int height) const {
     }
 }
 
-bool UITransform::draw_sort(Entity *a, Entity *b) {
+bool UITransform::draw_sort(Entity *a, Entity *b)
+{
     if(a->has_component<UITransform>() && b->has_component<UITransform>())
     {
         return a->get_component<UITransform>()->z_index < b->get_component<UITransform>()->z_index;
@@ -129,14 +135,16 @@ void UIController::text(Entity*e)
 
     // Create an SDL surface from the text
     SDL_Surface* surface = TTF_RenderText_Blended(text->font, text->text.c_str(), textColor);
-    if (!surface) {
+    if (!surface)
+    {
         // Handle error
         return;
     }
 
     // Create an SDL texture from the surface
     SDL_Texture* tex = SDL_CreateTextureFromSurface(Window::current->get_sdl_renderer(), surface);
-    if (!tex) {
+    if (!tex)
+    {
         // Handle error
         SDL_DestroySurface(surface);
         return;
@@ -179,8 +187,6 @@ void UIController::image(Entity *entity)
 {
     auto image = entity->get_component<UIImage>();
     auto trans = entity->get_component<UITransform>();
-
-    SDL_Color textColor = {(Uint8)image->color.r,(Uint8)image->color.g,(Uint8)image->color.b,(Uint8)image->color.a}; // White color
 
     // Set the position and dimensions of the text
 
@@ -253,7 +259,7 @@ void UIController::interaction(Entity *entity)
     auto* i = entity->get_component<UIInteraction>();
     Vec2 position = t->get_pos((int)Window::current->get_width(), (int)Window::current->get_height());
     Vec2 size = t->get_size((int)Window::current->get_width(), (int)Window::current->get_height());
-    Vec2 mousepos = InputManager::get_mouse_position();
+    Vec2 mouse_pos = InputManager::get_mouse_position();
 
     SDL_FRect buttonRect = {position.x, position.y, size.x, size.y};
 
@@ -276,7 +282,7 @@ void UIController::interaction(Entity *entity)
     }
 
     //Check if mouse is inside button
-    if(SDL_PointInRectFloat(new SDL_FPoint{mousepos.x,mousepos.y}, &buttonRect))
+    if(SDL_PointInRectFloat(new SDL_FPoint{mouse_pos.x, mouse_pos.y}, &buttonRect))
     {
         i->mouse_over = true;
         if(!i->ignore_input)
@@ -284,13 +290,16 @@ void UIController::interaction(Entity *entity)
             if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
             {
                 i->mouse_down = true;
-                if (!UIController::mouse_down) {
+                if (!UIController::mouse_down)
+                {
                     if (i->click_callback)
                         i->click_callback(entity);
                     focused = entity;
                 }
                 UIController::mouse_down = true;
-            } else {
+            }
+            else
+            {
                 i->mouse_down = false;
                 UIController::mouse_down = false;
             }
@@ -321,10 +330,10 @@ void UIController::text_field(Entity *entity)
 {
     if(focused == entity)
     {
-        auto *i = entity->get_component<UIInteraction>();
         auto *t = entity->get_component<UITextField>();
         auto *text = entity->get_component<UIText>();
-        if (InputManager::get_text() != -1) {
+        if (InputManager::get_text() != -1)
+        {
             if (InputManager::get_text() == 8)
             {
                 if (t->edit_position > 0)
@@ -350,7 +359,7 @@ void UIController::text_field(Entity *entity)
                 t->edit_position++;
                 if(t->edit_position > text->text.length())
                 {
-                    t->edit_position = text->text.length();
+                    t->edit_position = (int)text->text.length();
                 }
             }
             else if ((t->max_length == 0 || text->text.length() < t->max_length) && InputManager::get_text() > 0)
@@ -372,7 +381,7 @@ void UIController::on_text_field_click(Entity *entity)
     print_debug("click");
     auto *t = entity->get_component<UITextField>();
     auto *text = entity->get_component<UIText>();
-    t->edit_position = text->text.length();
+    t->edit_position = (int)text->text.length();
 }
 
 void UIController::on_check_box_click(Entity *entity)
@@ -396,7 +405,6 @@ void UIController::slider(Entity *entity)
     auto *s = entity->get_component<UISlider>();
     auto *t = entity->get_component<UITransform>();
     auto *h = s->slider_handle->get_component<UITransform>();
-    auto *i = s->slider_handle->get_component<UIInteraction>();
 
     Vec2 position = t->get_pos((int)Window::current->get_width(), (int)Window::current->get_height());
     Vec2 size = t->get_size((int)Window::current->get_width(), (int)Window::current->get_height());
@@ -542,4 +550,5 @@ UIInteraction::UIInteraction()
     this->mouse_over = false;
     this->mouse_down = false;
     this->click_callback = nullptr;
+    this->ignore_input = false;
 }

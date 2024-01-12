@@ -1,16 +1,12 @@
 #include <iostream>
-#include<cstdint>
-#include<vector>
 #include <SDL.h>
 #include <SDL_image.h>
-#include <SDL_ttf.h>
-#include "engine/pomegranate.h"
-#include"engine/standard_ecs.h"
-#include"engine/standard_ecs_rendering.h"
-#include"engine/standard_ecs_audio.h"
-#include"engine/standard_ecs_physics.h"
-#include"engine/standard_ecs_ui.h"
-#include <omp.h>
+#include <pomegranate.h>
+#include<standard_ecs.h>
+#include<standard_ecs_rendering.h>
+#include<standard_ecs_audio.h>
+#include<standard_ecs_physics.h>
+#include<standard_ecs_ui.h>
 #include <chrono>
 
 //Example system that allows you to draw the physics objects
@@ -21,74 +17,83 @@ class Drag : public System
     bool clicked = false;
     void tick(Entity* entity) override
     {
-        Vec2 mousepos = InputManager::get_mouse_position() + Camera::current->get_component<Transform>()->pos;
-        if(currently_dragged== nullptr)
+        if(entity!=nullptr)
         {
-            if (entity->has_component<PhysicsObject>() && entity->has_component<Transform>()) {
-                auto *p = entity->get_component<PhysicsObject>();
-                auto *t = entity->get_component<Transform>();
-                auto *c = entity->get_component<CollisionShape>();
-                if (p->body_type == PHYSICS_BODY_TYPE_RIGID) {
-                    if (mousepos.distance_to(t->pos) < c->radius*t->scale.x) {
-                        if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
+            Vec2 mousepos = InputManager::get_mouse_position() + Camera::current->get_component<Transform>()->pos;
+            if (currently_dragged == nullptr)
+            {
+                if (entity->has_component<PhysicsObject>() && entity->has_component<Transform>())
+                {
+                    auto *p = entity->get_component<PhysicsObject>();
+                    auto *t = entity->get_component<Transform>();
+                    auto *c = entity->get_component<CollisionShape>();
+                    if (p->body_type == PHYSICS_BODY_TYPE_RIGID)
+                    {
+                        if (mousepos.distance_to(t->pos) < c->radius * t->scale.x)
                         {
-                            currently_dragged = entity;
-                            currently_dragged->get_component<PhysicsObject>()->drag*=5.0;
+                            if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
+                            {
+                                currently_dragged = entity;
+                                currently_dragged->get_component<PhysicsObject>()->drag *= 5.0;
+                            }
                         }
                     }
                 }
             }
-        }
-        if(currently_dragged!= nullptr)
-        {
-            auto* p = currently_dragged->get_component<PhysicsObject>();
-            auto* t = currently_dragged->get_component<Transform>();
-            p->linear_velocity = t->pos.direction_to(mousepos) * t->pos.distance_to(mousepos) * 10.0;
-            p->angular_velocity = 0.0;
-        }
-        if (!InputManager::get_mouse_button(SDL_BUTTON_LEFT)) {
-            if(currently_dragged!= nullptr)
+            if (currently_dragged != nullptr)
             {
-                currently_dragged->get_component<PhysicsObject>()->drag/=5.0;
+                auto *p = currently_dragged->get_component<PhysicsObject>();
+                auto *t = currently_dragged->get_component<Transform>();
+                p->linear_velocity = t->pos.direction_to(mousepos) * t->pos.distance_to(mousepos) * 10.0;
+                p->angular_velocity = 0.0;
             }
-            currently_dragged = nullptr;
-
-        }
-        if (InputManager::get_mouse_button(SDL_BUTTON_RIGHT)) {
-            if(!clicked)
+            if (!InputManager::get_mouse_button(SDL_BUTTON_LEFT))
             {
-                if (entity->has_component<PhysicsObject>() && entity->has_component<Transform>()) {
-                    auto *p = entity->get_component<PhysicsObject>();
-                    auto* t = entity->get_component<Transform>();
-                    p->linear_velocity = t->pos.direction_to(mousepos) * 10000.0;
+                if (currently_dragged != nullptr)
+                {
+                    currently_dragged->get_component<PhysicsObject>()->drag /= 5.0;
                 }
+                currently_dragged = nullptr;
+
             }
-            clicked = true;
-        }
-        else
-        {
-            clicked = false;
+            if (InputManager::get_mouse_button(SDL_BUTTON_RIGHT))
+            {
+                if (!clicked)
+                {
+                    if (entity->has_component<PhysicsObject>() && entity->has_component<Transform>())
+                    {
+                        auto *p = entity->get_component<PhysicsObject>();
+                        auto *t = entity->get_component<Transform>();
+                        p->linear_velocity = t->pos.direction_to(mousepos) * 10000.0;
+                    }
+                }
+                clicked = true;
+            } else
+            {
+                clicked = false;
+            }
         }
     }
 };
 
 //A test function for the button
-void button_pressed(Entity* entity)
+static void button_pressed(Entity* entity)
 {
     print_debug("Button pressed!");
 }
 
 //Deltatime
-float DELTA = 0.0;
+float delta = 0.0;
 
 //Main window
-Window main_window("Window", 1024, 720);
+Window main_window = Window("Window", 1024, 720);
 
 int main(int argc, char* argv[])
 {
     //Initialization stuff
     print_log("Initializing Pomegranate");
     pomegranate_init();
+    srand((unsigned int)time(nullptr));
 
     print_log("Opening Test Window");
     main_window.open();
@@ -108,17 +113,17 @@ int main(int argc, char* argv[])
             auto* physics_body = new Entity();
             physics_body->add_component<PhysicsObject>();
             physics_body->add_component<Transform>();
-            physics_body->get_component<Transform>()->scale = Vec2(1.0, 1.0);
+            physics_body->get_component<Transform>()->scale = Vec2(0.25f, 0.25f);
             physics_body->add_component<Sprite>();
             auto* s = physics_body->get_component<Sprite>();
-            s->load_texture("res/circle_none.png");
+            s->load_texture("res/pomegranate.png");
 
             physics_body->add_component<CollisionShape>();
             auto* c = physics_body->get_component<CollisionShape>();
-            c->radius = 16.0;
+            c->radius = 128.0;
             c->restitution = 0.0;
 
-            physics_body->get_component<Transform>()->pos = Vec2(256 + z * 32, 16 + i * 32);
+            physics_body->get_component<Transform>()->pos = Vec2(256.0f + (float)z * 32.0f, 16.0f + (float)i * 32.0f);
             group.add_entity(physics_body);
         }
     }
@@ -127,16 +132,17 @@ int main(int argc, char* argv[])
 
     for (int i = -32; i <= 32; ++i)
     {
-        auto* collision_body = new Entity();
+        auto *collision_body = new Entity();
         collision_body->add_component<CollisionShape>();
         collision_body->add_component<Transform>();
         collision_body->add_component<PhysicsObject>();
-        auto* p = collision_body->get_component<PhysicsObject>();
+        auto *p = collision_body->get_component<PhysicsObject>();
         p->body_type = PHYSICS_BODY_TYPE_STATIC;
-        collision_body->get_component<Transform>()->pos = Vec2(256 + 8 * i, 256 + 196 - (abs(i) * abs(i)) * 0.2);
+        collision_body->get_component<Transform>()->pos = Vec2(256.0f + 8.0f * (float) i,
+                                                               256.0f + 196.0f - (float) (abs(i) * abs(i)) * 0.2f);
         collision_body->add_component<DebugCircle>();
-        auto* d = collision_body->get_component<DebugCircle>();
-        d->color = Color(34,221,255,255);
+        auto *d = collision_body->get_component<DebugCircle>();
+        d->color = Color(34, 221, 255, 255);
 
         world.add_entity(collision_body);
     }
@@ -158,7 +164,8 @@ int main(int argc, char* argv[])
     t->set_tileset_tile_size(16,16);
     t->add_layer();
     print_log("Added layer");
-    for (int i = 1; i < 15; ++i) {
+    for (int i = 1; i < 15; ++i)
+    {
         t->set_tile(Vec2i(i, 10), Vec2i(8, 0), 1);
     }
     t->set_tile(Vec2i(0, 10), Vec2i(8, 1), 1);
@@ -168,12 +175,10 @@ int main(int argc, char* argv[])
     {
         t->set_tile(Vec2i(0, i + 10), Vec2i(10, 1), 1);
         t->set_tile(Vec2i(15, i + 10), Vec2i(12, 1), 1);
-        for (int j = 1; j < 15; ++j)
-        {
+        for (int j = 1; j < 15; ++j) {
             t->set_tile(Vec2i(j, i + 10), Vec2i(11, 1), 1);
         }
     }
-    srand(time(nullptr));
     for (int i = 1; i < 15; ++i) {
         int r = rand()%10;
         if(r == 0)
@@ -365,8 +370,8 @@ int main(int argc, char* argv[])
         //Calculate delta time
         Uint64 end = SDL_GetPerformanceCounter();
         float secondsElapsed = (float)(end - start) / (float)SDL_GetPerformanceFrequency();
-        DELTA = secondsElapsed;
-        tick_time += DELTA;
+        delta = secondsElapsed;
+        tick_time += delta;
     }
 
     pomegranate_quit(); //Cleanup

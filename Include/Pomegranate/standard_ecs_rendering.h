@@ -43,7 +43,6 @@ class Render: public System
 public:
     void draw(Entity* entity) override;
     static void sprite(Entity*);
-    static void text(Entity*);
     static void debug_circle(Entity*);
     static void animated_sprite(Entity *e);
 
@@ -57,6 +56,8 @@ public:
     static void make_current(Entity*entity);
     static Entity* current;
 };
+
+Entity* Camera::current = nullptr;
 
 class Tilemap : public Component
 {

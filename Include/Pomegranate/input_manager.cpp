@@ -1,12 +1,10 @@
 #include "input_manager.h"
 
-InputManager::InputManager() {
+InputManager::InputManager()
+= default;
 
-}
-
-InputManager::~InputManager() {
-
-}
+InputManager::~InputManager()
+= default;
 
 void InputManager::update() {
     InputManager::mouse_delta = Vec2();
@@ -17,8 +15,10 @@ void InputManager::update() {
     InputManager::press = -1;
 
     SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
             case SDL_EVENT_KEY_DOWN:
                 InputManager::keys[event.key.keysym.scancode] = true;
                 //Set press to char form of key pressed
@@ -32,7 +32,7 @@ void InputManager::update() {
                     press = 1;
                 break;
             case SDL_EVENT_TEXT_INPUT:
-                InputManager::press = event.text.text[0];
+                InputManager::press = (unsigned char)event.text.text[0];
                 break;
             case SDL_EVENT_KEY_UP:
                 InputManager::keys[event.key.keysym.scancode] = false;
@@ -58,31 +58,38 @@ void InputManager::update() {
     }
 }
 
-bool InputManager::get_key(int key_code) {
+bool InputManager::get_key(int key_code)
+{
     return InputManager::keys[key_code];
 }
 
-bool InputManager::get_mouse_button(int mouse_code) {
+bool InputManager::get_mouse_button(int mouse_code)
+{
     return InputManager::mouse_buttons[mouse_code];
 }
 
-Vec2 InputManager::get_mouse_position() {
+Vec2 InputManager::get_mouse_position()
+{
     return InputManager::mouse_position;
 }
 
-Vec2 InputManager::get_mouse_delta() {
+Vec2 InputManager::get_mouse_delta()
+{
     return InputManager::mouse_delta;
 }
 
-bool InputManager::get_mouse_moved() {
+bool InputManager::get_mouse_moved()
+{
     return InputManager::mouse_moved;
 }
 
-bool InputManager::get_mouse_scrolled() {
+bool InputManager::get_mouse_scrolled()
+{
     return InputManager::mouse_scrolled;
 }
 
-Vec2 InputManager::get_mouse_scroll() {
+Vec2 InputManager::get_mouse_scroll()
+{
     return InputManager::mouse_scroll;
 }
 
@@ -95,10 +102,12 @@ void InputManager::init()
 {
     InputManager::keys = new bool[SDL_NUM_SCANCODES];
     InputManager::mouse_buttons = new bool[8];
-    for (int i = 0; i < SDL_NUM_SCANCODES; ++i) {
+    for (int i = 0; i < SDL_NUM_SCANCODES; ++i)
+    {
         InputManager::keys[i] = false;
     }
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 8; ++i)
+    {
         InputManager::mouse_buttons[i] = false;
     }
     InputManager::mouse_position = Vec2();

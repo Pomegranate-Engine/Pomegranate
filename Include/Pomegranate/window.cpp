@@ -1,5 +1,7 @@
 #include "window.h"
 
+const Window* Window::current = nullptr;
+
 Window::Window(const char* title, int width, int height)
 {
     this->title = title;
@@ -15,12 +17,12 @@ Window::~Window()
     this->close();
 }
 
-unsigned int Window::get_width() const
+int Window::get_width() const
 {
     return this->width;
 }
 
-unsigned int Window::get_height() const
+int Window::get_height() const
 {
     return this->height;
 }
@@ -44,7 +46,7 @@ int Window::open()
         return -1;
     }
 
-    this->renderer = SDL_CreateRenderer(this->window,NULL, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+    this->renderer = SDL_CreateRenderer(this->window, nullptr, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
 
     if (!this->renderer)
     {
@@ -70,4 +72,3 @@ void Window::make_current()
 {
     Window::current = this;
 }
-Window* Window::current = nullptr;

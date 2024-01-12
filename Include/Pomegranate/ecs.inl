@@ -33,7 +33,7 @@ template<typename T> inline void Entity::add_component()
     {
         T* component = new T();
         component->init(this);
-        std::pair<const std::type_info *, Component *> pair(&typeid(*(new T)), component);
+        std::pair<const std::type_info *, Component *> pair(&typeid(T), component);
         this->components.insert(pair);
     }
     else

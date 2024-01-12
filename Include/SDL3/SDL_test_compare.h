@@ -48,7 +48,7 @@ extern "C" {
  * Retrieves a single pixel from a surface.
  *
  * This function prioritizes correctness over speed: it is suitable for
- * unit tests, but is not intended for use in a game engine.
+ * unit tests, but is not intended for use in a game Pomegranate.
  *
  * Like SDL_GetRGBA, this uses the entire 0..255 range when converting
  * color components from pixel formats with less than 8 bits per RGB

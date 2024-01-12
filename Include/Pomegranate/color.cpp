@@ -18,10 +18,10 @@ Color::Color(int r, int g, int b, int a)
 
 Color::Color(int hex)
 {
-    this->r = (hex & 0xFF000000) >> 24;
-    this->g = (hex & 0x00FF0000) >> 16;
-    this->b = (hex & 0x0000FF00) >> 8;
-    this->a = (hex & 0x000000FF);
+    this->r = (int)(hex & 0xFF000000) >> 24;
+    this->g = (int)(hex & 0x00FF0000) >> 16;
+    this->b = (int)(hex & 0x0000FF00) >> 8;
+    this->a = (int)(hex & 0x000000FF);
 }
 
 Color::Color(float r, float g, float b, float a)
@@ -32,22 +32,22 @@ Color::Color(float r, float g, float b, float a)
     this->a = (int)(a*255);
 }
 
-Color Color::operator+(const Color &other)
+Color Color::operator+(const Color &other) const
 {
     return {this->r+other.r, this->g+other.g, this->b+other.b, this->a+other.a};
 }
 
-Color Color::operator-(const Color &other)
+Color Color::operator-(const Color &other) const
 {
     return {this->r-other.r, this->g-other.g, this->b-other.b, this->a-other.a};
 }
 
-Color Color::operator*(float other)
+Color Color::operator*(float other) const
 {
     return {((float)this->r/255.0f)*other, ((float)this->g/255.0f)*other, ((float)this->b/255.0f)*other, ((float)this->a/255.0f)*other};
 }
 
-Color Color::operator/(float other)
+Color Color::operator/(float other) const
 {
     return {((float)this->r/255.0f)/other, ((float)this->g/255.0f)/other, ((float)this->b/255.0f)/other, ((float)this->a/255.0f)/other};
 }

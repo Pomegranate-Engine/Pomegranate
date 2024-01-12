@@ -32,7 +32,6 @@ void Camera::make_current(Entity*entity)
 {
     current = entity;
 }
-Entity* Camera::current = nullptr;
 
 DebugCircle::DebugCircle()
 {
@@ -86,7 +85,7 @@ void Render::animated_sprite(Entity*e) {
     int w = 0;
     int h = 0;
     SDL_QueryTexture(s->texture, nullptr, nullptr, &w, &h);
-    SDL_FRect src = {r.w/s->horizontal_frames*s->frame+s->x_offset, r.h/s->vertical_frames*s->frame+s->y_offset, r.w/s->horizontal_frames, r.h/s->vertical_frames};
+    SDL_FRect src = {r.w/(float)s->horizontal_frames*(float)s->frame+(float)s->x_offset, r.h/(float)s->vertical_frames*(float)s->frame+(float)s->y_offset, r.w/(float)s->horizontal_frames, r.h/(float)s->vertical_frames};
     r.w = (float)w*t->scale.x;
     r.h = (float)h*t->scale.y;
     r.x = t->pos.x-r.w/2-Camera::current->get_component<Transform>()->pos.x;
@@ -104,18 +103,18 @@ void Render::debug_circle(Entity* entity)
 
     SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), dc->color.r,dc->color.g,dc->color.b, dc->color.a);
     // Calculate angle step for each segment
-    double angleStep = 2.0 * 3.14159 / 32;
+    float angleStep = 2.0 * 3.14159 / 32;
 
     // Draw the circle outline
     for (int i = 0; i < 32; ++i) {
-        double angle1 = i * angleStep;
-        double angle2 = (i + 1) * angleStep;
+        float angle1 = (float)i * angleStep;
+        float angle2 = ((float)i + 1.0f) * angleStep;
 
         // Calculate the coordinates of the two points on the circle
-        float x1 = t->pos.x-Camera::current->get_component<Transform>()->pos.x + (dc->radius * cos(angle1));
-        float y1 = t->pos.y-Camera::current->get_component<Transform>()->pos.y + (dc->radius * sin(angle1));
-        float x2 = t->pos.x-Camera::current->get_component<Transform>()->pos.x + (dc->radius * cos(angle2));
-        float y2 = t->pos.y-Camera::current->get_component<Transform>()->pos.y + (dc->radius * sin(angle2));
+        float x1 = t->pos.x-Camera::current->get_component<Transform>()->pos.x + (dc->radius * cosf(angle1));
+        float y1 = t->pos.y-Camera::current->get_component<Transform>()->pos.y + (dc->radius * sinf(angle1));
+        float x2 = t->pos.x-Camera::current->get_component<Transform>()->pos.x + (dc->radius * cosf(angle2));
+        float y2 = t->pos.y-Camera::current->get_component<Transform>()->pos.y + (dc->radius * sinf(angle2));
 
         // Draw a line between the two points to create the circle outline
         SDL_RenderLine(Window::current->get_sdl_renderer(), x1, y1, x2, y2);
@@ -212,8 +211,8 @@ Vec2i Tilemap::get_tile(Vec2i pos, int layer)
 
 void Tilemap::set_tileset_tile_size(int w, int h)
 {
-    this->tileset_tile_width = 16;
-    this->tileset_tile_height = 16;
+    this->tileset_tile_width = w;
+    this->tileset_tile_height = h;
     int wid = 0;
     int hei = 0;
     SDL_QueryTexture(this->tileset_texture, nullptr, nullptr, &wid, &hei);
@@ -259,5 +258,5 @@ void Tilemap::add_layer()
 
 int Tilemap::get_layer_count()
 {
-    return this->tiles.size();
+    return (int)this->tiles.size();
 }

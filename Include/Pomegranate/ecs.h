@@ -41,7 +41,8 @@ public:
     static void global_system_tick();
     static void global_system_draw(std::function<bool(Entity*, Entity*)> sortingFunction);
 };
-class Entity
+
+class __declspec(dllexport) Entity
 {
 private:
     /* data */
@@ -78,10 +79,10 @@ public:
     void remove_entity(Entity*);
     void add_system(System*);
     void remove_system(System*);
-    void add_group(EntityGroup);
-    void remove_group(EntityGroup);
+    void add_group(const EntityGroup&);
+    void remove_group(const EntityGroup&);
     void tick();
-    void draw(std::function<bool(Entity*, Entity*)> sortingFunction);
+    void draw(const std::function<bool(Entity*, Entity*)>& sortingFunction);
 };
 
 #include "ecs.inl"

@@ -459,7 +459,7 @@ extern "C" {
  *  A variable controlling how 3D acceleration is used to accelerate the SDL screen surface.
  *
  *  SDL can try to accelerate the SDL screen surface by using streaming
- *  textures with a 3D rendering engine.  This variable controls whether and
+ *  textures with a 3D rendering Pomegranate.  This variable controls whether and
  *  how this is done.
  *
  *  This variable can be set to the following values:
@@ -1988,7 +1988,7 @@ extern "C" {
  *  Enable or disable mouse pointer warp emulation, needed by some older games.
  *
  *  When this hint is set, any SDL will emulate mouse warps using relative mouse mode.
- *  This is required for some older games (such as Source engine games), which warp the
+ *  This is required for some older games (such as Source Pomegranate games), which warp the
  *  mouse to the centre of the screen rather than using relative mouse motion. Note that
  *  relative mouse mode may have different mouse acceleration behaviour than pointer warps.
  *

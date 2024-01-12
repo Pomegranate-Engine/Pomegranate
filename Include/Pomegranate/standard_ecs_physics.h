@@ -55,7 +55,7 @@ public:
     void tick(Entity* entity) override;
     static bool check_collision(Entity* a, Entity* b);
     static void resolve_collision(Entity* a, Entity* b);
-    static int substeps;
+    static int sub_steps;
 };
 
 #endif //POMEGRANATE_ENGINE_STANDARD_ECS_PHYSICS_H

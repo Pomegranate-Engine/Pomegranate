@@ -1,7 +1,8 @@
 #include "ecs.h"
-
 #include <utility>
 
+std::vector<System*> System::global_systems = std::vector<System*>();
+std::vector<Entity*> Entity::entities = std::vector<Entity*>();
 
 Entity::Entity()
 {
@@ -10,7 +11,8 @@ Entity::Entity()
     this->components = std::map<const std::type_info*,Component*>();
 }
 
-uint64_t Entity::get_id() const {
+uint64_t Entity::get_id() const
+{
     return this->id;
 }
 
@@ -41,8 +43,6 @@ System::~System() = default;
 void System::init(Entity*) {}
 void System::tick(Entity*) {}
 void System::draw(Entity*) {}
-
-std::vector<System*> System::global_systems = std::vector<System*>();
 
 void System::global_system_tick()
 {
@@ -94,9 +94,7 @@ EntityGroup::EntityGroup()
 }
 
 EntityGroup::~EntityGroup()
-{
-
-}
+= default;
 
 void EntityGroup::add_entity(Entity* entity)
 {
@@ -106,17 +104,17 @@ void EntityGroup::add_entity(Entity* entity)
 
 void EntityGroup::remove_entity(Entity* entity)
 {
-    for (int i = 0; i < entities.size(); ++i)
+    for (auto & entitie : entities)
     {
-        if (entities[i]->get_id() == entity->get_id())
+        if (entitie->get_id() == entity->get_id())
         {
-            entities[i]->remove_from_group(this);
+            entitie->remove_from_group(this);
             return;
         }
     }
-    for(int i = 0; i < this->child_groups.size(); ++i)
+    for(auto & child_group : this->child_groups)
     {
-        this->child_groups[i].remove_entity(entity);
+        child_group.remove_entity(entity);
     }
 }
 
@@ -130,34 +128,34 @@ void EntityGroup::remove_system(System * system)
 
 }
 
-void EntityGroup::add_group(EntityGroup entityGroup)
+void EntityGroup::add_group(const EntityGroup& entityGroup)
 {
     this->child_groups.push_back(entityGroup);
 }
 
-void EntityGroup::remove_group(EntityGroup entityGroup)
+void EntityGroup::remove_group(const EntityGroup& entityGroup)
 {
 
 }
 
 void EntityGroup::tick()
 {
-    for(int i = 0; i < this->entities.size(); ++i)
+    for(auto & entitie : this->entities)
     {
         for(auto & system : this->systems)
         {
-            system->tick(this->entities[i]);
+            system->tick(entitie);
         }
     }
 //#pragma omp parallel for
-    for(int i = 0; i < this->child_groups.size(); ++i)
+    for(auto & child_group : this->child_groups)
     {
-        this->child_groups[i].tick();
+        child_group.tick();
     }
 //#pragma omp barrier
 }
 
-void EntityGroup::draw(std::function<bool(Entity*, Entity*)> sortingFunction)
+void EntityGroup::draw(const std::function<bool(Entity*, Entity*)>& sortingFunction)
 {
     // Sort entities using the provided sorting function
     std::sort(this->entities.begin(), this->entities.end(), sortingFunction);
@@ -174,8 +172,6 @@ void EntityGroup::draw(std::function<bool(Entity*, Entity*)> sortingFunction)
         group.draw(sortingFunction);
     }
 }
-
-std::vector<Entity*> Entity::entities = std::vector<Entity*>();
 
 void Entity::add_to_group(EntityGroup * group)
 {
@@ -199,6 +195,7 @@ std::vector<EntityGroup*> Entity::get_parent_groups()
     return this->parents;
 }
 
-void Component::init(Entity *) {
+void Component::init(Entity *)
+{
 
 }

@@ -1,18 +1,19 @@
 #include "standard_ecs_physics.h"
 
+Vec2 PhysicsObject::gravity = Vec2(0.0f, 980.0f);
+int RigidBody::sub_steps = 12;
+
 PhysicsObject::PhysicsObject()
 {
-    this->linear_velocity = Vec2(0.0, 0.0);
-    this->angular_velocity = 0.0;
-    this->mass = 1.0;
-    this->gravity_scale = 1.0;
+    this->linear_velocity = Vec2(0.0f, 0.0f);
+    this->angular_velocity = 0.0f;
+    this->mass = 1.0f;
+    this->gravity_scale = 1.0f;
     this->continuous_collision_detection = false;
     this->use_collision = true;
-    this->drag = 0.0;
+    this->drag = 0.0f;
     this->body_type = PHYSICS_BODY_TYPE_RIGID;
 }
-
-Vec2 PhysicsObject::gravity = Vec2(0.0, 980.0);
 
 void KinematicBody::tick(Entity *entity)
 {
@@ -23,9 +24,9 @@ void RigidBody::tick(Entity *entity)
 {
     if(entity->has_component<PhysicsObject>() && entity->get_component<PhysicsObject>()->body_type == PHYSICS_BODY_TYPE_RIGID)
     {
-        for (int i = 0; i < RigidBody::substeps; ++i)
+        for (int i = 0; i < RigidBody::sub_steps; ++i)
         {
-            float delta = 0.016/RigidBody::substeps;
+            float delta = 0.016f/(float)RigidBody::sub_steps;
             auto *t = entity->get_component<Transform>();
             float x = 0;
             float y = 0;
@@ -51,7 +52,8 @@ void RigidBody::tick(Entity *entity)
                 {
                     if (entity->get_id() != entitie->get_id())
                     {
-                        if (RigidBody::check_collision(entity, entitie)) {
+                        if (RigidBody::check_collision(entity, entitie))
+                        {
                             RigidBody::resolve_collision(entity, entitie);
                         }
                     }
@@ -60,7 +62,6 @@ void RigidBody::tick(Entity *entity)
         }
     }
 }
-int RigidBody::substeps = 12;
 
 CollisionShape::CollisionShape()
 {
@@ -101,6 +102,7 @@ void RigidBody::resolve_collision(Entity* a, Entity* b) {
     // Calculate the unit normal and unit tangent vectors
     float nx = dx / distance;
     float ny = dy / distance;
+
     float tx = -ny; // Tangent is 90 degrees to the normal
     float ty = nx; // Tangent is 90 degrees to the normal
 
@@ -109,13 +111,23 @@ void RigidBody::resolve_collision(Entity* a, Entity* b) {
     float relativeVelocityY = b_p->linear_velocity.y - a_p->linear_velocity.y;
     float relativeVelocityDot = relativeVelocityX * nx + relativeVelocityY * ny;
 
+    // Calculate the angular velocity for each circle
+    float angularVelocity1 = a_p->angular_velocity * ty - a_p->angular_velocity * tx;
+    float angularVelocity2 = b_p->angular_velocity - b_p->angular_velocity * tx;
+
+    // Calculate the relative angular velocity
+    float relativeAngularVelocity = angularVelocity2 - angularVelocity1;
+
+    a_p->angular_velocity = relativeAngularVelocity;
+
     // Calculate the impulse
     float impulse = (2.0f * (a_p->mass * b_p->mass * relativeVelocityDot)) /
                     ((a_p->mass + b_p->mass) * distance);
 
     float overlap = (a_c->radius*a_size + b_c->radius*b_size) - distance;
     // Update velocities based on the impulse
-    if (a_p->body_type == PHYSICS_BODY_TYPE_RIGID) {
+    if (a_p->body_type == PHYSICS_BODY_TYPE_RIGID)
+    {
         a_p->linear_velocity.x += (impulse / a_p->mass) * nx;
         a_p->linear_velocity.y += (impulse / a_p->mass) * ny;
         a_t->pos.x -= overlap * nx;
