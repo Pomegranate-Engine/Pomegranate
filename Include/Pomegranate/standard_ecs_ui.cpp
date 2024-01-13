@@ -93,7 +93,10 @@ void UIController::tick(Entity *entity)
 {
 
 }
-
+void UIController::predraw()
+{
+    UIController::focus_selected = false;
+}
 void UIController::draw(Entity *entity)
 {
     if(entity->has_component<UIInteraction>())
@@ -213,7 +216,7 @@ void UIController::image(Entity *entity)
     }
 
     // Render the text to the screen
-    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), image->color.r, image->color.g, image->color.b, image->color.a);
+    SDL_SetTextureColorMod(image->texture, image->color.r, image->color.g, image->color.b);
     SDL_RenderTexture(Window::current->get_sdl_renderer(),image->texture, nullptr,&destinationRect);
 }
 
@@ -255,76 +258,73 @@ void UIController::nine_sliced_image(Entity *entity)
 
 void UIController::interaction(Entity *entity)
 {
-    auto* t = entity->get_component<UITransform>();
-    auto* i = entity->get_component<UIInteraction>();
-    Vec2 position = t->get_pos((int)Window::current->get_width(), (int)Window::current->get_height());
-    Vec2 size = t->get_size((int)Window::current->get_width(), (int)Window::current->get_height());
-    Vec2 mouse_pos = InputManager::get_mouse_position();
+    if(!UIController::focus_selected)
+    {
+        auto *t = entity->get_component<UITransform>();
+        auto *i = entity->get_component<UIInteraction>();
+        Vec2 position = t->get_pos((int) Window::current->get_width(), (int) Window::current->get_height());
+        Vec2 size = t->get_size((int) Window::current->get_width(), (int) Window::current->get_height());
+        Vec2 mouse_pos = InputManager::get_mouse_position();
 
-    SDL_FRect buttonRect = {position.x, position.y, size.x, size.y};
+        SDL_FRect buttonRect = {position.x, position.y, size.x, size.y};
 
-    if(t->horizontal_alignment == ALIGNMENT_HORIZONTAL_CENTER)
-    {
-        buttonRect.x -= buttonRect.w/2;
-    }
-    else if(t->horizontal_alignment == ALIGNMENT_HORIZONTAL_RIGHT)
-    {
-        buttonRect.x -= buttonRect.w;
-    }
-
-    if(t->vertical_alignment == ALIGNMENT_VERTICAL_CENTER)
-    {
-        buttonRect.y -= buttonRect.h/2;
-    }
-    else if(t->vertical_alignment == ALIGNMENT_VERTICAL_BOTTOM)
-    {
-        buttonRect.y -= buttonRect.h;
-    }
-
-    //Check if mouse is inside button
-    if(SDL_PointInRectFloat(new SDL_FPoint{mouse_pos.x, mouse_pos.y}, &buttonRect))
-    {
-        i->mouse_over = true;
-        if(!i->ignore_input)
+        if (t->horizontal_alignment == ALIGNMENT_HORIZONTAL_CENTER)
         {
-            if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
+            buttonRect.x -= buttonRect.w / 2;
+        }
+        else if (t->horizontal_alignment == ALIGNMENT_HORIZONTAL_RIGHT)
+        {
+            buttonRect.x -= buttonRect.w;
+        }
+
+        if (t->vertical_alignment == ALIGNMENT_VERTICAL_CENTER)
+        {
+            buttonRect.y -= buttonRect.h / 2;
+        }
+        else if (t->vertical_alignment == ALIGNMENT_VERTICAL_BOTTOM)
+        {
+            buttonRect.y -= buttonRect.h;
+        }
+
+        //Check if mouse is inside button
+        if (SDL_PointInRectFloat(new SDL_FPoint{mouse_pos.x, mouse_pos.y}, &buttonRect))
+        {
+            i->mouse_over = true;
+            if (!i->ignore_input)
             {
-                i->mouse_down = true;
-                if (!UIController::mouse_down)
+                if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
                 {
-                    if (i->click_callback)
-                        i->click_callback(entity);
-                    focused = entity;
+                    i->mouse_down = true;
+                    if (!UIController::mouse_down)
+                    {
+                        if (i->click_callback) i->click_callback(entity);
+                        focused = entity;
+                        UIController::focus_selected = true;
+                    }
+                    UIController::mouse_down = true;
                 }
-                UIController::mouse_down = true;
+                else
+                {
+                    i->mouse_down = false;
+                    UIController::mouse_down = false;
+                }
             }
             else
             {
-                i->mouse_down = false;
-                UIController::mouse_down = false;
+
             }
         }
         else
         {
-            if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
-            {
-                UIController::mouse_down = true;
-            }
-            else
-            {
-                UIController::mouse_down = false;
-            }
+            i->mouse_over = false;
+            i->mouse_down = false;
         }
-    }
-    else
-    {
-        i->mouse_over = false;
-        i->mouse_down = false;
     }
 }
 
 Entity* UIController::focused = nullptr;
 bool UIController::mouse_down = false;
+bool UIController::focus_selected = false;
 
 void UIController::text_field(Entity *entity)
 {
@@ -437,7 +437,6 @@ void UIController::slider(Entity *entity)
             if(h->screen_space)
             {
                 h->pos.x = UITransform::pixel_to_screen_space(Vec2(position.x+s->value*size.x-offset,0.0),(int)Window::current->get_width(), (int)Window::current->get_height()).x;
-                print_info(std::to_string(h->pos.x));
             }
             else
             {
@@ -466,6 +465,32 @@ void UIController::slider(Entity *entity)
                 h->pos.y = s->value * size.y;
             }
             h->pos.x = position.x;
+        }
+        if(s->slider_fill)
+        {
+            s->slider_fill->get_component<UITransform>()->horizontal_alignment = ALIGNMENT_HORIZONTAL_LEFT;
+            s->slider_fill->get_component<UITransform>()->vertical_alignment = ALIGNMENT_VERTICAL_TOP;
+            s->slider_fill->get_component<UITransform>()->size.x = t->size.x*s->value;
+            Vec2 pos = t->get_pos((int) Window::current->get_width(), (int) Window::current->get_height());
+            Vec2 size = t->get_size((int) Window::current->get_width(), (int) Window::current->get_height());
+            if (t->horizontal_alignment == ALIGNMENT_HORIZONTAL_CENTER)
+            {
+                pos.x -= size.x / 2;
+            }
+            else if (t->horizontal_alignment == ALIGNMENT_HORIZONTAL_RIGHT)
+            {
+                pos.x -= size.x;
+            }
+
+            if (t->vertical_alignment == ALIGNMENT_VERTICAL_CENTER)
+            {
+                pos.y -= size.y / 2;
+            }
+            else if (t->vertical_alignment == ALIGNMENT_VERTICAL_BOTTOM)
+            {
+                pos.y -= size.y;
+            }
+            s->slider_fill->get_component<UITransform>()->pos = UITransform::pixel_to_screen_space(pos,(int) Window::current->get_width(), (int) Window::current->get_height());
         }
     }
 }

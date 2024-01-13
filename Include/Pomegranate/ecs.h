@@ -34,7 +34,9 @@ public:
     System();
     ~System();
     virtual void init(Entity*);
+    virtual void pretick();
     virtual void tick(Entity*);
+    virtual void predraw();
     virtual void draw(Entity*);
     static void add_global_system(System*);
     static void remove_global_system(System*);

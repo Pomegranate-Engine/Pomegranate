@@ -43,11 +43,14 @@ System::~System() = default;
 void System::init(Entity*) {}
 void System::tick(Entity*) {}
 void System::draw(Entity*) {}
+void System::pretick(){}
+void System::predraw(){}
 
 void System::global_system_tick()
 {
     for(auto & system : System::global_systems)
     {
+        system->pretick();
         for(auto & entity : Entity::entities)
         {
             system->tick(entity);
@@ -79,6 +82,7 @@ void System::global_system_draw(std::function<bool(Entity*, Entity*)> sortingFun
 
     for (auto& system : System::global_systems)
     {
+        system->predraw();
         for (auto& entity : Entity::entities)
         {
             system->draw(entity);
@@ -140,9 +144,10 @@ void EntityGroup::remove_group(const EntityGroup& entityGroup)
 
 void EntityGroup::tick()
 {
-    for(auto & entitie : this->entities)
+    for(auto & system : this->systems)
     {
-        for(auto & system : this->systems)
+        system->pretick();
+        for(auto & entitie : this->entities)
         {
             system->tick(entitie);
         }
@@ -160,9 +165,10 @@ void EntityGroup::draw(const std::function<bool(Entity*, Entity*)>& sortingFunct
     // Sort entities using the provided sorting function
     std::sort(this->entities.begin(), this->entities.end(), sortingFunction);
 
-    for(auto & entity : this->entities)
+    for(auto & system : this->systems)
     {
-        for(auto & system : this->systems)
+        system->predraw();
+        for(auto & entity : this->entities)
         {
             system->draw(entity);
         }

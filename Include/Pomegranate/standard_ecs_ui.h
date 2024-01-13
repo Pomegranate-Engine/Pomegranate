@@ -123,6 +123,7 @@ public:
     float min;
     float max;
     Entity* slider_handle;
+    Entity* slider_fill;
     SliderOrientation orientation;
     UISlider();
     void init(Entity *) override;
@@ -132,6 +133,7 @@ class UIController : public System
 {
 public:
     UIController();
+    void predraw() override;
     void tick(Entity* entity) override;
     void draw(Entity* entity) override;
     static void interaction(Entity* entity);
@@ -146,6 +148,7 @@ public:
     static void slider(Entity *entity);
     static Entity* focused;
     static bool mouse_down;
+    static bool focus_selected;
 };
 
 #endif //POMEGRANATE_ENGINE_STANDARD_ECS_UI_H

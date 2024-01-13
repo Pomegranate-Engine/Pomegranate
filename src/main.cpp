@@ -4,6 +4,8 @@
 #include <Pomegranate/pomegranate.h>
 #include <chrono>
 
+
+
 //Example system that allows you to draw the physics objects
 class Drag : public System
 {
@@ -245,6 +247,7 @@ int main(int argc, char* argv[])
     button->get_component<UITransform>()->pos = Vec2(0.75, 0.1);
     button->get_component<UITransform>()->size = Vec2(0.1, 0.1);
     button->get_component<UIText>()->text = "Click me!";
+    button->get_component<UIText>()->color = Color(0.0f,0.0f,0.0f);
     button->get_component<UIButton>()->callback = button_pressed;
     button->get_component<UIImage>()->load_texture("res/9sliced.png");
     UI.add_entity(button);
@@ -268,10 +271,17 @@ int main(int argc, char* argv[])
     slider->get_component<UITransform>()->size = Vec2(0.33, 0.025);
     slider->get_component<UIImage>()->load_texture("res/9sliced.png");
     slider->get_component<UIInteraction>()->ignore_input = true;
-    slider->add_component<UIText>();
-    slider->get_component<UIText>()->text = "Gravity Multiplier";
-
     UI.add_entity(slider);
+
+    auto* slider_text = new Entity();
+    slider_text->add_component<UITransform>();
+    slider_text->get_component<UITransform>()->pos = Vec2(0.5, 0.2);
+    slider_text->get_component<UITransform>()->size = Vec2(0.33, 0.025);
+    slider_text->get_component<UITransform>()->z_index = 3;
+    slider_text->add_component<UIText>();
+    slider_text->get_component<UIText>()->text = "Gravity Multiplier";
+    slider_text->get_component<UIText>()->color = Color(0.0f,0.0f,0.0f);
+    UI.add_entity(slider_text);
 
 
     auto* slider_handle = new Entity();
@@ -280,11 +290,21 @@ int main(int argc, char* argv[])
     slider_handle->add_component<UIInteraction>();
     slider_handle->get_component<UITransform>()->pos = Vec2(0.5, 0.2);
     slider_handle->get_component<UITransform>()->size = Vec2(0.05, 0.05);
-    slider->get_component<UISlider>()->slider_handle = slider_handle;
     slider_handle->get_component<UIImage>()->load_texture("res/9sliced.png");
-    slider_handle->get_component<UITransform>()->z_index = 1;
-
+    slider_handle->get_component<UITransform>()->z_index = 2;
+    slider->get_component<UISlider>()->slider_handle = slider_handle;
     UI.add_entity(slider_handle);
+
+    auto* slider_fill = new Entity();
+    slider_fill->add_component<UIImage>();
+    slider_fill->add_component<UITransform>();
+    slider_fill->get_component<UITransform>()->pos = Vec2(0.5, 0.2);
+    slider_fill->get_component<UITransform>()->size = Vec2(0.33, 0.025);
+    slider_fill->get_component<UIImage>()->load_texture("res/9sliced.png");
+    slider_fill->get_component<UIImage>()->color = Color(44,255,22);
+    slider_fill->get_component<UITransform>()->z_index = 1;
+    slider->get_component<UISlider>()->slider_fill = slider_fill;
+    UI.add_entity(slider_fill);
 
 
     UI.add_system(new UIController());
