@@ -1,12 +1,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
-#include <pomegranate.h>
-#include<standard_ecs.h>
-#include<standard_ecs_rendering.h>
-#include<standard_ecs_audio.h>
-#include<standard_ecs_physics.h>
-#include<standard_ecs_ui.h>
+#include <Pomegranate/pomegranate.h>
 #include <chrono>
 
 //Example system that allows you to draw the physics objects
@@ -91,14 +86,12 @@ Window main_window = Window("Window", 1024, 720);
 int main(int argc, char* argv[])
 {
     //Initialization stuff
-    print_log("Initializing Pomegranate");
     pomegranate_init();
     srand((unsigned int)time(nullptr));
-
-    print_log("Opening Test Window");
+    print_pass("Pomegranate Initialized");
     main_window.open();
     main_window.make_current(); // This makes the window the current rendering target
-    print_log("Window opened: " + std::string(main_window.get_title()) + " with resolution of " + std::to_string(main_window.get_width()) + "x" + std::to_string(main_window.get_height()));
+    print_pass("Window opened: " + std::string(main_window.get_title()) + " with resolution of " + std::to_string(main_window.get_width()) + "x" + std::to_string(main_window.get_height()));
 
 //region Physics Example
     EntityGroup group = EntityGroup();
@@ -163,7 +156,7 @@ int main(int argc, char* argv[])
     t->load_texture("res/tilesheet.png");
     t->set_tileset_tile_size(16,16);
     t->add_layer();
-    print_log("Added layer");
+    print_pass("Added layer");
     for (int i = 1; i < 15; ++i)
     {
         t->set_tile(Vec2i(i, 10), Vec2i(8, 0), 1);
@@ -211,7 +204,7 @@ int main(int argc, char* argv[])
         }
     }
     t->place_multitile(Vec2i(rand() % 10 + 3, 2), Vec2i(2, 0), Vec2i(6, 7), 0);
-    print_log("Tiles done");
+    print_pass("Tiles done");
     tilemap->get_component<Transform>()->scale*=3.0;
     tilemap->get_component<Transform>()->pos+= Vec2(720, 0);
     world.add_entity(tilemap);
@@ -295,7 +288,7 @@ int main(int argc, char* argv[])
 
 
     UI.add_system(new UIController());
-
+    print_pass("Added UI");
 //endregion
 
     //Add global systems

@@ -42,7 +42,7 @@ public:
     static void global_system_draw(std::function<bool(Entity*, Entity*)> sortingFunction);
 };
 
-class __declspec(dllexport) Entity
+class Entity
 {
 private:
     /* data */

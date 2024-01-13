@@ -45,7 +45,7 @@ int pomegranate_init(bool input, bool video, bool audio, bool img, bool ttf)
 {
     auto* compiled = (SDL_version*)malloc(sizeof(SDL_version));
     SDL_GetVersion(compiled);
-    print_log(std::to_string(compiled->major) + "." + std::to_string(compiled->minor) + "." + std::to_string(compiled->patch));
+    print_info(std::to_string(compiled->major) + "." + std::to_string(compiled->minor) + "." + std::to_string(compiled->patch));
     if(video)
     {
         if (SDL_Init(SDL_INIT_VIDEO) < 0)

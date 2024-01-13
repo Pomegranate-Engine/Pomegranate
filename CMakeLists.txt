@@ -7,17 +7,32 @@ set(SDL_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/Lib/x64)
 link_directories("${CMAKE_SOURCE_DIR}/bin/")
 
 # Include directories
-include_directories("Include/" "Include/Pomegranate")
+include_directories("Include/")
 
 # Source files
 set(SOURCE_FILES src/main.cpp)
 
 set(POMEGRANATE_DIR ${CMAKE_SOURCE_DIR}/Include/Pomegranate)
 
-include("Include/Pomegranate/Pomegranate.cmake")
+add_subdirectory("Include/Pomegranate")
+
+set(POMEGRANATE_SOURCES
+        ${POMEGRANATE_DIR}/engine.cpp
+        ${POMEGRANATE_DIR}/standard_ecs.cpp
+        ${POMEGRANATE_DIR}/ecs.cpp
+        ${POMEGRANATE_DIR}/input_manager.cpp
+        ${POMEGRANATE_DIR}/vec_math.cpp
+        ${POMEGRANATE_DIR}/window.cpp
+        ${POMEGRANATE_DIR}/event_system.cpp
+        ${POMEGRANATE_DIR}/color.cpp
+        ${POMEGRANATE_DIR}/standard_ecs_rendering.cpp
+        ${POMEGRANATE_DIR}/standard_ecs_audio.cpp
+        ${POMEGRANATE_DIR}/standard_ecs_physics.cpp
+        ${POMEGRANATE_DIR}/standard_ecs_ui.cpp
+)
 
 # Add executable
-add_executable(Pomegranate_Engine ${SOURCE_FILES})
+add_executable(Pomegranate_Engine ${SOURCE_FILES} ${POMEGRANATE_SOURCES})
 
 
 

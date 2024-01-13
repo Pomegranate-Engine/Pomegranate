@@ -1,5 +1,7 @@
 #include "standard_ecs_rendering.h"
 
+Entity* Camera::current = nullptr;
+
 Sprite::Sprite()
 {
     this->texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), "res/none.png");

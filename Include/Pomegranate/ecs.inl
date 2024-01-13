@@ -9,7 +9,8 @@ template <typename T> inline T* Entity::get_component()
         return nullptr;
     }
 }
-template <typename T> inline bool Entity::has_component() {
+template <typename T> inline bool Entity::has_component()
+{
     return this->components.find(&typeid(T)) != this->components.end();
 }
 

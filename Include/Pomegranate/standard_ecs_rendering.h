@@ -57,8 +57,6 @@ public:
     static Entity* current;
 };
 
-Entity* Camera::current = nullptr;
-
 class Tilemap : public Component
 {
 private:
