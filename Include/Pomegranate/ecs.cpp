@@ -43,18 +43,21 @@ System::~System() = default;
 void System::init(Entity*) {}
 void System::tick(Entity*) {}
 void System::draw(Entity*) {}
-void System::pretick(){}
-void System::predraw(){}
+void System::pre_tick(){}
+void System::pre_draw(){}
+void System::post_tick(){}
+void System::post_draw(){}
 
 void System::global_system_tick()
 {
     for(auto & system : System::global_systems)
     {
-        system->pretick();
+        system->pre_tick();
         for(auto & entity : Entity::entities)
         {
             system->tick(entity);
         }
+        system->post_tick();
     }
 }
 
@@ -82,11 +85,12 @@ void System::global_system_draw(std::function<bool(Entity*, Entity*)> sortingFun
 
     for (auto& system : System::global_systems)
     {
-        system->predraw();
+        system->pre_draw();
         for (auto& entity : Entity::entities)
         {
             system->draw(entity);
         }
+        system->post_draw();
     }
 }
 
@@ -146,11 +150,12 @@ void EntityGroup::tick()
 {
     for(auto & system : this->systems)
     {
-        system->pretick();
+        system->pre_tick();
         for(auto & entitie : this->entities)
         {
             system->tick(entitie);
         }
+        system->post_tick();
     }
 //#pragma omp parallel for
     for(auto & child_group : this->child_groups)
@@ -167,11 +172,12 @@ void EntityGroup::draw(const std::function<bool(Entity*, Entity*)>& sortingFunct
 
     for(auto & system : this->systems)
     {
-        system->predraw();
+        system->pre_draw();
         for(auto & entity : this->entities)
         {
             system->draw(entity);
         }
+        system->post_draw();
     }
     for(auto & group : this->child_groups)
     {

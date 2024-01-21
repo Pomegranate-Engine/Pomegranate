@@ -1,18 +1,19 @@
 cmake_minimum_required(VERSION 3.27)
 project(Pomegranate_Engine)
-
+set(CMAKE_CXX_STANDARD 17)
 # Set the path to the SDL library directory
 set(SDL_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/Lib/x64)
 
 link_directories("${CMAKE_SOURCE_DIR}/bin/")
 
 # Include directories
-include_directories("Include/")
+include_directories("Include/" "Include/Imgui")
 
 # Source files
 set(SOURCE_FILES src/main.cpp)
 
 set(POMEGRANATE_DIR ${CMAKE_SOURCE_DIR}/Include/Pomegranate)
+set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/Include/Imgui)
 
 add_subdirectory("Include/Pomegranate")
 
@@ -29,10 +30,22 @@ set(POMEGRANATE_SOURCES
         ${POMEGRANATE_DIR}/standard_ecs_audio.cpp
         ${POMEGRANATE_DIR}/standard_ecs_physics.cpp
         ${POMEGRANATE_DIR}/standard_ecs_ui.cpp
+        Include/Pomegranate/lua_wrapper.cpp
+)
+
+set(IMGUI_SOURCES
+        ${IMGUI_DIR}/imgui.cpp
+        ${IMGUI_DIR}/imgui_draw.cpp
+        ${IMGUI_DIR}/imgui_widgets.cpp
+        ${IMGUI_DIR}/imgui_demo.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_sdl3.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_sdlrenderer3.cpp
+        ${IMGUI_DIR}/imgui_tables.cpp
+        ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
 )
 
 # Add executable
-add_executable(Pomegranate_Engine ${SOURCE_FILES} ${POMEGRANATE_SOURCES})
+add_executable(Pomegranate_Engine ${SOURCE_FILES} ${POMEGRANATE_SOURCES} ${IMGUI_SOURCES})
 
 
 
@@ -42,6 +55,7 @@ target_link_libraries(Pomegranate_Engine PRIVATE
         ${SDL_LIBRARY_DIR}/SDL3_ttf.lib
         ${SDL_LIBRARY_DIR}/SDL3_image.lib
         ${SDL_LIBRARY_DIR}/SDL3_mixer.lib
+        ${SDL_LIBRARY_DIR}/lua51.lib
         Pomegranate_Library.lib
 )
 

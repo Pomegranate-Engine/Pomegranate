@@ -2,8 +2,16 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <Pomegranate/pomegranate.h>
+#include<imgui.h>
+#include<backends/imgui_impl_sdl3.h>
+#include<backends/imgui_impl_sdlrenderer3.h>
 #include <chrono>
-
+extern "C"
+{
+#include <Lua/lua.h>
+#include <Lua/lauxlib.h>
+#include <Lua/lualib.h>
+}
 
 
 //Example system that allows you to draw the physics objects
@@ -94,6 +102,20 @@ int main(int argc, char* argv[])
     main_window.open();
     main_window.make_current(); // This makes the window the current rendering target
     print_pass("Window opened: " + std::string(main_window.get_title()) + " with resolution of " + std::to_string(main_window.get_width()) + "x" + std::to_string(main_window.get_height()));
+    //Imgui
+
+    auto gl_context = SDL_GL_CreateContext(main_window.get_sdl_window());
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplSDL3_InitForSDLRenderer(main_window.get_sdl_window(),main_window.get_sdl_renderer());
+    ImGui_ImplSDLRenderer3_Init(main_window.get_sdl_renderer());
+
 
 //region Physics Example
     EntityGroup group = EntityGroup();
@@ -216,105 +238,67 @@ int main(int argc, char* argv[])
     }
 
 //endregion
+    print_pass("Added UI");
 
-//region UI Example
-    EntityGroup UI = EntityGroup();
+    EntityGroup ui = EntityGroup();
     auto* text = new Entity();
     text->add_component<UIText>();
-    text->add_component<UITransform>();
-    text->add_component<UIInteraction>();
-    //Set the text to something
-    text->get_component<UIText>()->text = "Hello UI!";
-    text->get_component<UITransform>()->pos = Vec2(0.5, 0.05);
-    UI.add_entity(text);
-
-
-    auto* image = new Entity();
-    image->add_component<UIImage>();
-    image->add_component<UITransform>();
-    image->add_component<UIInteraction>();
-    image->get_component<UITransform>()->pos = Vec2(0.25, 0.1);
-    image->get_component<UITransform>()->size = Vec2(0.1, 0.1);
-    image->get_component<UIImage>()->load_texture("res/9sliced.png");
-    UI.add_entity(image);
-
+    text->get_component<UIText>()->text = "Hello World!";
+    text->get_component<UIText>()->color = Color(255, 255, 255, 255);
+    text->get_component<UITransform>()->position = Vec2(0, 0);
+    //Create button
     auto* button = new Entity();
-    button->add_component<UIButton>();
-    button->add_component<UIImage>();
-    button->add_component<UIText>();
-    button->add_component<UIInteraction>();
     button->add_component<UITransform>();
-    button->get_component<UITransform>()->pos = Vec2(0.75, 0.1);
-    button->get_component<UITransform>()->size = Vec2(0.1, 0.1);
-    button->get_component<UIText>()->text = "Click me!";
-    button->get_component<UIText>()->color = Color(0.0f,0.0f,0.0f);
+    button->get_component<UITransform>()->position = Vec2(0, 16);
+    button->get_component<UITransform>()->size = Vec2(128, 32);
+    button->add_component<UIButton>();
+    button->get_component<UIButton>()->text = "Button";
+    button->get_component<UIButton>()->text_color = Color(255, 255, 255, 255);
+    button->get_component<UIButton>()->background_color = Color(0, 0, 0, 255);
     button->get_component<UIButton>()->callback = button_pressed;
-    button->get_component<UIImage>()->load_texture("res/9sliced.png");
-    UI.add_entity(button);
-
+    ui.add_entity(text);
+    //Create text field
     auto* text_field = new Entity();
-    text_field->add_component<UITextField>();
-    text_field->add_component<UIText>();
-    text_field->add_component<UIImage>();
     text_field->add_component<UITransform>();
-    text_field->get_component<UITransform>()->pos = Vec2(0.5, 0.1);
-    text_field->get_component<UITransform>()->size = Vec2(0.33, 0.025);
-    text_field->get_component<UIImage>()->load_texture("res/9sliced.png");
-    UI.add_entity(text_field);
+    text_field->get_component<UITransform>()->position = Vec2(0, 48);
+    text_field->get_component<UITransform>()->size = Vec2(128, 32);
+    text_field->add_component<UITextField>();
+    text_field->get_component<UITextField>()->text = "Text Field";
+    text_field->get_component<UITextField>()->placeholder_text = "Placeholder";
+    text_field->get_component<UITextField>()->text_color = Color(255, 255, 255, 255);
+    text_field->get_component<UITextField>()->background_color = Color(0, 0, 0, 255);
+    ui.add_entity(text_field);
 
-    auto* slider = new Entity();
-    slider->add_component<UISlider>();
-    slider->add_component<UITransform>();
-    slider->add_component<UIInteraction>();
-    slider->add_component<UIImage>();
-    slider->get_component<UITransform>()->pos = Vec2(0.5, 0.2);
-    slider->get_component<UITransform>()->size = Vec2(0.33, 0.025);
-    slider->get_component<UIImage>()->load_texture("res/9sliced.png");
-    slider->get_component<UIInteraction>()->ignore_input = true;
-    UI.add_entity(slider);
+    //Create dropdown
+    auto* dropdown = new Entity();
+    dropdown->add_component<UITransform>();
+    dropdown->get_component<UITransform>()->position = Vec2(0, 67);
+    dropdown->get_component<UITransform>()->size = Vec2(128, 32);
+    dropdown->add_component<UIDropdown>();
+    dropdown->get_component<UIDropdown>()->text = "Dropdown";
+    dropdown->get_component<UIDropdown>()->options = {"Option 1", "Option 2", "Option 3"};
+    dropdown->get_component<UIDropdown>()->selected_option = 0;
+    dropdown->get_component<UIDropdown>()->text_color = Color(255, 255, 255, 255);
+    dropdown->get_component<UIDropdown>()->background_color = Color(0, 0, 0, 255);
+    ui.add_entity(dropdown);
 
-    auto* slider_text = new Entity();
-    slider_text->add_component<UITransform>();
-    slider_text->get_component<UITransform>()->pos = Vec2(0.5, 0.2);
-    slider_text->get_component<UITransform>()->size = Vec2(0.33, 0.025);
-    slider_text->get_component<UITransform>()->z_index = 3;
-    slider_text->add_component<UIText>();
-    slider_text->get_component<UIText>()->text = "Gravity Multiplier";
-    slider_text->get_component<UIText>()->color = Color(0.0f,0.0f,0.0f);
-    UI.add_entity(slider_text);
-
-
-    auto* slider_handle = new Entity();
-    slider_handle->add_component<UIImage>();
-    slider_handle->add_component<UITransform>();
-    slider_handle->add_component<UIInteraction>();
-    slider_handle->get_component<UITransform>()->pos = Vec2(0.5, 0.2);
-    slider_handle->get_component<UITransform>()->size = Vec2(0.05, 0.05);
-    slider_handle->get_component<UIImage>()->load_texture("res/9sliced.png");
-    slider_handle->get_component<UITransform>()->z_index = 2;
-    slider->get_component<UISlider>()->slider_handle = slider_handle;
-    UI.add_entity(slider_handle);
-
-    auto* slider_fill = new Entity();
-    slider_fill->add_component<UIImage>();
-    slider_fill->add_component<UITransform>();
-    slider_fill->get_component<UITransform>()->pos = Vec2(0.5, 0.2);
-    slider_fill->get_component<UITransform>()->size = Vec2(0.33, 0.025);
-    slider_fill->get_component<UIImage>()->load_texture("res/9sliced.png");
-    slider_fill->get_component<UIImage>()->color = Color(44,255,22);
-    slider_fill->get_component<UITransform>()->z_index = 1;
-    slider->get_component<UISlider>()->slider_fill = slider_fill;
-    UI.add_entity(slider_fill);
-
-
-    UI.add_system(new UIController());
-    print_pass("Added UI");
-//endregion
+    //Create checkbox
+    auto* checkbox = new Entity();
+    checkbox->add_component<UITransform>();
+    checkbox->get_component<UITransform>()->position = Vec2(0, 86);
+    checkbox->get_component<UITransform>()->size = Vec2(128, 32);
+    checkbox->add_component<UICheckbox>();
+    checkbox->get_component<UICheckbox>()->text = "Checkbox";
+    checkbox->get_component<UICheckbox>()->checked = false;
+    checkbox->get_component<UICheckbox>()->text_color = Color(255, 255, 255, 255);
+    checkbox->get_component<UICheckbox>()->background_color = Color(0, 0, 0, 255);
+    ui.add_entity(checkbox);
 
     //Add global systems
     System::add_global_system(new TransformLinkages());
     System::add_global_system(new Render());
 
+    ui.add_system(new UIController());
 
     float tick_time = 0.0;
     bool is_running = true;
@@ -324,16 +308,14 @@ int main(int argc, char* argv[])
     {
         Uint64 start = SDL_GetPerformanceCounter(); //For delta time
 
-        InputManager::update();
         while (SDL_PollEvent(&event))
         {
+            InputManager::process_event(event);
+            ImGui_ImplSDL3_ProcessEvent(&event);
             if (event.type == SDL_EVENT_QUIT) {
                 is_running = false;
             }
         }
-
-
-        PhysicsObject::gravity = Vec2(0.0, 980.0)*slider->get_component<UISlider>()->value;
 
         //- - - - - # UPDATE # - - - - -
         if (tick_time > 0.016)
@@ -344,7 +326,7 @@ int main(int argc, char* argv[])
             System::global_system_tick();
             group.tick();
             world.tick();
-            UI.tick();
+            ui.tick();
 
             //Move camera (Not correct way to do this)
             if(InputManager::get_key(SDL_SCANCODE_LEFT))
@@ -372,11 +354,21 @@ int main(int argc, char* argv[])
         SDL_RenderClear(Window::current->get_sdl_renderer());
         SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), 255, 255, 255, 255);
 
+        //Begin imgui
+        ImGui_ImplSDLRenderer3_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
+        ImGui::NewFrame();
+
         //Draw
         System::global_system_draw(Transform::draw_sort);
         group.draw(Transform::draw_sort);
         world.draw(Transform::draw_sort);
-        UI.draw(UITransform::draw_sort);
+        ui.draw(Transform::draw_sort);
+
+
+        //Draw imgui
+        ImGui::Render();
+        ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData());
 
         SDL_RenderPresent(Window::current->get_sdl_renderer()); //Present
 

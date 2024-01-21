@@ -6,149 +6,80 @@
 #include "color.h"
 #include "vec_math.h"
 #include "window.h"
-
-enum HorizontalAlignment
-{
-    ALIGNMENT_HORIZONTAL_LEFT,
-    ALIGNMENT_HORIZONTAL_CENTER,
-    ALIGNMENT_HORIZONTAL_RIGHT
-};
-
-enum VerticalAlignment
-{
-    ALIGNMENT_VERTICAL_TOP,
-    ALIGNMENT_VERTICAL_CENTER,
-    ALIGNMENT_VERTICAL_BOTTOM
-};
-
-enum SliderOrientation
-{
-    SLIDER_ORIENTATION_HORIZONTAL,
-    SLIDER_ORIENTATION_VERTICAL
-};
-
-class UIInteraction : public Component
-{
-public:
-    bool mouse_over;
-    bool mouse_down;
-    bool ignore_input;
-    std::function<void(Entity*)> click_callback;
-    UIInteraction();
-};
+#include<backends/imgui_impl_sdl3.h>
+#include<backends/imgui_impl_sdlrenderer3.h>
+#include<misc/cpp/imgui_stdlib.h>
 
 class UITransform : public Component
 {
 public:
-    bool visible;
-    bool screen_space;
-    Vec2 pos;
+    Vec2 position;
     Vec2 size;
-    Vec2 anchor;
-    float rot;
-    int z_index;
-    HorizontalAlignment horizontal_alignment;
-    VerticalAlignment vertical_alignment;
     UITransform();
-    Vec2 get_screen_pos(int width, int height) const;
-    Vec2 get_pos(int width, int height) const;
-    Vec2 get_screen_size(int width, int height) const;
-    Vec2 get_size(int width, int height) const;
-    static Vec2 pixel_to_screen_space(Vec2 pixel_pos, int width, int height);
-    static bool draw_sort(Entity* a, Entity* b);
-};
-
-
-class UIButton : public Component
-{
-public:
-    bool pressed;
-    std::function<void(Entity*)> callback;
-    UIButton();
-    void init(Entity *) override;
-};
-
-class UIImage : public Component
-{
-public:
-    SDL_Texture* texture;
-    Color color;
-    UIImage();
-    void load_texture(const char* path);
-};
-class UI9SlicedImage : public Component
-{
-public:
-    SDL_Texture* texture;
-    int left;
-    int right;
-    int top;
-    int bottom;
-    Color color;
-    UI9SlicedImage();
-    void load_texture(const char* path);
 };
 
 class UIText : public Component
 {
 public:
-    TTF_Font* font;
     std::string text;
     Color color;
     UIText();
+    void init(Entity* entity) override;
+};
+
+class UIButton : public Component
+{
+public:
+    std::string text;
+    Color text_color;
+    Color background_color;
+    std::function<void(Entity*)> callback;
+    UIButton();
+    void init(Entity* entity) override;
 };
 
 class UITextField : public Component
 {
 public:
-    //Text data is stored in UIText
-    int max_length;
-    int edit_position{};
+    std::string text;
+    std::string placeholder_text;
+    Color text_color;
+    Color background_color;
     UITextField();
-    void init(Entity *) override;
+    void init(Entity* entity) override;
 };
 
-class UICheckBox : public Component
+class UIDropdown : public Component
 {
 public:
+    std::string text;
+    std::vector<std::string> options;
+    int selected_option;
+    Color text_color;
+    Color background_color;
+    UIDropdown();
+    void init(Entity* entity) override;
+};
+
+class UICheckbox : public Component
+{
+public:
+    std::string text;
     bool checked;
-    UICheckBox();
-    void init(Entity *) override;
-};
-
-class UISlider : public Component
-{
-public:
-    float value;
-    float min;
-    float max;
-    Entity* slider_handle;
-    Entity* slider_fill;
-    SliderOrientation orientation;
-    UISlider();
-    void init(Entity *) override;
+    Color text_color;
+    Color background_color;
+    UICheckbox();
+    void init(Entity* entity) override;
 };
 
 class UIController : public System
 {
 public:
     UIController();
-    void predraw() override;
     void tick(Entity* entity) override;
+    void pre_draw() override;
     void draw(Entity* entity) override;
-    static void interaction(Entity* entity);
-    static void text(Entity* entity);
-    static void image(Entity* entity);
-    static void text_field(Entity* entity);
-    static void check_box(Entity* entity);
-    static void on_text_field_click(Entity* entity);
-    static void on_check_box_click(Entity* entity);
-    static void on_button_click(Entity* entity);
-    static void nine_sliced_image(Entity *entity);
-    static void slider(Entity *entity);
-    static Entity* focused;
-    static bool mouse_down;
-    static bool focus_selected;
+    void post_draw() override;
 };
 
 #endif //POMEGRANATE_ENGINE_STANDARD_ECS_UI_H

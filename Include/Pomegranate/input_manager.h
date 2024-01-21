@@ -20,7 +20,7 @@ public:
     InputManager();
     ~InputManager();
     static void init();
-    static void update();
+    static void process_event(SDL_Event event);
     static bool get_key(int);
     static bool get_mouse_button(int);
     static Vec2 get_mouse_position();

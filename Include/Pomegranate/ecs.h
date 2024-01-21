@@ -34,10 +34,12 @@ public:
     System();
     ~System();
     virtual void init(Entity*);
-    virtual void pretick();
+    virtual void pre_tick();
     virtual void tick(Entity*);
-    virtual void predraw();
+    virtual void post_tick();
+    virtual void pre_draw();
     virtual void draw(Entity*);
+    virtual void post_draw();
     static void add_global_system(System*);
     static void remove_global_system(System*);
     static void global_system_tick();

@@ -6,55 +6,36 @@ InputManager::InputManager()
 InputManager::~InputManager()
 = default;
 
-void InputManager::update() {
+void InputManager::process_event(SDL_Event event) {
     InputManager::mouse_delta = Vec2();
     InputManager::mouse_moved = false;
     InputManager::mouse_scrolled = false;
     InputManager::mouse_scroll = Vec2();
 
     InputManager::press = -1;
-
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
+    switch (event.type)
     {
-        switch (event.type)
-        {
-            case SDL_EVENT_KEY_DOWN:
-                InputManager::keys[event.key.keysym.scancode] = true;
-                //Set press to char form of key pressed
-                if(event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
-                    press = 8;
-                else if(event.key.keysym.scancode == SDL_SCANCODE_RETURN)
-                    press = 12;
-                else if(event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
-                    press = 2;
-                else if(event.key.keysym.scancode == SDL_SCANCODE_LEFT)
-                    press = 1;
-                break;
-            case SDL_EVENT_TEXT_INPUT:
-                InputManager::press = (unsigned char)event.text.text[0];
-                break;
-            case SDL_EVENT_KEY_UP:
-                InputManager::keys[event.key.keysym.scancode] = false;
-                break;
-            case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                InputManager::mouse_buttons[event.button.button] = true;
-                break;
-            case SDL_EVENT_MOUSE_BUTTON_UP:
-                InputManager::mouse_buttons[event.button.button] = false;
-                break;
-            case SDL_EVENT_MOUSE_MOTION:
-                InputManager::mouse_position = Vec2(event.motion.x, event.motion.y);
-                InputManager::mouse_delta = Vec2(event.motion.xrel, event.motion.yrel);
-                InputManager::mouse_moved = true;
-                break;
-            case SDL_EVENT_MOUSE_WHEEL:
-                InputManager::mouse_scroll = Vec2(event.wheel.x, event.wheel.y);
-                InputManager::mouse_scrolled = true;
-                break;
-            default:
-                break;
-        }
+        case SDL_EVENT_KEY_DOWN:
+            InputManager::keys[event.key.keysym.scancode] = true;
+            //Set press to char form of key pressed
+            if(event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
+                press = 8;
+            else if(event.key.keysym.scancode == SDL_SCANCODE_RETURN)
+                press = 12;
+            else if(event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
+                press = 2;
+            else if(event.key.keysym.scancode == SDL_SCANCODE_LEFT)
+                press = 1;
+            break;case SDL_EVENT_TEXT_INPUT:InputManager::press = (unsigned char)event.text.text[0];
+            break;case SDL_EVENT_KEY_UP:InputManager::keys[event.key.keysym.scancode] = false;
+            break;case SDL_EVENT_MOUSE_BUTTON_DOWN:InputManager::mouse_buttons[event.button.button] = true;
+            break;case SDL_EVENT_MOUSE_BUTTON_UP:InputManager::mouse_buttons[event.button.button] = false;
+            break;case SDL_EVENT_MOUSE_MOTION:InputManager::mouse_position = Vec2(event.motion.x, event.motion.y);
+            InputManager::mouse_delta = Vec2(event.motion.xrel, event.motion.yrel);
+            InputManager::mouse_moved = true;
+            break;case SDL_EVENT_MOUSE_WHEEL:InputManager::mouse_scroll = Vec2(event.wheel.x, event.wheel.y);
+            InputManager::mouse_scrolled = true;
+            break;default:break;
     }
 }
 
