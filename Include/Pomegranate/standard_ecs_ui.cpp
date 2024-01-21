@@ -1,5 +1,7 @@
 #include "standard_ecs_ui.h"
 
+int UITransform::UI_ID = 0;
+
 void UIController::tick(Entity *entity)
 {
 
@@ -12,8 +14,6 @@ void UIController::pre_draw()
                  ImGuiWindowFlags_NoDecoration |
     ImGuiWindowFlags_NoMove |
     ImGuiWindowFlags_NoResize |
-    ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_NoFocusOnAppearing |
     ImGuiWindowFlags_NoNav |
     ImGuiWindowFlags_NoBringToFrontOnFocus |
     ImGuiWindowFlags_NoBackground);
@@ -49,14 +49,14 @@ void UIController::draw(Entity *entity)
             auto text_field = entity->get_component<UITextField>();
             //Set size
             ImGui::SetNextItemWidth(transform->size.x);
-            ImGui::InputText("##label", &text_field->text, ImGuiInputTextFlags_EnterReturnsTrue);
+            ImGui::InputText((std::string("##Text Field")+std::to_string(transform->id)).c_str(), &text_field->text, ImGuiInputTextFlags_EnterReturnsTrue);
         }
         if (entity->has_component<UIDropdown>())
         {
             auto dropdown = entity->get_component<UIDropdown>();
             //Set size
             ImGui::SetNextItemWidth(transform->size.x);
-            if(ImGui::BeginCombo("##label", dropdown->options[dropdown->selected_option].c_str()))
+            if(ImGui::BeginCombo((std::string("##Combo")+std::to_string(transform->id)).c_str(), dropdown->options[dropdown->selected_option].c_str()))
             {
                 for (int n = 0; n < dropdown->options.size(); n++)
                 {
@@ -78,7 +78,7 @@ void UIController::draw(Entity *entity)
             auto checkbox = entity->get_component<UICheckbox>();
             //Set size
             ImGui::SetNextItemWidth(transform->size.x);
-            ImGui::Checkbox(checkbox->text.c_str(), &checkbox->checked);
+            ImGui::Checkbox((std::string("##Checkbox")+std::to_string(transform->id)).c_str(), &checkbox->checked);
         }
     }
 }
@@ -120,6 +120,7 @@ UITransform::UITransform()
 {
     this->position = Vec2(0, 0);
     this->size = Vec2(64, 64);
+    this->id = UITransform::UI_ID++;
 }
 
 UITextField::UITextField()

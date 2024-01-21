@@ -297,8 +297,8 @@ int main(int argc, char* argv[])
     //Add global systems
     System::add_global_system(new TransformLinkages());
     System::add_global_system(new Render());
-
-    ui.add_system(new UIController());
+    System::add_global_system(new UIController());
+    //ui.add_system(new UIController());
 
     float tick_time = 0.0;
     bool is_running = true;
@@ -310,8 +310,8 @@ int main(int argc, char* argv[])
 
         while (SDL_PollEvent(&event))
         {
-            InputManager::process_event(event);
             ImGui_ImplSDL3_ProcessEvent(&event);
+            InputManager::process_event(event);
             if (event.type == SDL_EVENT_QUIT) {
                 is_running = false;
             }

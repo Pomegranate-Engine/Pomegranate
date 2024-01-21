@@ -15,7 +15,9 @@ class UITransform : public Component
 public:
     Vec2 position;
     Vec2 size;
+    int id;
     UITransform();
+    static int UI_ID;
 };
 
 class UIText : public Component
