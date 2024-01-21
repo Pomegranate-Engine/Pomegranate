@@ -47,6 +47,7 @@ public:
     std::string placeholder_text;
     Color text_color;
     Color background_color;
+    bool multiline;
     UITextField();
     void init(Entity* entity) override;
 };

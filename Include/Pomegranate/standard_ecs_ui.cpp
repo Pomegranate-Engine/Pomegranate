@@ -47,9 +47,17 @@ void UIController::draw(Entity *entity)
         if (entity->has_component<UITextField>())
         {
             auto text_field = entity->get_component<UITextField>();
-            //Set size
-            ImGui::SetNextItemWidth(transform->size.x);
-            ImGui::InputText((std::string(text_field->placeholder_text)+"##Text Field"+std::to_string(transform->id)).c_str(), &text_field->text, ImGuiInputTextFlags_EnterReturnsTrue);
+
+            if(text_field->multiline)
+            {
+                ImGui::SetNextItemWidth(transform->size.x);
+                ImGui::InputTextMultiline((std::string(text_field->placeholder_text)+"##Text Field"+std::to_string(transform->id)).c_str(), &text_field->text, ImVec2(transform->size.x, transform->size.y));
+            }
+            else
+            {
+                ImGui::SetNextItemWidth(transform->size.x);
+                ImGui::InputText((std::string(text_field->placeholder_text)+"##Text Field"+std::to_string(transform->id)).c_str(), &text_field->text, ImGuiInputTextFlags_EnterReturnsTrue);
+            }
         }
         if (entity->has_component<UIDropdown>())
         {
@@ -129,6 +137,7 @@ UITextField::UITextField()
     this->placeholder_text = "Enter text here";
     this->text_color = Color(255, 255, 255, 255);
     this->background_color = Color(0, 0, 0, 255);
+    this->multiline = false;
 }
 
 void UITextField::init(Entity *entity)

@@ -261,9 +261,11 @@ int main(int argc, char* argv[])
     auto* text_field = new Entity();
     text_field->add_component<UITransform>();
     text_field->get_component<UITransform>()->position = Vec2(0, 48);
-    text_field->get_component<UITransform>()->size = Vec2(128, 32);
+    text_field->get_component<UITransform>()->size = Vec2(128, 128);
     text_field->add_component<UITextField>();
     text_field->get_component<UITextField>()->text = "Text Field";
+    text_field->get_component<UITextField>()->placeholder_text = "";
+    text_field->get_component<UITextField>()->multiline = true;
     text_field->get_component<UITextField>()->text_color = Color(255, 255, 255, 255);
     text_field->get_component<UITextField>()->background_color = Color(0, 0, 0, 255);
     ui.add_entity(text_field);
@@ -271,7 +273,7 @@ int main(int argc, char* argv[])
     //Create dropdown
     auto* dropdown = new Entity();
     dropdown->add_component<UITransform>();
-    dropdown->get_component<UITransform>()->position = Vec2(0, 67);
+    dropdown->get_component<UITransform>()->position = Vec2(0, 176);
     dropdown->get_component<UITransform>()->size = Vec2(128, 32);
     dropdown->add_component<UIDropdown>();
     dropdown->get_component<UIDropdown>()->text = "Dropdown";
@@ -284,7 +286,7 @@ int main(int argc, char* argv[])
     //Create checkbox
     auto* checkbox = new Entity();
     checkbox->add_component<UITransform>();
-    checkbox->get_component<UITransform>()->position = Vec2(0, 86);
+    checkbox->get_component<UITransform>()->position = Vec2(0, 192);
     checkbox->get_component<UITransform>()->size = Vec2(128, 32);
     checkbox->add_component<UICheckbox>();
     checkbox->get_component<UICheckbox>()->text = "Checkbox";
