@@ -264,7 +264,6 @@ int main(int argc, char* argv[])
     text_field->get_component<UITransform>()->size = Vec2(128, 32);
     text_field->add_component<UITextField>();
     text_field->get_component<UITextField>()->text = "Text Field";
-    text_field->get_component<UITextField>()->placeholder_text = "Placeholder";
     text_field->get_component<UITextField>()->text_color = Color(255, 255, 255, 255);
     text_field->get_component<UITextField>()->background_color = Color(0, 0, 0, 255);
     ui.add_entity(text_field);

@@ -20,7 +20,7 @@ void UIController::pre_draw()
 
     //Remove window margin
     ImGui::SetWindowPos(ImVec2(0, 0));
-    ImGui::SetWindowSize(ImVec2(Window::current->get_width(), Window::current->get_height()));
+    ImGui::SetWindowSize(ImVec2((float)Window::current->get_width(), (float)Window::current->get_height()));
 }
 void UIController::draw(Entity *entity)
 {
@@ -33,12 +33,12 @@ void UIController::draw(Entity *entity)
             auto text = entity->get_component<UIText>();
             ImGui::TextColored(ImVec4((float) text->color.r / 255.0f, (float) text->color.g / 255.0f,
                                       (float) text->color.b / 255.0f, (float) text->color.a / 255.0f),
-                               text->text.c_str());
+                               "%s", text->text.c_str());
         }
         if (entity->has_component<UIButton>())
         {
             auto button = entity->get_component<UIButton>();
-            if (ImGui::Button(button->text.c_str(), ImVec2(transform->size.x, transform->size.y)))
+            if (ImGui::Button((button->text+"##Button"+std::to_string(transform->id)).c_str(), ImVec2(transform->size.x, transform->size.y)))
             {
                 if(button->callback != nullptr)
                     button->callback(entity);
@@ -49,7 +49,7 @@ void UIController::draw(Entity *entity)
             auto text_field = entity->get_component<UITextField>();
             //Set size
             ImGui::SetNextItemWidth(transform->size.x);
-            ImGui::InputText((std::string("##Text Field")+std::to_string(transform->id)).c_str(), &text_field->text, ImGuiInputTextFlags_EnterReturnsTrue);
+            ImGui::InputText((std::string(text_field->placeholder_text)+"##Text Field"+std::to_string(transform->id)).c_str(), &text_field->text, ImGuiInputTextFlags_EnterReturnsTrue);
         }
         if (entity->has_component<UIDropdown>())
         {
@@ -78,7 +78,7 @@ void UIController::draw(Entity *entity)
             auto checkbox = entity->get_component<UICheckbox>();
             //Set size
             ImGui::SetNextItemWidth(transform->size.x);
-            ImGui::Checkbox((std::string("##Checkbox")+std::to_string(transform->id)).c_str(), &checkbox->checked);
+            ImGui::Checkbox((std::string(checkbox->text)+"##Checkbox"+std::to_string(transform->id)).c_str(), &checkbox->checked);
         }
     }
 }
