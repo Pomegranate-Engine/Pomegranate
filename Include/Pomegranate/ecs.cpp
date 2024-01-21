@@ -3,6 +3,8 @@
 
 std::vector<System*> System::global_systems = std::vector<System*>();
 std::vector<Entity*> Entity::entities = std::vector<Entity*>();
+std::map<const char*, std::function<Component*()>> Component::component_types = std::map<const char*, std::function<Component*()>>();
+std::map<const char*, std::function<System*()>> System::system_types = std::map<const char*, std::function<System*()>>();
 
 Entity::Entity()
 {

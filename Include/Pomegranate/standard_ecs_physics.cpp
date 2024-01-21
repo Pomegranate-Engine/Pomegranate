@@ -13,6 +13,7 @@ PhysicsObject::PhysicsObject()
     this->use_collision = true;
     this->drag = 0.0f;
     this->body_type = PHYSICS_BODY_TYPE_RIGID;
+    register_component<PhysicsObject>();
 }
 
 void KinematicBody::tick(Entity *entity)
@@ -69,6 +70,7 @@ CollisionShape::CollisionShape()
     this->radius = 16.0;
     this->restitution = 0.0;
     this->size = Vec2(32.0, 32.0);
+    register_component<CollisionShape>();
 }
 
 bool RigidBody::check_collision(Entity* a, Entity* b)
@@ -142,4 +144,9 @@ void RigidBody::resolve_collision(Entity* a, Entity* b) {
     }
 
     // Move the circles away from each other by a small distance to eliminate overlap
+}
+
+RigidBody::RigidBody()
+{
+    register_system<RigidBody>();
 }

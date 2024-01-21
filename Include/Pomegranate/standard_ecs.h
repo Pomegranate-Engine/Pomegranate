@@ -45,6 +45,7 @@ public:
 class TransformLinkages : public System
 {
 public:
+    TransformLinkages();
     void tick(Entity* entity) override;
 };
 

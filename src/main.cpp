@@ -20,6 +20,10 @@ class Drag : public System
     public:
     Entity* currently_dragged = nullptr;
     bool clicked = false;
+    Drag()
+    {
+        register_system<Drag>();
+    }
     void tick(Entity* entity) override
     {
         if(entity!=nullptr)

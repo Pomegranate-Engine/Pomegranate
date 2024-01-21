@@ -52,6 +52,7 @@ public:
 class RigidBody: public System
 {
 public:
+    RigidBody();
     void tick(Entity* entity) override;
     static bool check_collision(Entity* a, Entity* b);
     static void resolve_collision(Entity* a, Entity* b);

@@ -41,6 +41,7 @@ public:
 class Render: public System
 {
 public:
+    Render();
     void draw(Entity* entity) override;
     static void sprite(Entity*);
     static void debug_circle(Entity*);

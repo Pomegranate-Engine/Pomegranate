@@ -19,10 +19,11 @@ class EntityGroup;
 class Component
 {
 private:
-    /* data */
 public:
     virtual ~Component()=default;
     virtual void init(Entity*);
+    static std::map<const char*, std::function<Component*()>> component_types;
+    template<typename T> static void register_component();
 };
 
 class System
@@ -44,6 +45,8 @@ public:
     static void remove_global_system(System*);
     static void global_system_tick();
     static void global_system_draw(std::function<bool(Entity*, Entity*)> sortingFunction);
+    static std::map<const char*, std::function<System*()>> system_types;
+    template<typename T> static void register_system();
 };
 
 class Entity

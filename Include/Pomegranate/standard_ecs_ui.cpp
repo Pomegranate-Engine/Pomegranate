@@ -98,12 +98,15 @@ void UIController::post_draw()
 }
 
 UIController::UIController()
-= default;
+{
+    register_system<UIController>();
+}
 
 UIText::UIText()
 {
     this->text = "";
     this->color = Color(255, 255, 255, 255);
+    register_component<UIText>();
 }
 
 void UIText::init(Entity *entity)
@@ -117,6 +120,7 @@ UIButton::UIButton()
     this->text_color = Color(255, 255, 255, 255);
     this->background_color = Color(0, 0, 0, 255);
     this->callback = nullptr;
+    register_component<UIButton>();
 }
 
 void UIButton::init(Entity *entity)
@@ -129,6 +133,7 @@ UITransform::UITransform()
     this->position = Vec2(0, 0);
     this->size = Vec2(64, 64);
     this->id = UITransform::UI_ID++;
+    register_component<UITransform>();
 }
 
 UITextField::UITextField()
@@ -138,6 +143,7 @@ UITextField::UITextField()
     this->text_color = Color(255, 255, 255, 255);
     this->background_color = Color(0, 0, 0, 255);
     this->multiline = false;
+    register_component<UITextField>();
 }
 
 void UITextField::init(Entity *entity)
@@ -152,6 +158,7 @@ UIDropdown::UIDropdown()
     this->selected_option = 0;
     this->text_color = Color(255, 255, 255, 255);
     this->background_color = Color(0, 0, 0, 255);
+    register_component<UIDropdown>();
 }
 
 void UIDropdown::init(Entity *entity)
@@ -165,6 +172,7 @@ UICheckbox::UICheckbox()
     this->checked = false;
     this->text_color = Color(255, 255, 255, 255);
     this->background_color = Color(0, 0, 0, 255);
+    register_component<UICheckbox>();
 }
 
 void UICheckbox::init(Entity *entity)

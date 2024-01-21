@@ -42,3 +42,13 @@ template<typename T> inline void Entity::add_component()
         print_warn("Entity already has component of type " + std::string(typeid(T).name()) + "! Component not added.");
     }
 }
+
+template<typename T> inline void Component::register_component()
+{
+    Component::component_types[typeid(T).name()] = []() -> Component* { return new T(); };
+}
+
+template<typename T> inline void System::register_system()
+{
+    System::system_types[typeid(T).name()] = []() -> System* { return new T(); };
+}

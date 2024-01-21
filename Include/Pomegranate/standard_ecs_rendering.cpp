@@ -6,6 +6,7 @@ Sprite::Sprite()
 {
     this->texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), "res/none.png");
     this->color = Color(255, 255, 255, 255);
+    register_component<Sprite>();
 }
 
 void Sprite::load_texture(const char *path) {
@@ -21,6 +22,7 @@ AnimatedSprite::AnimatedSprite()
     this->x_offset = 0;
     this->y_offset = 0;
     this->color = Color(255, 255, 255, 255);
+    register_component<AnimatedSprite>();
 }
 
 void AnimatedSprite::load_texture(const char *path)
@@ -28,7 +30,10 @@ void AnimatedSprite::load_texture(const char *path)
     this->texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), path);
 }
 
-Camera::Camera()=default;
+Camera::Camera()
+{
+    register_component<Camera>();
+}
 
 void Camera::make_current(Entity*entity)
 {
@@ -39,6 +44,7 @@ DebugCircle::DebugCircle()
 {
     this->radius = 16.0;
     this->color = Color(255, 255, 255, 255);
+    register_component<DebugCircle>();
 }
 
 void Render::draw(Entity* entity)
@@ -162,6 +168,11 @@ void Render::tilemap(Entity* entity)
     }
 }
 
+Render::Render()
+{
+    register_system<Render>();
+}
+
 Tilemap::Tilemap()
 {
     this->width = 256;
@@ -178,6 +189,7 @@ Tilemap::Tilemap()
         tiles[0][i] = Vec2i(-1, -1);
     }
     this->tileset_texture = nullptr;
+    register_component<Tilemap>();
 }
 
 void Tilemap::load_texture(const char *path)

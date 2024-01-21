@@ -181,68 +181,13 @@ static int lua_vec2_newindex(lua_State *L)
     return 0;
 }
 
-static const struct luaL_Reg pomegranate_window_methods[] =
-{
-    {"get_width", lua_window_get_width},
-    {"get_height", lua_window_get_height},
-    {"open", lua_window_open},
-    {"close", lua_window_close},
-    {"make_current", lua_window_make_current},
-    {nullptr, nullptr}
-};
-
-static const struct luaL_Reg pomegranate_vec2_meta[] =
-{
-    {"__index", lua_vec2_index},
-    {"__newindex", lua_vec2_newindex},
-    {nullptr, nullptr}
-};
-
-static const struct luaL_Reg pomegranate[] =
-{
-    {"print_log", lua_print_log},
-    {"print_pass", lua_print_pass},
-    {"print_fail", lua_print_fail},
-    {"print_error", lua_print_error},
-    {"print_warn", lua_print_warn},
-    {"print_info", lua_print_info},
-    {"print_debug", lua_print_debug},
-    {"print_notice", lua_print_notice},
-    {"print_ready", lua_print_ready},
-    {"print_assert", lua_print_assert},
-    {"new_window", lua_window_new},
-    {"new_vec2", lua_vec2_new},
-    {nullptr, nullptr}
-};
 void lua_wrapper_init(lua_State* l)
 {
-    luaL_newmetatable(l, "Pomegranate.Window");
-    luaL_setfuncs(l, pomegranate_window_methods, 0);
 
-    lua_pushvalue(l,-1);
-    lua_setfield(l,-2,"__index");
-
-    luaL_newmetatable(l, "Pomegranate.Vec2");
-    luaL_setfuncs(l, pomegranate_vec2_meta, 0);
-    lua_pop(l, 1);  // Pop the metatable
-
-    lua_pushvalue(l,-1);
-    lua_setfield(l,-2,"__index");
-
-    lua_newtable(l);
-    lua_setfield(l, -2, "__metatable");
-
-    luaL_register(l, "Pomegranate", pomegranate);
 }
 
 LuaSystem::LuaSystem(const char* txt)
 {
-    this->lua = luaL_newstate();
-    lua_wrapper_init(this->lua);
-    if(luaL_dofile(this->lua, txt))
-    {
-        print_error("cannot run configuration file: " + std::string(lua_tostring(this->lua, -1)));
-    }
 
 }
 
@@ -253,18 +198,8 @@ LuaSystem::~LuaSystem()
 
 void LuaSystem::init(Entity *e)
 {
-    lua_getglobal(this->lua, "init");
-
-    if (lua_isfunction(this->lua, -1))
-    {
-        lua_pcall(this->lua, 0, 0, 0);
-    }
-    else
-    {
-        // Handle the case when the function is not found
-        fprintf(stderr, "Error: Lua function '%s' not found\n", "init");
-        lua_pop(this->lua, 1);  // Remove the non-function value from the stack
-    }
+    //Open lua
+    this->lua = luaL_newstate();
 }
 
 void LuaSystem::pre_tick()
