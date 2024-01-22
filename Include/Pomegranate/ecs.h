@@ -19,11 +19,14 @@ class EntityGroup;
 class Component
 {
 private:
+
 public:
     virtual ~Component()=default;
     virtual void init(Entity*);
+    std::vector<std::pair<const char*,std::pair<const type_info*, void*>>> component_data;
     static std::map<const char*, std::function<Component*()>> component_types;
     template<typename T> static void register_component();
+    void push_data(const char* name, const type_info* type, void* data);
 };
 
 class System
@@ -63,6 +66,7 @@ public:
     void remove_from_group(EntityGroup*);
     std::vector<EntityGroup*> get_parent_groups();
     template <typename T> T* get_component();
+    Component* get_component(const char*);
     template <typename T> T* require_component();
     template <typename T> bool has_component();
     Entity();

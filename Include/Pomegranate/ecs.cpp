@@ -17,7 +17,17 @@ uint64_t Entity::get_id() const
 {
     return this->id;
 }
-
+Component* Entity::get_component(const char* name)
+{
+    for (auto c : components)
+    {
+        if (std::string(c.first->name()) == "class " + std::string(name))
+        {
+            return c.second;
+        }
+    }
+    return nullptr;
+}
 Entity::~Entity()
 {
     for (int i = 0; i < Entity::entities.size(); i++)
@@ -212,4 +222,9 @@ std::vector<EntityGroup*> Entity::get_parent_groups()
 void Component::init(Entity *)
 {
 
+}
+
+void Component::push_data(const char *name, const type_info *type, void *data)
+{
+    this->component_data.push_back(std::pair<const char*,std::pair<const type_info*, void*>>(name, std::pair<const type_info*, void*>(type, data)));
 }

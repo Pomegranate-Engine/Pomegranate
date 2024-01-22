@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <Pomegranate/pomegranate.h>
+#include<Pomegranate/lua_wrapper.h>
 #include<imgui.h>
 #include<backends/imgui_impl_sdl3.h>
 #include<backends/imgui_impl_sdlrenderer3.h>
@@ -305,6 +306,11 @@ int main(int argc, char* argv[])
     System::add_global_system(new UIController());
     //ui.add_system(new UIController());
 
+    //Lua testing
+    lua_State* L = luaL_newstate();
+    lua_wrapper_init(L);
+
+
     float tick_time = 0.0;
     bool is_running = true;
     SDL_Event event;
@@ -332,6 +338,7 @@ int main(int argc, char* argv[])
             group.tick();
             world.tick();
             ui.tick();
+            lua_wrapper_tick(L);
 
             //Move camera (Not correct way to do this)
             if(InputManager::get_key(SDL_SCANCODE_LEFT))
