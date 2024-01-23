@@ -28,6 +28,19 @@ Component* Entity::get_component(const char* name)
     }
     return nullptr;
 }
+
+bool Entity::has_component(const char * name)
+{
+    for (auto c : components)
+    {
+        if (std::string(c.first->name()) == "class " + std::string(name))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 Entity::~Entity()
 {
     for (int i = 0; i < Entity::entities.size(); i++)

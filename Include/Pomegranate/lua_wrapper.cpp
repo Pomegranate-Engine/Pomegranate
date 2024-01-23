@@ -2,17 +2,6 @@
 
 std::map<Component*,int> ref_map;
 
-TestComponent::TestComponent()
-{
-    Component::register_component<TestComponent>();
-    this->push_data<int>("test_int", &this->test_int);
-    this->push_data<float>("test_float",  &this->test_float);
-    this->push_data<double>("test_double",  &this->test_double);
-    this->push_data<bool>("test_bool", &this->test_bool);
-}
-
-
-
 void lua_push_vec2(Vec2* vec2,lua_State* l)
 {
     lua_newtable(l);
@@ -80,19 +69,6 @@ void lua_push_component(Component* component,lua_State* l)
     lua_rawgeti(l, LUA_REGISTRYINDEX, ref);
 }
 
-int lua_get_entity(lua_State* l)
-{
-    double d = lua_tonumber(l, 1);
-    Entity* e = Entity::entities[(int)d];
-    //Create a table for the entity
-    lua_newtable(l);
-    //Push the entity id
-    lua_pushstring(l, "id");
-    lua_pushnumber(l, d);
-    lua_settable(l, -3);
-    return 1;
-}
-
 int lua_get_component(lua_State* l)
 {
     double d = lua_tonumber(l, 1);
@@ -103,25 +79,96 @@ int lua_get_component(lua_State* l)
     return 1;
 }
 
-void lua_wrapper_init(lua_State* l)
+int lua_has_component(lua_State* l)
 {
-    luaL_openlibs(l);
-    //Add functions
-    lua_register(l, "get_entity", lua_get_entity);
-    lua_register(l, "get_component", lua_get_component);
-    luaL_dofile(l, "res/main.lua");
+    double d = lua_tonumber(l, 1);
+    Entity* e = Entity::entities[(int)d];
+    const char* name = lua_tostring(l, 2);
+    lua_pushboolean(l, e->has_component(name));
+    return 1;
 }
-void lua_wrapper_tick(lua_State* l)
+
+
+int lua_get_key(lua_State* l)
 {
-    ref_map.clear();
-    lua_getglobal(l, "tick");
-    int res = lua_pcall(l, 0, 0, 0);
-    //Print error if there is one
-    if (res != LUA_OK)
+    const char* name = lua_tostring(l, 1);
+    auto key = static_cast<SDL_KeyCode>(SDL_GetKeyFromName(name));
+    lua_pushboolean(l, InputManager::get_key(key));
+    return 1;
+}
+
+int lua_get_axis(lua_State* l)
+{
+    const char* name1 = lua_tostring(l, 1);
+    auto key1 = static_cast<SDL_Scancode>(SDL_GetScancodeFromName(name1));
+    const char* name2 = lua_tostring(l, 2);
+    auto key2 = static_cast<SDL_Scancode>(SDL_GetScancodeFromName(name2));
+    float axis = 0;
+    if(InputManager::get_key(key1))
     {
-        print_error(lua_tostring(l, -1));
+
+        axis -= 1;
     }
-    //Iterate through ref_map
+    if(InputManager::get_key(key2))
+    {
+        axis += 1;
+    }
+    lua_pushnumber(l, axis);
+    return 1;
+}
+
+int lua_get_mouse(lua_State* l)
+{
+    int i = lua_tonumber(l, 1);
+    lua_pushboolean(l, InputManager::get_mouse_button(i));
+    return 1;
+}
+
+int lua_get_mouse_pos(lua_State* l)
+{
+    Vec2 pos = InputManager::get_mouse_position();
+    lua_push_vec2(&pos, l);
+    return 1;
+}
+
+int lua_debug_draw_rect(lua_State* l)
+{
+    //Read vector2 table position arg 1
+    lua_pushstring(l, "x");
+    lua_gettable(l, 1);
+    double x = lua_tonumber(l, -1);
+    lua_pushstring(l, "y");
+    lua_gettable(l, 1);
+    double y = lua_tonumber(l, -1);
+    //Read vector2 table size arg 2
+    lua_pushstring(l, "x");
+    lua_gettable(l, 2);
+    double w = lua_tonumber(l, -1);
+    lua_pushstring(l, "y");
+    lua_gettable(l, 2);
+    double h = lua_tonumber(l, -1);
+    //Read color arg 3
+    lua_pushstring(l, "r");
+    lua_gettable(l, 3);
+    double r = lua_tonumber(l, -1);
+    lua_pushstring(l, "g");
+    lua_gettable(l, 3);
+    double g = lua_tonumber(l, -1);
+    lua_pushstring(l, "b");
+    lua_gettable(l, 3);
+    double b = lua_tonumber(l, -1);
+    lua_pushstring(l, "a");
+    lua_gettable(l, 3);
+    double a = lua_tonumber(l, -1);
+
+    //Set draw color
+    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), (uint8_t)r, (uint8_t)g, (uint8_t)b, (uint8_t)a);
+    SDL_RenderRect(Window::current->get_sdl_renderer(), new SDL_FRect{(float)x, (float)y, (float)w, (float)h});
+    return 0;
+}
+
+void clean_refs(lua_State* l)
+{
     for(auto & ref : ref_map)
     {
         Component* c = ref.first;
@@ -180,4 +227,115 @@ void lua_wrapper_tick(lua_State* l)
         }
         luaL_unref(l, LUA_REGISTRYINDEX, ref.second);
     }
+}
+
+void LuaSystem::init(Entity *entity)
+{
+
+}
+
+void LuaSystem::tick(Entity *entity)
+{
+    if(!this->loaded) return;
+
+    lua_State* l = this->state;
+    ref_map.clear();
+    lua_getglobal(l, "tick");
+    if(!lua_isfunction(l, -1)) return;
+    //Push entity as argument
+    lua_pushnumber(l, (double)entity->get_id());
+    int res = lua_pcall(l, 1, 0, 0);
+    //Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
+    clean_refs(l);
+}
+
+void LuaSystem::draw(Entity *entity)
+{
+    if(!this->loaded) return;
+
+    lua_State* l = this->state;
+    ref_map.clear();
+    lua_getglobal(l, "draw");
+    if(!lua_isfunction(l, -1)) return;
+
+    //Push entity as argument
+    int res = lua_pcall(l, 1, 0, 0);
+    //Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
+    clean_refs(l);
+}
+
+void LuaSystem::pre_tick()
+{
+    if(!this->loaded) return;
+
+    lua_State* l = this->state;
+    ref_map.clear();
+    lua_getglobal(l, "pre_tick");
+    if(!lua_isfunction(l, -1)) return;
+
+    //Push entity as argument
+    int res = lua_pcall(l, 1, 0, 0);
+    //Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
+    clean_refs(l);
+}
+
+void LuaSystem::post_tick()
+{
+    if(!this->loaded) return;
+
+    lua_State* l = this->state;
+    ref_map.clear();
+    lua_getglobal(l, "post_tick");
+    if(!lua_isfunction(l, -1)) return;
+
+    //Push entity as argument
+    int res = lua_pcall(l, 1, 0, 0);
+    //Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
+    clean_refs(l);
+}
+
+void LuaSystem::pre_draw()
+{
+
+}
+
+void LuaSystem::post_draw()
+{
+
+}
+
+LuaSystem::LuaSystem()
+{
+    this->state = luaL_newstate();
+    luaL_openlibs(state);
+    //Add functions
+    lua_register(state, "get_component", lua_get_component);
+    lua_register(state, "has_component", lua_has_component);
+    lua_register(state, "input_get_key", lua_get_key);
+    lua_register(state, "input_get_axis", lua_get_axis);
+    lua_register(state, "input_get_mouse", lua_get_mouse);
+    lua_register(state, "input_get_mouse_pos", lua_get_mouse_pos);
+    lua_register(state, "debug_draw_rect", lua_debug_draw_rect);
+}
+
+void LuaSystem::load_script(const char *path)
+{
+    luaL_dofile(this->state, path);
+    this->loaded = true;
 }

@@ -11,22 +11,39 @@ extern "C"
 #include <Lua/lualib.h>
 }
 
-class TestComponent : public Component
+class LuaSystem : public System
 {
 public:
-    int test_int = 5.0;
-    float test_float = 0.0f;
-    double test_double = 0.0;
-    bool test_bool = false;
-    TestComponent();
+    lua_State* state;
+    bool loaded = false;
+    LuaSystem();
+    void load_script(const char* path);
+    void init(Entity* entity) override;
+    void tick(Entity* entity) override;
+    void draw(Entity* entity) override;
+    void pre_tick() override;
+    void post_tick() override;
+    void pre_draw() override;
+    void post_draw() override;
 };
 
+//Lua tools
 void lua_push_component(Component* component,lua_State* l);
 void lua_push_vec2(Vec2* vec2,lua_State* l);
-int lua_get_entity(lua_State* l);
+
+//Lua gets
 int lua_get_component(lua_State* l);
-void lua_wrapper_init(lua_State* l);
-void lua_wrapper_tick(lua_State* l);
+int lua_has_component(lua_State* l);
+int lua_get_key(lua_State* l);
+int lua_get_axis(lua_State* l);
+int lua_get_mouse(lua_State* l);
+int lua_get_mouse_pos(lua_State* l);
+
+//Lua functions
+int lua_debug_draw_rect(lua_State* l);
+
+//Wrapper
+void clean_refs(lua_State* l);
 extern std::map<Component*,int> ref_map;
 
 #endif //POMEGRANATE_ENGINE_LUA_WRAPPER_H

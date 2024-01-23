@@ -304,11 +304,10 @@ int main(int argc, char* argv[])
     System::add_global_system(new TransformLinkages());
     System::add_global_system(new Render());
     System::add_global_system(new UIController());
+    auto* lua_system = new LuaSystem();
+    lua_system->load_script("res/main.lua");
+    System::add_global_system(lua_system);
     //ui.add_system(new UIController());
-
-    //Lua testing
-    lua_State* L = luaL_newstate();
-    lua_wrapper_init(L);
 
 
     float tick_time = 0.0;
@@ -333,12 +332,16 @@ int main(int argc, char* argv[])
         {
             tick_time = 0.0;
 
+            for (int i = 0; i < Entity::entities.size(); ++i)
+            {
+                Entity::entities[i]->id = i;
+            }
+
             //tick systems
             System::global_system_tick();
             group.tick();
             world.tick();
             ui.tick();
-            lua_wrapper_tick(L);
 
             //Move camera (Not correct way to do this)
             if(InputManager::get_key(SDL_SCANCODE_LEFT))

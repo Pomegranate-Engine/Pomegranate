@@ -69,6 +69,7 @@ public:
     Component* get_component(const char*);
     template <typename T> T* require_component();
     template <typename T> bool has_component();
+    bool has_component(const char*);
     Entity();
     ~Entity();
     uint64_t get_id() const;
