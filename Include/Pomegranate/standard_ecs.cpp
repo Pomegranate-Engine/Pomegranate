@@ -8,7 +8,7 @@ Transform::Transform()
     this->z_index = 0;
     push_data<Vec2>("pos", &this->pos);
     push_data<Vec2>("scale", &this->scale);
-    push_data<Vec2>("rot",  &this->rot);
+    push_data<float>("rot",  &this->rot);
     push_data<int>("z_index",  &this->z_index);
     register_component<Transform>();
 }

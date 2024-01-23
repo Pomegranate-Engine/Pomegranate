@@ -27,5 +27,6 @@ int lua_get_entity(lua_State* l);
 int lua_get_component(lua_State* l);
 void lua_wrapper_init(lua_State* l);
 void lua_wrapper_tick(lua_State* l);
+extern std::map<Component*,int> ref_map;
 
 #endif //POMEGRANATE_ENGINE_LUA_WRAPPER_H

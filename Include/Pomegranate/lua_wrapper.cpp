@@ -1,5 +1,7 @@
 #include "lua_wrapper.h"
 
+std::map<Component*,int> ref_map;
+
 TestComponent::TestComponent()
 {
     Component::register_component<TestComponent>();
@@ -8,6 +10,8 @@ TestComponent::TestComponent()
     this->push_data<double>("test_double",  &this->test_double);
     this->push_data<bool>("test_bool", &this->test_bool);
 }
+
+
 
 void lua_push_vec2(Vec2* vec2,lua_State* l)
 {
@@ -22,6 +26,11 @@ void lua_push_vec2(Vec2* vec2,lua_State* l)
 
 void lua_push_component(Component* component,lua_State* l)
 {
+    if(ref_map.find(component) != ref_map.end())
+    {
+        lua_rawgeti(l, LUA_REGISTRYINDEX, ref_map[component]);
+        return;
+    }
     //Create a table
     lua_newtable(l);
     for (auto d : component->component_data)
@@ -64,6 +73,11 @@ void lua_push_component(Component* component,lua_State* l)
         //Set the value of the variable
         lua_settable(l, -3);
     }
+
+    int ref = luaL_ref(l, LUA_REGISTRYINDEX);
+    ref_map[component] = ref;
+
+    lua_rawgeti(l, LUA_REGISTRYINDEX, ref);
 }
 
 int lua_get_entity(lua_State* l)
@@ -99,11 +113,71 @@ void lua_wrapper_init(lua_State* l)
 }
 void lua_wrapper_tick(lua_State* l)
 {
+    ref_map.clear();
     lua_getglobal(l, "tick");
     int res = lua_pcall(l, 0, 0, 0);
     //Print error if there is one
     if (res != LUA_OK)
     {
         print_error(lua_tostring(l, -1));
+    }
+    //Iterate through ref_map
+    for(auto & ref : ref_map)
+    {
+        Component* c = ref.first;
+        for (auto d : c->component_data)
+        {
+            lua_rawgeti(l, LUA_REGISTRYINDEX, ref.second);
+            //Push the name of the variable
+            lua_pushstring(l, d.first);
+            //Get the variable
+            lua_gettable(l, -2);
+            //Check type
+            if(d.second.first == &typeid(int))
+            {
+                *(int*)d.second.second = lua_tonumber(l, -1);
+            }
+            else if(d.second.first == &typeid(float))
+            {
+                *(float*)d.second.second = lua_tonumber(l, -1);
+            }
+            else if(d.second.first == &typeid(double))
+            {
+                *(double*)d.second.second = lua_tonumber(l, -1);
+            }
+            else if(d.second.first == &typeid(bool))
+            {
+                *(bool*)d.second.second = lua_toboolean(l, -1);
+            }
+            else if(d.second.first == &typeid(std::string))
+            {
+                *(std::string*)d.second.second = lua_tostring(l, -1);
+            }
+            else if(d.second.first == &typeid(Vec2))
+            {
+                Vec2* vec2 = (Vec2*)d.second.second;
+                lua_pushstring(l, "x");
+                lua_gettable(l, -2);
+                vec2->x = lua_tonumber(l, -1);
+                lua_pushstring(l, "y");
+                lua_gettable(l, -3);
+                vec2->y = lua_tonumber(l, -1);
+            }
+            else if(d.second.first == &typeid(Vec2i*))
+            {
+                Vec2i* vec2 = (Vec2i*)d.second.second;
+                lua_pushstring(l, "x");
+                lua_gettable(l, -2);
+                vec2->x = lua_tonumber(l, -1);
+                lua_pushstring(l, "y");
+                lua_gettable(l, -3);
+                vec2->y = lua_tonumber(l, -1);
+            }
+            else
+            {
+                print_error("Unknown type");
+            }
+        }
+        luaL_unref(l, LUA_REGISTRYINDEX, ref.second);
     }
 }
