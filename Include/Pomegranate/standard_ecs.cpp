@@ -6,10 +6,10 @@ Transform::Transform()
     this->scale = Vec2(1.0, 1.0);
     this->rot = 0.0;
     this->z_index = 0;
-    push_data("pos", &typeid(Vec2), &this->pos);
-    push_data("scale", &typeid(Vec2), &this->scale);
-    push_data("rot", &typeid(double), &this->rot);
-    push_data("z_index", &typeid(int), &this->z_index);
+    push_data<Vec2>("pos", &this->pos);
+    push_data<Vec2>("scale", &this->scale);
+    push_data<Vec2>("rot",  &this->rot);
+    push_data<int>("z_index",  &this->z_index);
     register_component<Transform>();
 }
 

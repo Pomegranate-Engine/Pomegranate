@@ -1,3 +1,8 @@
+template <typename T> void Component::push_data(const char *name, void *data)
+{
+    this->component_data.emplace_back(name, std::pair<const type_info*, void*>(&typeid(T), data));
+}
+
 template <typename T> inline T* Entity::get_component()
 {
     if(this->has_component<T>())

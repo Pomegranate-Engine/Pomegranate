@@ -26,7 +26,7 @@ public:
     std::vector<std::pair<const char*,std::pair<const type_info*, void*>>> component_data;
     static std::map<const char*, std::function<Component*()>> component_types;
     template<typename T> static void register_component();
-    void push_data(const char* name, const type_info* type, void* data);
+    template<typename T> void push_data(const char* name, void* data);
 };
 
 class System

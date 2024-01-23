@@ -3,10 +3,10 @@
 TestComponent::TestComponent()
 {
     Component::register_component<TestComponent>();
-    this->push_data("test_int", &typeid(int), &this->test_int);
-    this->push_data("test_float", &typeid(float), &this->test_float);
-    this->push_data("test_double", &typeid(double), &this->test_double);
-    this->push_data("test_bool", &typeid(bool), &this->test_bool);
+    this->push_data<int>("test_int", &this->test_int);
+    this->push_data<float>("test_float",  &this->test_float);
+    this->push_data<double>("test_double",  &this->test_double);
+    this->push_data<bool>("test_bool", &this->test_bool);
 }
 
 void lua_push_vec2(Vec2* vec2,lua_State* l)
@@ -53,6 +53,10 @@ void lua_push_component(Component* component,lua_State* l)
         {
             lua_push_vec2((Vec2*)d.second.second, l);
         }
+        else if(d.second.first == &typeid(Vec2i*))
+        {
+            lua_push_vec2((Vec2*)d.second.second, l);
+        }
         else
         {
             lua_pushnil(l);
@@ -60,11 +64,6 @@ void lua_push_component(Component* component,lua_State* l)
         //Set the value of the variable
         lua_settable(l, -3);
     }
-    //Save reference to the table
-    int ref = luaL_ref(l, LUA_REGISTRYINDEX);
-    //Push the reference to the table
-    lua_pushnumber(l, ref);
-
 }
 
 int lua_get_entity(lua_State* l)
@@ -101,5 +100,10 @@ void lua_wrapper_init(lua_State* l)
 void lua_wrapper_tick(lua_State* l)
 {
     lua_getglobal(l, "tick");
-    lua_pcall(l, 0, 0, 0);
+    int res = lua_pcall(l, 0, 0, 0);
+    //Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
 }

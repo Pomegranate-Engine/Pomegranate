@@ -224,7 +224,4 @@ void Component::init(Entity *)
 
 }
 
-void Component::push_data(const char *name, const type_info *type, void *data)
-{
-    this->component_data.push_back(std::pair<const char*,std::pair<const type_info*, void*>>(name, std::pair<const type_info*, void*>(type, data)));
-}
+
