@@ -14,6 +14,20 @@ extern "C"
 #include <Lua/lualib.h>
 }
 
+class CameraController : public Component
+{
+public:
+    Vec2 velocity;
+    float speed = 3.0;
+    float drag = 0.9;
+    CameraController()
+    {
+        register_component<CameraController>();
+        push_data<Vec2>("velocity", &this->velocity);
+        push_data<float>("speed", &this->speed);
+        push_data<float>("drag", &this->drag);
+    }
+};
 
 //Example system that allows you to draw the physics objects
 class Drag : public System
@@ -126,6 +140,7 @@ int main(int argc, char* argv[])
     EntityGroup group = EntityGroup();
     auto camera = new Entity();
     camera->add_component<Camera>();
+    camera->add_component<CameraController>();
     camera->add_component<Transform>();
     Camera::make_current(camera);
     group.add_entity(camera);
@@ -305,7 +320,7 @@ int main(int argc, char* argv[])
     System::add_global_system(new Render());
     System::add_global_system(new UIController());
     auto* lua_system = new LuaSystem();
-    lua_system->load_script("res/main.lua");
+    lua_system->load_script("res/CameraControllerSystem.lua");
     System::add_global_system(lua_system);
     //ui.add_system(new UIController());
 
@@ -328,14 +343,13 @@ int main(int argc, char* argv[])
         }
 
         //- - - - - # UPDATE # - - - - -
+        for (int i = 0; i < Entity::entities.size(); ++i)
+        {
+            Entity::entities[i]->id = i;
+        }
         if (tick_time > 0.016)
         {
             tick_time = 0.0;
-
-            for (int i = 0; i < Entity::entities.size(); ++i)
-            {
-                Entity::entities[i]->id = i;
-            }
 
             //tick systems
             System::global_system_tick();

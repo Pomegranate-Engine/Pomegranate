@@ -42,6 +42,17 @@ int lua_get_mouse_pos(lua_State* l);
 //Lua functions
 int lua_debug_draw_rect(lua_State* l);
 
+int lia_print_pass(lua_State* l);
+int lia_print_fail(lua_State* l);
+int lia_print_error(lua_State* l);
+int lia_print_warn(lua_State* l);
+int lia_print_info(lua_State* l);
+int lia_print_debug(lua_State* l);
+int lia_print_notice(lua_State* l);
+int lia_print_log(lua_State* l);
+int lia_print_ready(lua_State* l);
+int lia_print_assert(lua_State* l);
+
 //Wrapper
 void clean_refs(lua_State* l);
 extern std::map<Component*,int> ref_map;

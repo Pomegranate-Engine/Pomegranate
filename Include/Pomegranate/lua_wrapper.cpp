@@ -62,10 +62,8 @@ void lua_push_component(Component* component,lua_State* l)
         //Set the value of the variable
         lua_settable(l, -3);
     }
-
     int ref = luaL_ref(l, LUA_REGISTRYINDEX);
     ref_map[component] = ref;
-
     lua_rawgeti(l, LUA_REGISTRYINDEX, ref);
 }
 
@@ -75,7 +73,9 @@ int lua_get_component(lua_State* l)
     Entity* e = Entity::entities[(int)d];
     const char* name = lua_tostring(l, 2);
     Component* c = e->get_component(name);
+    lua_pop(l, 2);
     lua_push_component(c, l);
+
     return 1;
 }
 
@@ -84,7 +84,8 @@ int lua_has_component(lua_State* l)
     double d = lua_tonumber(l, 1);
     Entity* e = Entity::entities[(int)d];
     const char* name = lua_tostring(l, 2);
-    lua_pushboolean(l, e->has_component(name));
+    bool has = e->has_component(name);
+    lua_pushboolean(l, has);
     return 1;
 }
 
@@ -106,7 +107,6 @@ int lua_get_axis(lua_State* l)
     float axis = 0;
     if(InputManager::get_key(key1))
     {
-
         axis -= 1;
     }
     if(InputManager::get_key(key2))
@@ -147,6 +147,7 @@ int lua_debug_draw_rect(lua_State* l)
     lua_pushstring(l, "y");
     lua_gettable(l, 2);
     double h = lua_tonumber(l, -1);
+
     //Read color arg 3
     lua_pushstring(l, "r");
     lua_gettable(l, 3);
@@ -164,6 +165,76 @@ int lua_debug_draw_rect(lua_State* l)
     //Set draw color
     SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), (uint8_t)r, (uint8_t)g, (uint8_t)b, (uint8_t)a);
     SDL_RenderRect(Window::current->get_sdl_renderer(), new SDL_FRect{(float)x, (float)y, (float)w, (float)h});
+    return 0;
+}
+
+int lia_print_pass(lua_State* l)
+{
+    const char* str = lua_tostring(l, 1);
+    print_pass(str);
+    return 0;
+}
+
+int lia_print_fail(lua_State* l)
+{
+    const char* str = lua_tostring(l, 1);
+    print_fail(str);
+    return 0;
+}
+
+int lia_print_error(lua_State* l)
+{
+    const char* str = lua_tostring(l, 1);
+    print_error(str);
+    return 0;
+}
+
+int lia_print_warn(lua_State* l)
+{
+    const char* str = lua_tostring(l, 1);
+    print_warn(str);
+    return 0;
+}
+
+int lia_print_info(lua_State* l)
+{
+    const char* str = lua_tostring(l, 1);
+    print_info(str);
+    return 0;
+}
+
+int lia_print_debug(lua_State* l)
+{
+    const char* str = lua_tostring(l, 1);
+    print_debug(str);
+    return 0;
+}
+
+int lia_print_notice(lua_State* l)
+{
+    const char* str = lua_tostring(l, 1);
+    print_notice(str);
+    return 0;
+}
+
+int lia_print_log(lua_State* l)
+{
+    const char* str = lua_tostring(l, 1);
+    print_log(str);
+    return 0;
+}
+
+int lia_print_ready(lua_State* l)
+{
+    const char* str = lua_tostring(l, 1);
+    print_ready(str);
+    return 0;
+}
+
+int lia_print_assert(lua_State* l)
+{
+    const char* str = lua_tostring(l, 1);
+    print_assert(str);
     return 0;
 }
 
@@ -224,9 +295,12 @@ void clean_refs(lua_State* l)
             {
                 print_error("Unknown type");
             }
+            lua_pop(l, 1);
         }
         luaL_unref(l, LUA_REGISTRYINDEX, ref.second);
+
     }
+    ref_map.clear();
 }
 
 void LuaSystem::init(Entity *entity)
@@ -236,78 +310,46 @@ void LuaSystem::init(Entity *entity)
 
 void LuaSystem::tick(Entity *entity)
 {
-    if(!this->loaded) return;
+    if (!this->loaded) return;
 
-    lua_State* l = this->state;
-    ref_map.clear();
+    lua_State *l = this->state;
     lua_getglobal(l, "tick");
-    if(!lua_isfunction(l, -1)) return;
-    //Push entity as argument
+    if (!lua_isfunction(l, -1)) return;
+
+    // Push entity as argument
     lua_pushnumber(l, (double)entity->get_id());
-    int res = lua_pcall(l, 1, 0, 0);
-    //Print error if there is one
+
+    int arguments = 1;  // Number of arguments pushed onto the stack
+
+    int res = lua_pcall(l, arguments, 0, 0);
+
+    // Clear the stack
+    lua_pop(l, lua_gettop(l));
+
+    // Print error if there is one
     if (res != LUA_OK)
     {
         print_error(lua_tostring(l, -1));
     }
+
+    // Clean up references
     clean_refs(l);
 }
 
+
 void LuaSystem::draw(Entity *entity)
 {
-    if(!this->loaded) return;
 
-    lua_State* l = this->state;
-    ref_map.clear();
-    lua_getglobal(l, "draw");
-    if(!lua_isfunction(l, -1)) return;
-
-    //Push entity as argument
-    int res = lua_pcall(l, 1, 0, 0);
-    //Print error if there is one
-    if (res != LUA_OK)
-    {
-        print_error(lua_tostring(l, -1));
-    }
-    clean_refs(l);
 }
 
 void LuaSystem::pre_tick()
 {
-    if(!this->loaded) return;
 
-    lua_State* l = this->state;
-    ref_map.clear();
-    lua_getglobal(l, "pre_tick");
-    if(!lua_isfunction(l, -1)) return;
-
-    //Push entity as argument
-    int res = lua_pcall(l, 1, 0, 0);
-    //Print error if there is one
-    if (res != LUA_OK)
-    {
-        print_error(lua_tostring(l, -1));
-    }
-    clean_refs(l);
 }
 
 void LuaSystem::post_tick()
 {
-    if(!this->loaded) return;
 
-    lua_State* l = this->state;
-    ref_map.clear();
-    lua_getglobal(l, "post_tick");
-    if(!lua_isfunction(l, -1)) return;
-
-    //Push entity as argument
-    int res = lua_pcall(l, 1, 0, 0);
-    //Print error if there is one
-    if (res != LUA_OK)
-    {
-        print_error(lua_tostring(l, -1));
-    }
-    clean_refs(l);
 }
 
 void LuaSystem::pre_draw()
@@ -332,6 +374,16 @@ LuaSystem::LuaSystem()
     lua_register(state, "input_get_mouse", lua_get_mouse);
     lua_register(state, "input_get_mouse_pos", lua_get_mouse_pos);
     lua_register(state, "debug_draw_rect", lua_debug_draw_rect);
+    lua_register(state, "print_pass", lia_print_pass);
+    lua_register(state, "print_fail", lia_print_fail);
+    lua_register(state, "print_error", lia_print_error);
+    lua_register(state, "print_warn", lia_print_warn);
+    lua_register(state, "print_info", lia_print_info);
+    lua_register(state, "print_debug", lia_print_debug);
+    lua_register(state, "print_notice", lia_print_notice);
+    lua_register(state, "print_log", lia_print_log);
+    lua_register(state, "print_ready", lia_print_ready);
+    lua_register(state, "print_assert", lia_print_assert);
 }
 
 void LuaSystem::load_script(const char *path)
