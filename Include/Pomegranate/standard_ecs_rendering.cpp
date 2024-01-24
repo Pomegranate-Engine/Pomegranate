@@ -7,6 +7,8 @@ Sprite::Sprite()
     this->texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), "res/none.png");
     this->color = Color(255, 255, 255, 255);
     register_component<Sprite>();
+    //TODO: Add texture support to lua
+    push_data<Color>("color", &this->color);
 }
 
 void Sprite::load_texture(const char *path) {
@@ -23,6 +25,14 @@ AnimatedSprite::AnimatedSprite()
     this->y_offset = 0;
     this->color = Color(255, 255, 255, 255);
     register_component<AnimatedSprite>();
+    //TODO: Add texture support to lua
+    push_data<Color>("color", &this->color);
+    push_data<int>("frame", &this->frame);
+    push_data<int>("horizontal_frames", &this->horizontal_frames);
+    push_data<int>("vertical_frames", &this->vertical_frames);
+    push_data<int>("x_offset", &this->x_offset);
+    push_data<int>("y_offset", &this->y_offset);
+    push_data<Color>("color", &this->color);
 }
 
 void AnimatedSprite::load_texture(const char *path)
@@ -45,6 +55,8 @@ DebugCircle::DebugCircle()
     this->radius = 16.0;
     this->color = Color(255, 255, 255, 255);
     register_component<DebugCircle>();
+    push_data<float>("radius", &this->radius);
+    push_data<Color>("color", &this->color);
 }
 
 void Render::draw(Entity* entity)
@@ -190,6 +202,15 @@ Tilemap::Tilemap()
     }
     this->tileset_texture = nullptr;
     register_component<Tilemap>();
+    //TODO: Add texture support to lua
+    //TODO: add vector support to lua
+    push_data<int>("width", &this->width);
+    push_data<int>("height", &this->height);
+    push_data<Color>("color", &this->color);
+    push_data<int>("tileset_horizontal_tiles", &this->tileset_horizontal_tiles);
+    push_data<int>("tileset_vertical_tiles", &this->tileset_vertical_tiles);
+    push_data<int>("tileset_tile_width", &this->tileset_tile_width);
+    push_data<int>("tileset_tile_height", &this->tileset_tile_height);
 }
 
 void Tilemap::load_texture(const char *path)

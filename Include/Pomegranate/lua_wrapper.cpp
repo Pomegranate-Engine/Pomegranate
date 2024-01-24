@@ -13,6 +13,23 @@ void lua_push_vec2(Vec2* vec2,lua_State* l)
     lua_settable(l, -3);
 }
 
+void lua_push_color(Color* color, lua_State* l)
+{
+    lua_newtable(l);
+    lua_pushstring(l, "r");
+    lua_pushnumber(l, color->r);
+    lua_settable(l, -3);
+    lua_pushstring(l, "g");
+    lua_pushnumber(l, color->g);
+    lua_settable(l, -3);
+    lua_pushstring(l, "b");
+    lua_pushnumber(l, color->b);
+    lua_settable(l, -3);
+    lua_pushstring(l, "a");
+    lua_pushnumber(l, color->a);
+    lua_settable(l, -3);
+}
+
 void lua_push_component(Component* component,lua_State* l)
 {
     if(ref_map.find(component) != ref_map.end())
@@ -54,6 +71,10 @@ void lua_push_component(Component* component,lua_State* l)
         else if(d.second.first == &typeid(Vec2i*))
         {
             lua_push_vec2((Vec2*)d.second.second, l);
+        }
+        else if(d.second.first == &typeid(Color*))
+        {
+            lua_push_color((Color*)d.second.second, l);
         }
         else
         {
@@ -129,43 +150,6 @@ int lua_get_mouse_pos(lua_State* l)
     Vec2 pos = InputManager::get_mouse_position();
     lua_push_vec2(&pos, l);
     return 1;
-}
-
-int lua_debug_draw_rect(lua_State* l)
-{
-    //Read vector2 table position arg 1
-    lua_pushstring(l, "x");
-    lua_gettable(l, 1);
-    double x = lua_tonumber(l, -1);
-    lua_pushstring(l, "y");
-    lua_gettable(l, 1);
-    double y = lua_tonumber(l, -1);
-    //Read vector2 table size arg 2
-    lua_pushstring(l, "x");
-    lua_gettable(l, 2);
-    double w = lua_tonumber(l, -1);
-    lua_pushstring(l, "y");
-    lua_gettable(l, 2);
-    double h = lua_tonumber(l, -1);
-
-    //Read color arg 3
-    lua_pushstring(l, "r");
-    lua_gettable(l, 3);
-    double r = lua_tonumber(l, -1);
-    lua_pushstring(l, "g");
-    lua_gettable(l, 3);
-    double g = lua_tonumber(l, -1);
-    lua_pushstring(l, "b");
-    lua_gettable(l, 3);
-    double b = lua_tonumber(l, -1);
-    lua_pushstring(l, "a");
-    lua_gettable(l, 3);
-    double a = lua_tonumber(l, -1);
-
-    //Set draw color
-    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), (uint8_t)r, (uint8_t)g, (uint8_t)b, (uint8_t)a);
-    SDL_RenderRect(Window::current->get_sdl_renderer(), new SDL_FRect{(float)x, (float)y, (float)w, (float)h});
-    return 0;
 }
 
 int lia_print_pass(lua_State* l)
@@ -291,6 +275,22 @@ void clean_refs(lua_State* l)
                 lua_gettable(l, -3);
                 vec2->y = lua_tonumber(l, -1);
             }
+            else if(d.second.first == &typeid(Color*))
+            {
+                Color* color = (Color*)d.second.second;
+                lua_pushstring(l, "r");
+                lua_gettable(l, -2);
+                color->r = lua_tonumber(l, -1);
+                lua_pushstring(l, "g");
+                lua_gettable(l, -3);
+                color->g = lua_tonumber(l, -1);
+                lua_pushstring(l, "b");
+                lua_gettable(l, -4);
+                color->b = lua_tonumber(l, -1);
+                lua_pushstring(l, "a");
+                lua_gettable(l, -5);
+                color->a = lua_tonumber(l, -1);
+            }
             else
             {
                 print_error("Unknown type");
@@ -373,7 +373,6 @@ LuaSystem::LuaSystem()
     lua_register(state, "input_get_axis", lua_get_axis);
     lua_register(state, "input_get_mouse", lua_get_mouse);
     lua_register(state, "input_get_mouse_pos", lua_get_mouse_pos);
-    lua_register(state, "debug_draw_rect", lua_debug_draw_rect);
     lua_register(state, "print_pass", lia_print_pass);
     lua_register(state, "print_fail", lia_print_fail);
     lua_register(state, "print_error", lia_print_error);
@@ -384,6 +383,18 @@ LuaSystem::LuaSystem()
     lua_register(state, "print_log", lia_print_log);
     lua_register(state, "print_ready", lia_print_ready);
     lua_register(state, "print_assert", lia_print_assert);
+    //Add constants
+    //Physics constants
+    lua_pushnumber(state, 0);
+    lua_setglobal(state, "PHYSICS_BODY_TYPE_KINEMATIC");
+    lua_pushnumber(state, 1);
+    lua_setglobal(state, "PHYSICS_BODY_TYPE_RIGID");
+    lua_pushnumber(state, 2);
+    lua_setglobal(state, "PHYSICS_BODY_TYPE_STATIC");
+    lua_pushnumber(state, 0);
+    lua_setglobal(state, "COLLISION_SHAPE_TYPE_RECTANGLE");
+    lua_pushnumber(state, 1);
+    lua_setglobal(state, "COLLISION_SHAPE_TYPE_CIRCLE");
 }
 
 void LuaSystem::load_script(const char *path)

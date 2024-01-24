@@ -107,6 +107,8 @@ UIText::UIText()
     this->text = "";
     this->color = Color(255, 255, 255, 255);
     register_component<UIText>();
+    push_data<std::string>("text", &this->text);
+    push_data<Color>("color", &this->color);
 }
 
 void UIText::init(Entity *entity)
@@ -121,6 +123,9 @@ UIButton::UIButton()
     this->background_color = Color(0, 0, 0, 255);
     this->callback = nullptr;
     register_component<UIButton>();
+    push_data<std::string>("text", &this->text);
+    push_data<Color>("text_color", &this->text_color);
+    push_data<Color>("background_color", &this->background_color);
 }
 
 void UIButton::init(Entity *entity)
@@ -134,6 +139,9 @@ UITransform::UITransform()
     this->size = Vec2(64, 64);
     this->id = UITransform::UI_ID++;
     register_component<UITransform>();
+    push_data<Vec2>("position", &this->position);
+    push_data<Vec2>("size", &this->size);
+    push_data<int>("id", &this->id);
 }
 
 UITextField::UITextField()
@@ -144,6 +152,11 @@ UITextField::UITextField()
     this->background_color = Color(0, 0, 0, 255);
     this->multiline = false;
     register_component<UITextField>();
+    push_data<std::string>("text", &this->text);
+    push_data<std::string>("placeholder_text", &this->placeholder_text);
+    push_data<Color>("text_color", &this->text_color);
+    push_data<Color>("background_color", &this->background_color);
+    push_data<bool>("multiline", &this->multiline);
 }
 
 void UITextField::init(Entity *entity)
@@ -159,6 +172,11 @@ UIDropdown::UIDropdown()
     this->text_color = Color(255, 255, 255, 255);
     this->background_color = Color(0, 0, 0, 255);
     register_component<UIDropdown>();
+    push_data<std::string>("text", &this->text);
+    push_data<int>("selected_option", &this->selected_option);
+    //TODO: Push data for options
+    push_data<Color>("text_color", &this->text_color);
+    push_data<Color>("background_color", &this->background_color);
 }
 
 void UIDropdown::init(Entity *entity)
@@ -173,6 +191,10 @@ UICheckbox::UICheckbox()
     this->text_color = Color(255, 255, 255, 255);
     this->background_color = Color(0, 0, 0, 255);
     register_component<UICheckbox>();
+    push_data<std::string>("text", &this->text);
+    push_data<bool>("checked", &this->checked);
+    push_data<Color>("text_color", &this->text_color);
+    push_data<Color>("background_color", &this->background_color);
 }
 
 void UICheckbox::init(Entity *entity)

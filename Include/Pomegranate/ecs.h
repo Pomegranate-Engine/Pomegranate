@@ -35,6 +35,7 @@ private:
     /* data */
     static std::vector<System*> global_systems;
 public:
+    bool active = true;
     System();
     ~System();
     virtual void init(Entity*);

@@ -3,6 +3,7 @@
 #include "engine.h"
 #include "window.h"
 #include "ecs.h"
+#include "color.h"
 
 extern "C"
 {
@@ -40,8 +41,6 @@ int lua_get_mouse(lua_State* l);
 int lua_get_mouse_pos(lua_State* l);
 
 //Lua functions
-int lua_debug_draw_rect(lua_State* l);
-
 int lia_print_pass(lua_State* l);
 int lia_print_fail(lua_State* l);
 int lia_print_error(lua_State* l);

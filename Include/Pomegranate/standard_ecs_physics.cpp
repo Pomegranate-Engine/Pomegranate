@@ -14,6 +14,15 @@ PhysicsObject::PhysicsObject()
     this->drag = 0.0f;
     this->body_type = PHYSICS_BODY_TYPE_RIGID;
     register_component<PhysicsObject>();
+
+    push_data<Vec2>("linear_velocity", &this->linear_velocity);
+    push_data<float>("angular_velocity", &this->angular_velocity);
+    push_data<float>("mass", &this->mass);
+    push_data<float>("gravity_scale", &this->gravity_scale);
+    push_data<bool>("continuous_collision_detection", &this->continuous_collision_detection);
+    push_data<bool>("use_collision", &this->use_collision);
+    push_data<float>("drag", &this->drag);
+    push_data<int>("body_type", &this->body_type);
 }
 
 void KinematicBody::tick(Entity *entity)
@@ -71,6 +80,11 @@ CollisionShape::CollisionShape()
     this->restitution = 0.0;
     this->size = Vec2(32.0, 32.0);
     register_component<CollisionShape>();
+
+    push_data<int>("shape_type", &this->shape_type);
+    push_data<float>("radius", &this->radius);
+    push_data<float>("restitution", &this->restitution);
+    push_data<Vec2>("size", &this->size);
 }
 
 bool RigidBody::check_collision(Entity* a, Entity* b)

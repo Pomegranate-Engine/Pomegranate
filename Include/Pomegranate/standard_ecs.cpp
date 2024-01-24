@@ -30,6 +30,8 @@ PositionLink::PositionLink()
     this->link = nullptr;
     this->offset = Vec2(0.0, 0.0);
     register_component<PositionLink>();
+    //TODO: Add support for entity links in lua
+    push_data<Vec2>("offset", &this->offset);
 }
 
 RotationLink::RotationLink()
@@ -37,6 +39,8 @@ RotationLink::RotationLink()
     this->link = nullptr;
     this->offset = 0.0;
     register_component<RotationLink>();
+    //TODO: Add support for entity links in lua
+    push_data<float>("offset", &this->offset);
 }
 
 ScaleLink::ScaleLink()
@@ -44,6 +48,8 @@ ScaleLink::ScaleLink()
     this->link = nullptr;
     this->offset = Vec2(0.0, 0.0);
     register_component<ScaleLink>();
+    //TODO: Add support for entity links in lua
+    push_data<Vec2>("offset", &this->offset);
 }
 
 void TransformLinkages::tick(Entity *entity)

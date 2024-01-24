@@ -29,6 +29,41 @@ public:
     }
 };
 
+class CameraControllerSystem : public System
+{
+public:
+    CameraControllerSystem()
+    {
+        register_system<CameraControllerSystem>();
+    }
+    void tick(Entity* entity) override
+    {
+        if(entity->has_component<CameraController>() && entity->has_component<Transform>())
+        {
+            auto* c = entity->get_component<CameraController>();
+            auto* t = entity->get_component<Transform>();
+            c->velocity*=c->drag;
+            if(InputManager::get_key(SDL_SCANCODE_W))
+            {
+                c->velocity.y-=c->speed;
+            }
+            if(InputManager::get_key(SDL_SCANCODE_S))
+            {
+                c->velocity.y+=c->speed;
+            }
+            if(InputManager::get_key(SDL_SCANCODE_A))
+            {
+                c->velocity.x-=c->speed;
+            }
+            if(InputManager::get_key(SDL_SCANCODE_D))
+            {
+                c->velocity.x+=c->speed;
+            }
+            t->pos+=c->velocity;
+        }
+    }
+};
+
 //Example system that allows you to draw the physics objects
 class Drag : public System
 {
@@ -322,8 +357,14 @@ int main(int argc, char* argv[])
     auto* lua_system = new LuaSystem();
     lua_system->load_script("res/CameraControllerSystem.lua");
     System::add_global_system(lua_system);
+    auto* camera_controller_system = new CameraControllerSystem();
+    System::add_global_system(camera_controller_system);
+
+    lua_system->active = false;
     //ui.add_system(new UIController());
 
+    bool f1pressed = false;
+    bool camera_mode = false;
 
     float tick_time = 0.0;
     bool is_running = true;
@@ -347,6 +388,18 @@ int main(int argc, char* argv[])
         {
             Entity::entities[i]->id = i;
         }
+
+        if(camera_mode)
+        {
+            camera_controller_system->active = true;
+            lua_system->active = false;
+        }
+        else
+        {
+            camera_controller_system->active = false;
+            lua_system->active = true;
+        }
+
         if (tick_time > 0.016)
         {
             tick_time = 0.0;
@@ -356,24 +409,27 @@ int main(int argc, char* argv[])
             group.tick();
             world.tick();
             ui.tick();
+        }
 
-            //Move camera (Not correct way to do this)
-            if(InputManager::get_key(SDL_SCANCODE_LEFT))
+        if(InputManager::get_key(SDL_SCANCODE_F1))
+        {
+            if(!f1pressed)
             {
-                camera->get_component<Transform>()->pos.x -= 8.0f;
+                camera_mode = !camera_mode;
+                if(camera_mode)
+                {
+                    print_info("Camera Mode C++");
+                }
+                else
+                {
+                    print_info("Camera Mode Lua");
+                }
             }
-            if(InputManager::get_key(SDL_SCANCODE_RIGHT))
-            {
-                camera->get_component<Transform>()->pos.x += 8.0f;
-            }
-            if(InputManager::get_key(SDL_SCANCODE_UP))
-            {
-                camera->get_component<Transform>()->pos.y -= 8.0f;
-            }
-            if(InputManager::get_key(SDL_SCANCODE_DOWN))
-            {
-                camera->get_component<Transform>()->pos.y += 8.0f;
-            }
+            f1pressed = true;
+        }
+        else
+        {
+            f1pressed = false;
         }
 
         //- - - - - # DRAW # - - - - -
