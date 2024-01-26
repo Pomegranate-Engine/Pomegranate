@@ -38,28 +38,41 @@ public:
     }
     void tick(Entity* entity) override
     {
-        if(entity->has_component<CameraController>() && entity->has_component<Transform>())
+        if(entity->has_component<LuaComponent>("CameraController") && entity->has_component<Transform>())
         {
-            auto* c = entity->get_component<CameraController>();
+            auto* c = entity->get_component<LuaComponent>("CameraController");
             auto* t = entity->get_component<Transform>();
-            c->velocity*=c->drag;
+            auto vx = c->get<double>("vx");
+            auto vy = c->get<double>("vy");
+            Vec2 v = Vec2(vx, vy);
+            Vec2 m = Vec2(0,0);
             if(InputManager::get_key(SDL_SCANCODE_W))
             {
-                c->velocity.y-=c->speed;
+                m.y-=1;
             }
             if(InputManager::get_key(SDL_SCANCODE_S))
             {
-                c->velocity.y+=c->speed;
+                m.y+=1;
             }
             if(InputManager::get_key(SDL_SCANCODE_A))
             {
-                c->velocity.x-=c->speed;
+                m.x-=1;
             }
             if(InputManager::get_key(SDL_SCANCODE_D))
             {
-                c->velocity.x+=c->speed;
+                m.x+=1;
             }
-            t->pos+=c->velocity;
+
+            auto speed = c->get<double>("speed");
+            auto drag = c->get<double>("drag");
+            v += m * (float)speed;
+            v *= (float)drag;
+
+
+            c->set<double>("vx", v.x);
+            c->set<double>("vy", v.y);
+
+            t->pos += v;
         }
     }
 };

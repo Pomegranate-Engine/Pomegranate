@@ -72,7 +72,7 @@ void lua_push_component(Component* component,lua_State* l)
     for (auto d : component->component_data)
     {
         //Push the name of the variable
-        lua_pushstring(l, d.first);
+        lua_pushstring(l, d.first.c_str());
         //Push the value of the variable
         if (d.second.first == &typeid(int))
         {
@@ -377,7 +377,7 @@ void clean_refs(lua_State* l)
         {
             lua_rawgeti(l, LUA_REGISTRYINDEX, ref.second);
             //Push the name of the variable
-            lua_pushstring(l, d.first);
+            lua_pushstring(l, d.first.c_str());
             //Get the variable
             lua_gettable(l, -2);
             //Check type

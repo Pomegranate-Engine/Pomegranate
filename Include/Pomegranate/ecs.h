@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <functional>
 #include <utility>
+#include <typeindex>
+
 extern "C"
 {
 #include <Lua/lua.h>
@@ -30,11 +32,12 @@ private:
 public:
     virtual ~Component()=default;
     virtual void init(Entity*);
-    std::vector<std::pair<const char*,std::pair<const std::type_info*, void*>>> component_data;
+    std::unordered_map<std::string,std::pair<const std::type_info*, void*>> component_data;
     static std::unordered_map<const char*, std::function<Component*()>> component_types;
     template<typename T> static void register_component();
-    template<typename T> void push_data(const char* name, void* data);
-    template<typename T> T get_data(const char* name);
+    template<typename T> void push_data(std::string name, void* data);
+    template<typename T> T get(std::string name);
+    template<typename T> void set(const char* name, T value);
 };
 
 //For lua wrapper

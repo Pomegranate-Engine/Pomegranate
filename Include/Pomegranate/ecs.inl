@@ -1,19 +1,23 @@
-template <typename T> void Component::push_data(const char *name, void *data)
+template <typename T> void Component::push_data(std::string name, void *data)
 {
-    auto p = std::make_pair(&typeid(T), data);
-    this->component_data.emplace_back(name, p);
+    auto p = std::pair<const std::type_info*, void*>(&typeid(T), data);
+    this->component_data[name] = p;
 }
-template <typename T> T Component::get_data(const char *name)
+template <typename T> T Component::get(std::string name)
 {
-    if(std::find(component_data.begin(), component_data.end(), name) != component_data.end())
+    if(this->component_data[name].second != nullptr)
     {
-        return *(T*)component_data[std::find(component_data.begin(), component_data.end(), name) - component_data.begin()].second.second;
+        return *(T*)this->component_data[name].second;
     }
     else
     {
-        print_error("Component does not have data with name " + std::string(name));
-        return nullptr;
+        print_warn("Component " + std::string(typeid(T).name()) + " does not have data " + std::string(name) + "! Returning default value.");
+        return T();
     }
+}
+template <typename T> void Component::set(const char *name, T value)
+{
+    *(T*)this->component_data[name].second = value;
 }
 
 template <typename T> inline T* Entity::get_component(const char* lua_type)
