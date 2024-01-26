@@ -1,6 +1,6 @@
 #include "lua_wrapper.h"
 
-std::map<Component*,int> ref_map;
+std::unordered_map<Component*,int> ref_map;
 
 void lua_push_vec2(Vec2* vec2,lua_State* l)
 {
@@ -11,6 +11,36 @@ void lua_push_vec2(Vec2* vec2,lua_State* l)
     lua_pushstring(l, "y");
     lua_pushnumber(l, vec2->y);
     lua_settable(l, -3);
+}
+
+Vec2 lua_get_vec2(lua_State* l, int idx)
+{
+    Vec2 vec2;
+    lua_pushstring(l, "x");
+    lua_gettable(l, idx);
+    vec2.x = lua_tonumber(l, -1);
+    lua_pushstring(l, "y");
+    lua_gettable(l, idx);
+    vec2.y = lua_tonumber(l, -1);
+    return vec2;
+}
+
+Color lua_get_color(lua_State* l, int idx)
+{
+    Color color;
+    lua_pushstring(l, "r");
+    lua_gettable(l, idx);
+    color.r = lua_tonumber(l, -1);
+    lua_pushstring(l, "g");
+    lua_gettable(l, idx);
+    color.g = lua_tonumber(l, -1);
+    lua_pushstring(l, "b");
+    lua_gettable(l, idx);
+    color.b = lua_tonumber(l, -1);
+    lua_pushstring(l, "a");
+    lua_gettable(l, idx);
+    color.a = lua_tonumber(l, -1);
+    return color;
 }
 
 void lua_push_color(Color* color, lua_State* l)
@@ -93,10 +123,17 @@ int lua_get_component(lua_State* l)
     double d = lua_tonumber(l, 1);
     Entity* e = Entity::entities[(int)d];
     const char* name = lua_tostring(l, 2);
-    Component* c = e->get_component(name);
-    lua_pop(l, 2);
-    lua_push_component(c, l);
 
+    if(LuaComponent::lua_component_types.find(std::string(name)) != LuaComponent::lua_component_types.end())
+    {
+        Component *c = e->get_component<LuaComponent>(name);
+        lua_push_component(c, l);
+    }
+    else
+    {
+        Component *c = e->get_component(name);
+        lua_push_component(c, l);
+    }
     return 1;
 }
 
@@ -105,8 +142,16 @@ int lua_has_component(lua_State* l)
     double d = lua_tonumber(l, 1);
     Entity* e = Entity::entities[(int)d];
     const char* name = lua_tostring(l, 2);
-    bool has = e->has_component(name);
-    lua_pushboolean(l, has);
+    if(LuaComponent::lua_component_types.find(std::string(name)) != LuaComponent::lua_component_types.end())
+    {
+        bool has = e->has_component<LuaComponent>(name);
+        lua_pushboolean(l, has);
+    }
+    else
+    {
+        bool has = e->has_component(name);
+        lua_pushboolean(l, has);
+    }
     return 1;
 }
 
@@ -222,6 +267,107 @@ int lia_print_assert(lua_State* l)
     return 0;
 }
 
+int lua_draw_pixel(lua_State* l)
+{
+    Vec2 p = lua_get_vec2(l, 1);
+    Color c = lua_get_color(l, 2);
+    SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), c.r, c.g, c.b, c.a);
+    SDL_RenderPoint(Window::current->get_sdl_renderer(), p.x, p.y);
+    return 0;
+}
+
+int lua_register_component(lua_State* l)
+{
+    const char* name = lua_tostring(l, 1);
+    // Check if the second argument is a table
+    if (lua_istable(l, 2)) {
+        // Iterate through the table
+        lua_pushnil(l);  // Push a nil key to start the iteration
+        while (lua_next(l, 2) != 0) {
+            // Key is at index -2, value is at index -1
+            const char* key = lua_tostring(l, -2);
+
+            // Process the key-value pair (replace this with your logic)
+            if(lua_isnumber(l,-1))
+            {
+                LuaComponent::current->push_data<double>(key, new double(lua_tonumber(l, -1)));
+            }
+            else if(lua_isstring(l,-1))
+            {
+                LuaComponent::current->push_data<std::string>(key, new std::string(lua_tostring(l, -1)));
+            }
+            else if(lua_isboolean(l,-1))
+            {
+                LuaComponent::current->push_data<bool>(key, new bool(lua_toboolean(l, -1)));
+            }
+            else if(lua_istable(l,-1))
+            {
+                //TODO: Add support for vec2s and stuff
+            }
+            else
+            {
+                print_error("Unknown type");
+            }
+
+            // Pop the value, leaving the key on top for the next iteration
+            lua_pop(l, 1);
+        }
+    }
+
+    //Debug all current component data
+    for (auto d : LuaComponent::current->component_data)
+    {
+        print_debug(d.first);
+        if (d.second.first == &typeid(int))
+        {
+            print_debug(std::to_string(*(int*)d.second.second));
+        }
+        else if (d.second.first == &typeid(float))
+        {
+            print_debug(std::to_string(*(float*)d.second.second));
+        }
+        else if (d.second.first == &typeid(double))
+        {
+            print_debug(std::to_string(*(double*)d.second.second));
+        }
+        else if (d.second.first == &typeid(bool))
+        {
+            print_debug(std::to_string(*(bool*)d.second.second));
+        }
+        else if (d.second.first == &typeid(std::string))
+        {
+            print_debug(*(std::string*)d.second.second);
+        }
+        else if(d.second.first == &typeid(Vec2))
+        {
+            Vec2* vec2 = (Vec2*)d.second.second;
+            print_debug(std::to_string(vec2->x));
+            print_debug(std::to_string(vec2->y));
+        }
+        else if(d.second.first == &typeid(Vec2i*))
+        {
+            Vec2i* vec2 = (Vec2i*)d.second.second;
+            print_debug(std::to_string(vec2->x));
+            print_debug(std::to_string(vec2->y));
+        }
+        else if(d.second.first == &typeid(Color*))
+        {
+            Color* color = (Color*)d.second.second;
+            print_debug(std::to_string(color->r));
+            print_debug(std::to_string(color->g));
+            print_debug(std::to_string(color->b));
+            print_debug(std::to_string(color->a));
+        }
+        else
+        {
+            print_error("Unknown type");
+        }
+    }
+
+    LuaComponent::lua_component_types[name] = 0;
+    return 0;
+}
+
 void clean_refs(lua_State* l)
 {
     for(auto & ref : ref_map)
@@ -323,14 +469,14 @@ void LuaSystem::tick(Entity *entity)
 
     int res = lua_pcall(l, arguments, 0, 0);
 
-    // Clear the stack
-    lua_pop(l, lua_gettop(l));
-
     // Print error if there is one
     if (res != LUA_OK)
     {
         print_error(lua_tostring(l, -1));
     }
+
+    // Clear the stack
+    lua_pop(l, lua_gettop(l));
 
     // Clean up references
     clean_refs(l);
@@ -339,27 +485,130 @@ void LuaSystem::tick(Entity *entity)
 
 void LuaSystem::draw(Entity *entity)
 {
+    if (!this->loaded) return;
 
+    lua_State *l = this->state;
+    lua_getglobal(l, "draw");
+    if (!lua_isfunction(l, -1)) return;
+
+    // Push entity as argument
+    lua_pushnumber(l, (double)entity->get_id());
+
+    int arguments = 1;  // Number of arguments pushed onto the stack
+
+    int res = lua_pcall(l, arguments, 0, 0);
+
+    // Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
+
+    // Clear the stack
+    lua_pop(l, lua_gettop(l));
+
+    // Clean up references
+    clean_refs(l);
 }
 
 void LuaSystem::pre_tick()
 {
+    if (!this->loaded) return;
 
+    lua_State *l = this->state;
+    lua_getglobal(l, "pre_tick");
+    if (!lua_isfunction(l, -1)) return;
+
+    int arguments = 0;  // Number of arguments pushed onto the stack
+
+    int res = lua_pcall(l, arguments, 0, 0);
+
+    // Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
+
+    // Clear the stack
+    lua_pop(l, lua_gettop(l));
+
+    // Clean up references
+    clean_refs(l);
 }
 
 void LuaSystem::post_tick()
 {
+    if (!this->loaded) return;
 
+    lua_State *l = this->state;
+    lua_getglobal(l, "post_tick");
+    if (!lua_isfunction(l, -1)) return;
+
+    int arguments = 0;  // Number of arguments pushed onto the stack
+
+    int res = lua_pcall(l, arguments, 0, 0);
+
+    // Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
+
+    // Clear the stack
+    lua_pop(l, lua_gettop(l));
+
+    // Clean up references
+    clean_refs(l);
 }
 
 void LuaSystem::pre_draw()
 {
+    if (!this->loaded) return;
 
+    lua_State *l = this->state;
+    lua_getglobal(l, "pre_draw");
+    if (!lua_isfunction(l, -1)) return;
+
+    int arguments = 0;  // Number of arguments pushed onto the stack
+
+    int res = lua_pcall(l, arguments, 0, 0);
+
+    // Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
+
+    // Clear the stack
+    lua_pop(l, lua_gettop(l));
+
+    // Clean up references
+    clean_refs(l);
 }
 
 void LuaSystem::post_draw()
 {
+    if (!this->loaded) return;
 
+    lua_State *l = this->state;
+    lua_getglobal(l, "post_draw");
+    if (!lua_isfunction(l, -1)) return;
+
+    int arguments = 0;  // Number of arguments pushed onto the stack
+
+    int res = lua_pcall(l, arguments, 0, 0);
+
+    // Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
+
+    // Clear the stack
+    lua_pop(l, lua_gettop(l));
+
+    // Clean up references
+    clean_refs(l);
 }
 
 LuaSystem::LuaSystem()
@@ -383,6 +632,8 @@ LuaSystem::LuaSystem()
     lua_register(state, "print_log", lia_print_log);
     lua_register(state, "print_ready", lia_print_ready);
     lua_register(state, "print_assert", lia_print_assert);
+    lua_register(state, "draw_pixel", lua_draw_pixel);
+
     //Add constants
     //Physics constants
     lua_pushnumber(state, 0);
@@ -399,6 +650,33 @@ LuaSystem::LuaSystem()
 
 void LuaSystem::load_script(const char *path)
 {
+    luaL_dofile(this->state, path);
+    this->loaded = true;
+}
+
+LuaComponent::LuaComponent()
+{
+    this->real_type = 0;
+    this->loaded = false;
+    this->state = luaL_newstate();
+    luaL_openlibs(this->state);
+    lua_register(state, "register_component", lua_register_component);
+    lua_register(state, "print_pass", lia_print_pass);
+    lua_register(state, "print_fail", lia_print_fail);
+    lua_register(state, "print_error", lia_print_error);
+    lua_register(state, "print_warn", lia_print_warn);
+    lua_register(state, "print_info", lia_print_info);
+    lua_register(state, "print_debug", lia_print_debug);
+    lua_register(state, "print_notice", lia_print_notice);
+    lua_register(state, "print_log", lia_print_log);
+    lua_register(state, "print_ready", lia_print_ready);
+    lua_register(state, "print_assert", lia_print_assert);
+    lua_register(state, "draw_pixel", lua_draw_pixel);
+}
+
+void LuaComponent::load_script(const char *path)
+{
+    current = this;
     luaL_dofile(this->state, path);
     this->loaded = true;
 }

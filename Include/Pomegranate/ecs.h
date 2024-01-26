@@ -6,9 +6,16 @@
 #include <omp.h>
 #include<string>
 #include "engine.h"
-#include <map>
+#include <unordered_map>
 #include <algorithm>
 #include <functional>
+#include <utility>
+extern "C"
+{
+#include <Lua/lua.h>
+#include <Lua/lauxlib.h>
+#include <Lua/lualib.h>
+}
 
 
 class Entity;
@@ -23,11 +30,26 @@ private:
 public:
     virtual ~Component()=default;
     virtual void init(Entity*);
-    std::vector<std::pair<const char*,std::pair<const type_info*, void*>>> component_data;
-    static std::map<const char*, std::function<Component*()>> component_types;
+    std::vector<std::pair<const char*,std::pair<const std::type_info*, void*>>> component_data;
+    static std::unordered_map<const char*, std::function<Component*()>> component_types;
     template<typename T> static void register_component();
     template<typename T> void push_data(const char* name, void* data);
+    template<typename T> T get_data(const char* name);
 };
+
+//For lua wrapper
+class LuaComponent : public Component
+{
+public:
+    uint32_t real_type;
+    static std::unordered_map<std::string, int> lua_component_types;
+    static LuaComponent* current;
+    lua_State* state;
+    bool loaded = false;
+    LuaComponent();
+    void load_script(const char* path);
+};
+
 
 class System
 {
@@ -49,7 +71,7 @@ public:
     static void remove_global_system(System*);
     static void global_system_tick();
     static void global_system_draw(std::function<bool(Entity*, Entity*)> sortingFunction);
-    static std::map<const char*, std::function<System*()>> system_types;
+    static std::unordered_map<const char*, std::function<System*()>> system_types;
     template<typename T> static void register_system();
 };
 
@@ -57,19 +79,19 @@ class Entity
 {
 private:
     /* data */
-    std::map<const std::type_info*,Component*> components;
+    std::unordered_multimap<const std::type_info*,Component*> components;
     std::vector<EntityGroup*> parents;
 public:
     uint64_t id;
-    template <typename T> void add_component();
+    template <typename T> void add_component(const char* lua_type = nullptr);
     void remove_component(Component*);
     void add_to_group(EntityGroup*);
     void remove_from_group(EntityGroup*);
     std::vector<EntityGroup*> get_parent_groups();
-    template <typename T> T* get_component();
+    template <typename T> T* get_component(const char* lua_type = nullptr);
     Component* get_component(const char*);
     template <typename T> T* require_component();
-    template <typename T> bool has_component();
+    template <typename T> bool has_component(const char* lua_type = nullptr);
     bool has_component(const char*);
     Entity();
     ~Entity();

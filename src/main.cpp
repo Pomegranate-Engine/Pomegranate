@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
     EntityGroup group = EntityGroup();
     auto camera = new Entity();
     camera->add_component<Camera>();
-    camera->add_component<CameraController>();
+    camera->add_component<LuaComponent>("res/scripts/CameraControllerComponent.lua");
     camera->add_component<Transform>();
     Camera::make_current(camera);
     group.add_entity(camera);
@@ -355,7 +355,7 @@ int main(int argc, char* argv[])
     System::add_global_system(new Render());
     System::add_global_system(new UIController());
     auto* lua_system = new LuaSystem();
-    lua_system->load_script("res/CameraControllerSystem.lua");
+    lua_system->load_script("res/scripts/CameraControllerSystem.lua");
     System::add_global_system(lua_system);
     auto* camera_controller_system = new CameraControllerSystem();
     System::add_global_system(camera_controller_system);

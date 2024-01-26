@@ -1,22 +1,66 @@
 template <typename T> void Component::push_data(const char *name, void *data)
 {
-    this->component_data.emplace_back(name, std::pair<const type_info*, void*>(&typeid(T), data));
+    auto p = std::make_pair(&typeid(T), data);
+    this->component_data.emplace_back(name, p);
 }
-
-template <typename T> inline T* Entity::get_component()
+template <typename T> T Component::get_data(const char *name)
 {
-    if(this->has_component<T>())
+    if(std::find(component_data.begin(), component_data.end(), name) != component_data.end())
     {
-        return (T*)this->components[&typeid(T)];
+        return *(T*)component_data[std::find(component_data.begin(), component_data.end(), name) - component_data.begin()].second.second;
     }
     else
     {
+        print_error("Component does not have data with name " + std::string(name));
         return nullptr;
     }
 }
-template <typename T> inline bool Entity::has_component()
+
+template <typename T> inline T* Entity::get_component(const char* lua_type)
 {
-    return this->components.find(&typeid(T)) != this->components.end();
+    if(typeid(T) == typeid(LuaComponent))
+    {
+        auto r = this->components.equal_range(&typeid(T));
+        for(auto i = r.first; i != r.second; i++)
+        {
+            if(((LuaComponent*)(i->second))->real_type == LuaComponent::lua_component_types[lua_type])
+            {
+                return (T*)i->second;
+            }
+        }
+        return nullptr;
+    }
+    else
+    {
+        if(this->has_component<T>())
+        {
+            T* component = (T*)this->components.equal_range(&typeid(T)).first->second;
+            return component;
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+}
+template <typename T> inline bool Entity::has_component(const char* lua_type)
+{
+    if(typeid(T) == typeid(LuaComponent))
+    {
+        auto r = this->components.equal_range(&typeid(T));
+        for(auto i = r.first; i != r.second; i++)
+        {
+            if(((LuaComponent*)(i->second))->real_type == LuaComponent::lua_component_types[lua_type])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    else
+    {
+        return this->components.find(&typeid(T)) != this->components.end();
+    }
 }
 
 template<typename T> inline T *Entity::require_component()
@@ -32,19 +76,37 @@ template<typename T> inline T *Entity::require_component()
     }
 }
 
-template<typename T> inline void Entity::add_component()
+template<typename T> inline void Entity::add_component(const char* lua_type)
 {
-    // Insert the component into the components map
-    if(!has_component<T>())
+    if(typeid(T) == typeid(LuaComponent))
     {
-        T* component = new T();
-        component->init(this);
-        std::pair<const std::type_info *, Component *> pair(&typeid(T), component);
-        this->components.insert(pair);
+        if(!has_component<T>())
+        {
+            LuaComponent* component = new LuaComponent();
+            component->real_type = LuaComponent::lua_component_types[lua_type];
+            component->load_script(lua_type);
+            component->init(this);
+            std::pair<const std::type_info *, Component *> pair(&typeid(T), component);
+            this->components.insert(pair);
+        }
+        else
+        {
+            print_warn("Entity already has component of type " + std::string(typeid(T).name()) + "! Component not added.");
+        }
     }
     else
     {
-        print_warn("Entity already has component of type " + std::string(typeid(T).name()) + "! Component not added.");
+        if(!has_component<T>())
+        {
+            T* component = new T();
+            component->init(this);
+            std::pair<const std::type_info *, Component *> pair(&typeid(T), component);
+            this->components.insert(pair);
+        }
+        else
+        {
+            print_warn("Entity already has component of type " + std::string(typeid(T).name()) + "! Component not added.");
+        }
     }
 }
 

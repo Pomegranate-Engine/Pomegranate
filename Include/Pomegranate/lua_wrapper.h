@@ -27,10 +27,11 @@ public:
     void pre_draw() override;
     void post_draw() override;
 };
-
 //Lua tools
 void lua_push_component(Component* component,lua_State* l);
 void lua_push_vec2(Vec2* vec2,lua_State* l);
+Vec2 lua_get_vec2(lua_State* l, int idx);
+Color lua_get_color(lua_State* l, int idx);
 
 //Lua gets
 int lua_get_component(lua_State* l);
@@ -51,9 +52,10 @@ int lia_print_notice(lua_State* l);
 int lia_print_log(lua_State* l);
 int lia_print_ready(lua_State* l);
 int lia_print_assert(lua_State* l);
+int lua_register_component(lua_State* l);
 
 //Wrapper
 void clean_refs(lua_State* l);
-extern std::map<Component*,int> ref_map;
+extern std::unordered_map<Component*,int> ref_map;
 
 #endif //POMEGRANATE_ENGINE_LUA_WRAPPER_H

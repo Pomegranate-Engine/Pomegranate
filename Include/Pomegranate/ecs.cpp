@@ -1,16 +1,17 @@
 #include "ecs.h"
-#include <utility>
 
 std::vector<System*> System::global_systems = std::vector<System*>();
 std::vector<Entity*> Entity::entities = std::vector<Entity*>();
-std::map<const char*, std::function<Component*()>> Component::component_types = std::map<const char*, std::function<Component*()>>();
-std::map<const char*, std::function<System*()>> System::system_types = std::map<const char*, std::function<System*()>>();
+std::unordered_map<const char*, std::function<Component*()>> Component::component_types = std::unordered_map<const char*, std::function<Component*()>>();
+std::unordered_map<const char*, std::function<System*()>> System::system_types = std::unordered_map<const char*, std::function<System*()>>();
+std::unordered_map<std::string, int> LuaComponent::lua_component_types = std::unordered_map<std::string, int>();
+LuaComponent* LuaComponent::current = nullptr;
 
 Entity::Entity()
 {
     Entity::entities.push_back(this);
     this->id = Entity::entity_count++;
-    this->components = std::map<const std::type_info*,Component*>();
+    this->components = std::unordered_multimap<const std::type_info*,Component*>();
 }
 
 uint64_t Entity::get_id() const
@@ -248,5 +249,3 @@ void Component::init(Entity *)
 {
 
 }
-
-
