@@ -1,16 +1,19 @@
 #include "ecs.h"
 
 std::vector<System*> System::global_systems = std::vector<System*>();
-std::vector<Entity*> Entity::entities = std::vector<Entity*>();
+std::unordered_map<uint64_t,Entity*> Entity::entities = std::unordered_map<uint64_t,Entity*>();
 std::unordered_map<const char*, std::function<Component*()>> Component::component_types = std::unordered_map<const char*, std::function<Component*()>>();
 std::unordered_map<const char*, std::function<System*()>> System::system_types = std::unordered_map<const char*, std::function<System*()>>();
 std::unordered_map<std::string, int> LuaComponent::lua_component_types = std::unordered_map<std::string, int>();
 LuaComponent* LuaComponent::current = nullptr;
 
+std::unordered_map<std::string, EntityGroup*> EntityGroup::groups = std::unordered_map<std::string, EntityGroup*>();
+std::vector<Entity*> Entity::destroy_queue = std::vector<Entity*>();
+
 Entity::Entity()
 {
-    Entity::entities.push_back(this);
     this->id = Entity::entity_count++;
+    Entity::entities.emplace(this->id,this);
     this->components = std::unordered_multimap<const std::type_info*,Component*>();
 }
 
@@ -44,13 +47,12 @@ bool Entity::has_component(const char * name)
 
 Entity::~Entity()
 {
-    for (int i = 0; i < Entity::entities.size(); i++)
+    for (auto & component : this->components)
     {
-        if(Entity::entities[i] == this)
-        {
-            Entity::entities.erase(Entity::entities.begin() + i);
-        }
+        delete component.second;
     }
+    this->components.clear();
+    Entity::entities.erase(this->id);
 }
 
 
@@ -81,11 +83,14 @@ void System::global_system_tick()
         if(system->active)
         {
             system->pre_tick();
+            Entity::apply_destruction_queue();
             for (auto &entity: Entity::entities)
             {
-                system->tick(entity);
+                system->tick(entity.second);
             }
+            Entity::apply_destruction_queue();
             system->post_tick();
+            Entity::apply_destruction_queue();
         }
     }
 }
@@ -109,32 +114,40 @@ void System::remove_global_system(System * system)
 
 void System::global_system_draw(std::function<bool(Entity*, Entity*)> sortingFunction)
 {
-    // Sort entities using the provided sorting function
-    std::sort(Entity::entities.begin(), Entity::entities.end(), std::move(sortingFunction));
+    //TODO: Sort entities based on transform component
+
 
     for (auto& system : System::global_systems)
     {
         if(system->active)
         {
             system->pre_draw();
+            Entity::apply_destruction_queue();
             for (auto &entity: Entity::entities)
             {
-                system->draw(entity);
+                system->draw(entity.second);
             }
+            Entity::apply_destruction_queue();
             system->post_draw();
+            Entity::apply_destruction_queue();
         }
     }
 }
 
-EntityGroup::EntityGroup()
+EntityGroup::EntityGroup(std::string name)
 {
     this->entities = std::vector<Entity*>();
     this->systems = std::vector<System*>();
     this->child_groups = std::vector<EntityGroup>();
+    this->name = name;
+    groups.emplace(name,this);
 }
 
 EntityGroup::~EntityGroup()
-= default;
+{
+    //Remove this group from the groups map
+    groups.erase(this->name);
+}
 
 void EntityGroup::add_entity(Entity* entity)
 {
@@ -149,6 +162,7 @@ void EntityGroup::remove_entity(Entity* entity)
         if (entitie->get_id() == entity->get_id())
         {
             entitie->remove_from_group(this);
+this->entities.erase(std::remove(this->entities.begin(), this->entities.end(), entitie), this->entities.end());
             return;
         }
     }
@@ -185,11 +199,14 @@ void EntityGroup::tick()
         if(system->active)
         {
             system->pre_tick();
+            Entity::apply_destruction_queue();
             for (auto &entitie: this->entities)
             {
                 system->tick(entitie);
             }
+            Entity::apply_destruction_queue();
             system->post_tick();
+            Entity::apply_destruction_queue();
         }
     }
 //#pragma omp parallel for
@@ -210,17 +227,25 @@ void EntityGroup::draw(const std::function<bool(Entity*, Entity*)>& sortingFunct
         if(system->active)
         {
             system->pre_draw();
+            Entity::apply_destruction_queue();
             for (auto &entity: this->entities)
             {
                 system->draw(entity);
             }
+            Entity::apply_destruction_queue();
             system->post_draw();
+            Entity::apply_destruction_queue();
         }
     }
     for(auto & group : this->child_groups)
     {
         group.draw(sortingFunction);
     }
+}
+
+EntityGroup* EntityGroup::get_group(const std::string& name)
+{
+    return groups[name];
 }
 
 void Entity::add_to_group(EntityGroup * group)
@@ -243,6 +268,34 @@ void Entity::remove_from_group(EntityGroup * group)
 std::vector<EntityGroup*> Entity::get_parent_groups()
 {
     return this->parents;
+}
+
+void Entity::orphan()
+{
+    for (auto & parent : this->parents)
+    {
+        parent->remove_entity(this);
+    }
+}
+
+void Entity::destroy()
+{
+    destroy_queue.push_back(this);
+}
+
+void Entity::force_destroy()
+{
+    this->orphan();
+    delete this;
+}
+
+void Entity::apply_destruction_queue()
+{
+    for (auto & entity : destroy_queue)
+    {
+        entity->force_destroy();
+    }
+    destroy_queue.clear();
 }
 
 void Component::init(Entity *)

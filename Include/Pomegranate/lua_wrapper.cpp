@@ -680,3 +680,8 @@ void LuaComponent::load_script(const char *path)
     luaL_dofile(this->state, path);
     this->loaded = true;
 }
+
+LuaComponent::~LuaComponent()
+{
+    lua_close(this->state);
+}

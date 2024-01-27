@@ -50,6 +50,7 @@ public:
     lua_State* state;
     bool loaded = false;
     LuaComponent();
+    ~LuaComponent() override;
     void load_script(const char* path);
 };
 
@@ -100,8 +101,13 @@ public:
     ~Entity();
     uint64_t get_id() const;
     //Add a static list of all entities
-    static std::vector<Entity*> entities;
+    static std::unordered_map<uint64_t,Entity*> entities;
     static uint64_t entity_count;
+    static std::vector<Entity*> destroy_queue;
+    void orphan();
+    void destroy();
+    void force_destroy();
+    static void apply_destruction_queue();
 };
 class EntityGroup
 {
@@ -111,7 +117,8 @@ private:
     std::vector<System*> systems;
     std::vector<EntityGroup> child_groups;
 public:
-    EntityGroup();
+    std::string name;
+    EntityGroup(std::string name);
     ~EntityGroup();
     void add_entity(Entity*);
     void remove_entity(Entity*);
@@ -121,6 +128,8 @@ public:
     void remove_group(const EntityGroup&);
     void tick();
     void draw(const std::function<bool(Entity*, Entity*)>& sortingFunction);
+    static std::unordered_map<std::string,EntityGroup*> groups;
+    static EntityGroup* get_group(const std::string& name);
 };
 
 #include "ecs.inl"

@@ -29,6 +29,17 @@ public:
     }
 };
 
+class DestroyAfterTime : public Component
+{
+public:
+    float time = 1.0;
+    DestroyAfterTime()
+    {
+        register_component<DestroyAfterTime>();
+        push_data<float>("time", &this->time);
+    }
+};
+
 class CameraControllerSystem : public System
 {
 public:
@@ -148,6 +159,70 @@ class Drag : public System
     }
 };
 
+class Spawn : public System
+{
+public:
+    bool clicked = false;
+    Spawn()
+    {
+        register_system<Spawn>();
+    }
+    void pre_tick() override
+    {
+        Vec2 mousepos = InputManager::get_mouse_position() + Camera::current->get_component<Transform>()->pos;
+        if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
+        {
+            if (!clicked)
+            {
+                auto *e = new Entity();
+                e->add_component<PhysicsObject>();
+                e->add_component<Transform>();
+                e->get_component<Transform>()->pos = mousepos;
+                e->get_component<Transform>()->scale = Vec2(0.25f, 0.25f);
+                e->add_component<Sprite>();
+                auto *s = e->get_component<Sprite>();
+                s->load_texture("res/pomegranate.png");
+
+                e->add_component<CollisionShape>();
+                auto *c = e->get_component<CollisionShape>();
+                c->radius = 128.0;
+                c->restitution = 0.0;
+
+                e->add_component<DestroyAfterTime>();
+                auto *d = e->get_component<DestroyAfterTime>();
+                d->time = 1.0;
+
+                EntityGroup::get_group("PHYSICS")->add_entity(e);
+                clicked = true;
+            }
+        } else
+        {
+            clicked = false;
+        }
+    }
+};
+
+class Destroy : public System
+{
+public:
+    Destroy()
+    {
+        register_system<Destroy>();
+    }
+    void tick(Entity* entity) override
+    {
+        if(entity->has_component<DestroyAfterTime>())
+        {
+            auto* d = entity->get_component<DestroyAfterTime>();
+            d->time -= 0.016;
+            if(d->time <= 0)
+            {
+                entity->destroy();
+            }
+        }
+    }
+};
+
 //A test function for the button
 static void button_pressed(Entity* entity)
 {
@@ -185,7 +260,7 @@ int main(int argc, char* argv[])
 
 
 //region Physics Example
-    EntityGroup group = EntityGroup();
+    EntityGroup group = EntityGroup("PHYSICS");
     auto camera = new Entity();
     camera->add_component<Camera>();
     camera->add_component<LuaComponent>("res/scripts/CameraControllerComponent.lua");
@@ -213,7 +288,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    EntityGroup world = EntityGroup();
+    EntityGroup world = EntityGroup("WORLD");
 
     for (int i = -32; i <= 32; ++i)
     {
@@ -301,14 +376,10 @@ int main(int argc, char* argv[])
     tilemap->get_component<Transform>()->pos+= Vec2(720, 0);
     world.add_entity(tilemap);
 
-    for (int i = 0; i < Entity::entities.size(); ++i) {
-        Entity::entities[i]->id = i;
-    }
-
 //endregion
     print_pass("Added UI");
 
-    EntityGroup ui = EntityGroup();
+    EntityGroup ui = EntityGroup("UI");
     auto* text = new Entity();
     text->add_component<UIText>();
     text->get_component<UIText>()->text = "Hello World!";
@@ -367,6 +438,8 @@ int main(int argc, char* argv[])
     System::add_global_system(new TransformLinkages());
     System::add_global_system(new Render());
     System::add_global_system(new UIController());
+    System::add_global_system(new Spawn());
+    System::add_global_system(new Destroy());
     auto* lua_system = new LuaSystem();
     lua_system->load_script("res/scripts/CameraControllerSystem.lua");
     System::add_global_system(lua_system);
@@ -397,10 +470,6 @@ int main(int argc, char* argv[])
         }
 
         //- - - - - # UPDATE # - - - - -
-        for (int i = 0; i < Entity::entities.size(); ++i)
-        {
-            Entity::entities[i]->id = i;
-        }
 
         if(camera_mode)
         {
@@ -475,6 +544,7 @@ int main(int argc, char* argv[])
         float secondsElapsed = (float)(end - start) / (float)SDL_GetPerformanceFrequency();
         delta = secondsElapsed;
         tick_time += delta;
+        print_info("Delta time: " + std::to_string(delta));
     }
 
     pomegranate_quit(); //Cleanup

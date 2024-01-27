@@ -58,13 +58,13 @@ void RigidBody::tick(Entity *entity)
 
             for (auto &entitie: Entity::entities)
             {
-                if (entitie->has_component<CollisionShape>())
+                if (entitie.second->has_component<CollisionShape>())
                 {
-                    if (entity->get_id() != entitie->get_id())
+                    if (entity->get_id() != entitie.second->get_id())
                     {
-                        if (RigidBody::check_collision(entity, entitie))
+                        if (RigidBody::check_collision(entity, entitie.second))
                         {
-                            RigidBody::resolve_collision(entity, entitie);
+                            RigidBody::resolve_collision(entity, entitie.second);
                         }
                     }
                 }
