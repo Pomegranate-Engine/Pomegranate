@@ -18,6 +18,7 @@ A graphical editor will be created in the future.
 
 ## Features
 - Hybrid Gameobject-ECS System
+- Lua scripting support
 - Builtin Multithreading (Disabled ATM)
 - Neat Debugging Tools
 - <details>
@@ -31,19 +32,17 @@ A graphical editor will be created in the future.
     - [x] Rigidbody
     - [x] Tilemap (No Collision)
     - [x] Debug Circles
-    - [x] Text
+    - [x] ImGui UI
 
 </details>
 
 ## Planned Features
 - Graphical Editor
 - Optimizations
-- Scripting Languages Support ([Lua](https://github.com/lua/lua), [Teascript](https://github.com/RevengerWizard/teascript))
+- Scripting Languages Support ([Teascript](https://github.com/RevengerWizard/teascript))
 - Shaders/Post Processing
 - 2D Lighting
-- ECS Standard Library Audio (In Progress)
 - ECS Standard Library Navigation
-- ECS Standard Library UI
 - Documentation
 - Event System
 ## Possible Future Features
