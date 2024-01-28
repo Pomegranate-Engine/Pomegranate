@@ -32,11 +32,13 @@ public:
 class DestroyAfterTime : public Component
 {
 public:
-    float time = 1.0;
+    float time = 0.0;
+    float length = 5.0;
     DestroyAfterTime()
     {
         register_component<DestroyAfterTime>();
         push_data<float>("time", &this->time);
+        push_data<float>("length", &this->length);
     }
 };
 
@@ -98,14 +100,39 @@ class Drag : public System
     {
         register_system<Drag>();
     }
+    void pre_tick() override
+    {
+        Vec2 mousepos = InputManager::get_mouse_position() + Camera::current->get_component<Transform>()->pos;
+        if (currently_dragged != nullptr)
+        {
+            auto *p = currently_dragged->get_component<PhysicsObject>();
+            auto *t = currently_dragged->get_component<Transform>();
+            p->linear_velocity = t->pos.direction_to(mousepos) * t->pos.distance_to(mousepos) * 10.0;
+            p->angular_velocity = 0.0;
+
+            if (currently_dragged->has_component<DestroyAfterTime>())
+            {
+                auto *d = currently_dragged->get_component<DestroyAfterTime>();
+                d->time = 0.0;
+            }
+        }
+        if (!InputManager::get_mouse_button(SDL_BUTTON_LEFT))
+        {
+            if (currently_dragged != nullptr)
+            {
+                currently_dragged->get_component<PhysicsObject>()->drag /= 5.0;
+            }
+            currently_dragged = nullptr;
+        }
+    }
     void tick(Entity* entity) override
     {
-        if(entity!=nullptr)
+        if(entity != nullptr)
         {
             Vec2 mousepos = InputManager::get_mouse_position() + Camera::current->get_component<Transform>()->pos;
             if (currently_dragged == nullptr)
             {
-                if (entity->has_component<PhysicsObject>() && entity->has_component<Transform>())
+                if (entity->has_component<PhysicsObject>())
                 {
                     auto *p = entity->get_component<PhysicsObject>();
                     auto *t = entity->get_component<Transform>();
@@ -116,28 +143,12 @@ class Drag : public System
                         {
                             if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
                             {
-                                currently_dragged = entity;
+                                entity->get_ref(currently_dragged);
                                 currently_dragged->get_component<PhysicsObject>()->drag *= 5.0;
                             }
                         }
                     }
                 }
-            }
-            if (currently_dragged != nullptr)
-            {
-                auto *p = currently_dragged->get_component<PhysicsObject>();
-                auto *t = currently_dragged->get_component<Transform>();
-                p->linear_velocity = t->pos.direction_to(mousepos) * t->pos.distance_to(mousepos) * 10.0;
-                p->angular_velocity = 0.0;
-            }
-            if (!InputManager::get_mouse_button(SDL_BUTTON_LEFT))
-            {
-                if (currently_dragged != nullptr)
-                {
-                    currently_dragged->get_component<PhysicsObject>()->drag /= 5.0;
-                }
-                currently_dragged = nullptr;
-
             }
             if (InputManager::get_mouse_button(SDL_BUTTON_RIGHT))
             {
@@ -190,7 +201,8 @@ public:
 
                 e->add_component<DestroyAfterTime>();
                 auto *d = e->get_component<DestroyAfterTime>();
-                d->time = 1.0;
+                d->length = 5.0;
+                d->time = 0.0;
 
                 EntityGroup::get_group("PHYSICS")->add_entity(e);
                 clicked = true;
@@ -214,8 +226,8 @@ public:
         if(entity->has_component<DestroyAfterTime>())
         {
             auto* d = entity->get_component<DestroyAfterTime>();
-            d->time -= 0.016;
-            if(d->time <= 0)
+            d->time += 0.016;
+            if(d->time >= d->length)
             {
                 entity->destroy();
             }
@@ -544,7 +556,6 @@ int main(int argc, char* argv[])
         float secondsElapsed = (float)(end - start) / (float)SDL_GetPerformanceFrequency();
         delta = secondsElapsed;
         tick_time += delta;
-        print_info("Delta time: " + std::to_string(delta));
     }
 
     pomegranate_quit(); //Cleanup

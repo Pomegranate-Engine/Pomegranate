@@ -85,6 +85,7 @@ private:
     /* data */
     std::unordered_multimap<const std::type_info*,Component*> components;
     std::vector<EntityGroup*> parents;
+    std::vector<Entity*> refs;
 public:
     uint64_t id;
     template <typename T> void add_component(const char* lua_type = nullptr);
@@ -107,6 +108,8 @@ public:
     void orphan();
     void destroy();
     void force_destroy();
+    void clean_refs();
+    void get_ref(Entity*&e);
     static void apply_destruction_queue();
 };
 class EntityGroup

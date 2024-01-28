@@ -15,6 +15,8 @@ Entity::Entity()
     this->id = Entity::entity_count++;
     Entity::entities.emplace(this->id,this);
     this->components = std::unordered_multimap<const std::type_info*,Component*>();
+    this->parents = std::vector<EntityGroup*>();
+    this->refs = std::vector<Entity*>();
 }
 
 uint64_t Entity::get_id() const
@@ -285,6 +287,7 @@ void Entity::destroy()
 
 void Entity::force_destroy()
 {
+    clean_refs();
     this->orphan();
     delete this;
 }
@@ -296,6 +299,21 @@ void Entity::apply_destruction_queue()
         entity->force_destroy();
     }
     destroy_queue.clear();
+}
+
+void Entity::clean_refs()
+{
+    for (auto & ref : this->refs)
+    {
+        ref = nullptr;
+    }
+    this->refs.clear();
+}
+
+void Entity::get_ref(Entity * &e)
+{
+    e = this;
+    this->refs.push_back(e);
 }
 
 void Component::init(Entity *)
