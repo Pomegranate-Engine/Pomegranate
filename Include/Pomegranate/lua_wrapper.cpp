@@ -643,41 +643,48 @@ void LuaSystem::post_draw()
     clean_refs(l);
 }
 
+void add_wrapper_functions(lua_State* l)
+{
+    //Add functions
+    lua_register(l, "require_component", lua_require_component);
+    lua_register(l, "register_component", lua_register_component);
+    lua_register(l, "get_component", lua_get_component);
+    lua_register(l, "has_component", lua_has_component);
+    lua_register(l, "input_get_key", lua_get_key);
+    lua_register(l, "input_get_axis", lua_get_axis);
+    lua_register(l, "input_get_mouse", lua_get_mouse);
+    lua_register(l, "input_get_mouse_pos", lua_get_mouse_pos);
+    lua_register(l, "print_pass", lia_print_pass);
+    lua_register(l, "print_fail", lia_print_fail);
+    lua_register(l, "print_error", lia_print_error);
+    lua_register(l, "print_warn", lia_print_warn);
+    lua_register(l, "print_info", lia_print_info);
+    lua_register(l, "print_debug", lia_print_debug);
+    lua_register(l, "print_notice", lia_print_notice);
+    lua_register(l, "print_log", lia_print_log);
+    lua_register(l, "print_ready", lia_print_ready);
+    lua_register(l, "print_assert", lia_print_assert);
+    lua_register(l, "draw_pixel", lua_draw_pixel);
+
+    //Add constants
+    //Physics constants
+    lua_pushnumber(l, 0);
+    lua_setglobal(l, "PHYSICS_BODY_TYPE_KINEMATIC");
+    lua_pushnumber(l, 1);
+    lua_setglobal(l, "PHYSICS_BODY_TYPE_RIGID");
+    lua_pushnumber(l, 2);
+    lua_setglobal(l, "PHYSICS_BODY_TYPE_STATIC");
+    lua_pushnumber(l, 0);
+    lua_setglobal(l, "COLLISION_SHAPE_TYPE_RECTANGLE");
+    lua_pushnumber(l, 1);
+    lua_setglobal(l, "COLLISION_SHAPE_TYPE_CIRCLE");
+}
+
 LuaSystem::LuaSystem()
 {
     this->state = luaL_newstate();
     luaL_openlibs(state);
-    //Add functions
-    lua_register(state, "get_component", lua_get_component);
-    lua_register(state, "has_component", lua_has_component);
-    lua_register(state, "input_get_key", lua_get_key);
-    lua_register(state, "input_get_axis", lua_get_axis);
-    lua_register(state, "input_get_mouse", lua_get_mouse);
-    lua_register(state, "input_get_mouse_pos", lua_get_mouse_pos);
-    lua_register(state, "print_pass", lia_print_pass);
-    lua_register(state, "print_fail", lia_print_fail);
-    lua_register(state, "print_error", lia_print_error);
-    lua_register(state, "print_warn", lia_print_warn);
-    lua_register(state, "print_info", lia_print_info);
-    lua_register(state, "print_debug", lia_print_debug);
-    lua_register(state, "print_notice", lia_print_notice);
-    lua_register(state, "print_log", lia_print_log);
-    lua_register(state, "print_ready", lia_print_ready);
-    lua_register(state, "print_assert", lia_print_assert);
-    lua_register(state, "draw_pixel", lua_draw_pixel);
-
-    //Add constants
-    //Physics constants
-    lua_pushnumber(state, 0);
-    lua_setglobal(state, "PHYSICS_BODY_TYPE_KINEMATIC");
-    lua_pushnumber(state, 1);
-    lua_setglobal(state, "PHYSICS_BODY_TYPE_RIGID");
-    lua_pushnumber(state, 2);
-    lua_setglobal(state, "PHYSICS_BODY_TYPE_STATIC");
-    lua_pushnumber(state, 0);
-    lua_setglobal(state, "COLLISION_SHAPE_TYPE_RECTANGLE");
-    lua_pushnumber(state, 1);
-    lua_setglobal(state, "COLLISION_SHAPE_TYPE_CIRCLE");
+    add_wrapper_functions(state);
 }
 
 void LuaSystem::load_script(const char *path)
@@ -692,21 +699,7 @@ LuaComponent::LuaComponent()
     this->loaded = false;
     this->state = luaL_newstate();
     luaL_openlibs(this->state);
-    lua_register(state, "register_component", lua_register_component);
-    lua_register(state, "get_component", lua_get_component);
-    lua_register(state, "has_component", lua_has_component);
-    lua_register(state, "require_component", lua_require_component);
-    lua_register(state, "print_pass", lia_print_pass);
-    lua_register(state, "print_fail", lia_print_fail);
-    lua_register(state, "print_error", lia_print_error);
-    lua_register(state, "print_warn", lia_print_warn);
-    lua_register(state, "print_info", lia_print_info);
-    lua_register(state, "print_debug", lia_print_debug);
-    lua_register(state, "print_notice", lia_print_notice);
-    lua_register(state, "print_log", lia_print_log);
-    lua_register(state, "print_ready", lia_print_ready);
-    lua_register(state, "print_assert", lia_print_assert);
-    lua_register(state, "draw_pixel", lua_draw_pixel);
+    add_wrapper_functions(state);
 }
 
 void LuaComponent::load_script(const char *path)

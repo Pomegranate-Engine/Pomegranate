@@ -56,6 +56,7 @@ int lua_register_component(lua_State* l);
 int lua_require_component(lua_State* l);
 
 //Wrapper
+void add_wrapper_functions(lua_State* l);
 void clean_refs(lua_State* l);
 extern std::unordered_map<Component*,int> ref_map;
 
