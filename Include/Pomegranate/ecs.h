@@ -33,7 +33,7 @@ public:
     virtual ~Component()=default;
     virtual void init(Entity*);
     std::unordered_map<std::string,std::pair<const std::type_info*, void*>> component_data;
-    static std::unordered_map<const char*, std::function<Component*()>> component_types;
+    static std::unordered_map<std::string, std::function<Component*()>> component_types;
     template<typename T> static void register_component();
     template<typename T> void push_data(std::string name, void* data);
     template<typename T> T get(std::string name);
@@ -52,6 +52,7 @@ public:
     LuaComponent();
     ~LuaComponent() override;
     void load_script(const char* path);
+    void init(Entity* entity) override;
 };
 
 
@@ -89,6 +90,7 @@ private:
 public:
     uint64_t id;
     template <typename T> void add_component(const char* lua_type = nullptr);
+    void add_component(const char* name);
     void remove_component(Component*);
     void add_to_group(EntityGroup*);
     void remove_from_group(EntityGroup*);

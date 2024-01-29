@@ -255,10 +255,34 @@ int main(int argc, char* argv[])
     print_pass("Pomegranate Initialized");
     main_window.open();
     main_window.make_current(); // This makes the window the current rendering target
+    main_window.set_icon("res/pomegranate.png");
+    //Random window title
+
+    int r = rand()%5;
+    if(r == 0)
+    {
+        main_window.set_title("Pomegranate Engine - Pomegranates are berries!");
+    }
+    else if(r == 1)
+    {
+        main_window.set_title("Pomegranate Engine - Pomegranate trees live longer than 200 years!");
+    }
+    else if(r == 2)
+    {
+        main_window.set_title("Pomegranate Engine - Pomegranates are considered a superfruit!");
+    }
+    else if(r == 3)
+    {
+        main_window.set_title("Pomegranate Engine - Grenades are named after pomegranates!");
+    }
+    else if(r == 4)
+    {
+        main_window.set_title("Pomegranate Engine - Pomegranates on average have 613 seeds and can get up to 1400!");
+    }
+
+
     print_pass("Window opened: " + std::string(main_window.get_title()) + " with resolution of " + std::to_string(main_window.get_width()) + "x" + std::to_string(main_window.get_height()));
     //Imgui
-
-    auto gl_context = SDL_GL_CreateContext(main_window.get_sdl_window());
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -270,13 +294,17 @@ int main(int argc, char* argv[])
     ImGui_ImplSDL3_InitForSDLRenderer(main_window.get_sdl_window(),main_window.get_sdl_renderer());
     ImGui_ImplSDLRenderer3_Init(main_window.get_sdl_renderer());
 
+    Component::register_component<Camera>();
+    Component::register_component<Transform>();
 
 //region Physics Example
     EntityGroup group = EntityGroup("PHYSICS");
     auto camera = new Entity();
     camera->add_component<Camera>();
-    camera->add_component<LuaComponent>("res/scripts/CameraControllerComponent.lua");
     camera->add_component<Transform>();
+    camera->add_component<LuaComponent>("res/scripts/CameraControllerComponent.lua");
+
+
     Camera::make_current(camera);
     group.add_entity(camera);
     for(int z = -1; z <= 1; z++)

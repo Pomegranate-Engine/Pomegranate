@@ -2,7 +2,7 @@
 
 std::vector<System*> System::global_systems = std::vector<System*>();
 std::unordered_map<uint64_t,Entity*> Entity::entities = std::unordered_map<uint64_t,Entity*>();
-std::unordered_map<const char*, std::function<Component*()>> Component::component_types = std::unordered_map<const char*, std::function<Component*()>>();
+std::unordered_map<std::string, std::function<Component*()>> Component::component_types = std::unordered_map<std::string, std::function<Component*()>>();
 std::unordered_map<const char*, std::function<System*()>> System::system_types = std::unordered_map<const char*, std::function<System*()>>();
 std::unordered_map<std::string, int> LuaComponent::lua_component_types = std::unordered_map<std::string, int>();
 LuaComponent* LuaComponent::current = nullptr;
@@ -33,6 +33,14 @@ Component* Entity::get_component(const char* name)
         }
     }
     return nullptr;
+}
+
+void Entity::add_component(const char *name)
+{
+    auto component = Component::component_types["class " + std::string(name)]();
+    component->init(this);
+    std::pair<const std::type_info *, Component *> pair(&typeid(*component), component);
+    this->components.insert(pair);
 }
 
 bool Entity::has_component(const char * name)
@@ -164,7 +172,7 @@ void EntityGroup::remove_entity(Entity* entity)
         if (entitie->get_id() == entity->get_id())
         {
             entitie->remove_from_group(this);
-this->entities.erase(std::remove(this->entities.begin(), this->entities.end(), entitie), this->entities.end());
+            this->entities.erase(std::remove(this->entities.begin(), this->entities.end(), entitie), this->entities.end());
             return;
         }
     }

@@ -155,6 +155,34 @@ int lua_has_component(lua_State* l)
     return 1;
 }
 
+int lua_require_component(lua_State* l)
+{
+    double d = lua_tonumber(l, 1);
+    Entity* e = Entity::entities[(int)d];
+    const char* name = lua_tostring(l, 2);
+    bool has = false;
+    if(LuaComponent::lua_component_types.find(std::string(name)) != LuaComponent::lua_component_types.end())
+    {
+        has = e->has_component<LuaComponent>(name);
+    }
+    else
+    {
+        has = e->has_component(name);
+    }
+
+    if(!has)
+    {
+        if(LuaComponent::lua_component_types.find(std::string(name)) != LuaComponent::lua_component_types.end())
+        {
+            e->add_component<LuaComponent>(name);
+        }
+        else
+        {
+            e->add_component(name);
+        }
+    }
+    return 0;
+}
 
 int lua_get_key(lua_State* l)
 {
@@ -315,6 +343,8 @@ int lua_register_component(lua_State* l)
     }
 
     //Debug all current component data
+//region Debug
+/*
     for (auto d : LuaComponent::current->component_data)
     {
         print_debug(d.first);
@@ -363,6 +393,8 @@ int lua_register_component(lua_State* l)
             print_error("Unknown type");
         }
     }
+*/
+//endregion
 
     LuaComponent::lua_component_types[name] = 0;
     return 0;
@@ -661,6 +693,9 @@ LuaComponent::LuaComponent()
     this->state = luaL_newstate();
     luaL_openlibs(this->state);
     lua_register(state, "register_component", lua_register_component);
+    lua_register(state, "get_component", lua_get_component);
+    lua_register(state, "has_component", lua_has_component);
+    lua_register(state, "require_component", lua_require_component);
     lua_register(state, "print_pass", lia_print_pass);
     lua_register(state, "print_fail", lia_print_fail);
     lua_register(state, "print_error", lia_print_error);
@@ -679,6 +714,35 @@ void LuaComponent::load_script(const char *path)
     current = this;
     luaL_dofile(this->state, path);
     this->loaded = true;
+}
+
+void LuaComponent::init(Entity *entity)
+{
+    if (!this->loaded) return;
+
+    lua_State *l = this->state;
+    lua_getglobal(l, "init");
+    if (!lua_isfunction(l, -1)) return;
+
+    // Push entity as argument
+    lua_pushnumber(l, (double)entity->get_id());
+
+    int arguments = 1;  // Number of arguments pushed onto the stack
+
+    int res = lua_pcall(l, arguments, 0, 0);
+
+    // Print error if there is one
+    if (res != LUA_OK)
+    {
+        print_error(lua_tostring(l, -1));
+    }
+
+    // Clear the stack
+    lua_pop(l, lua_gettop(l));
+
+    // Clean up references
+    clean_refs(l);
+
 }
 
 LuaComponent::~LuaComponent()

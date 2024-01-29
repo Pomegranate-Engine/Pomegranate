@@ -53,6 +53,7 @@ int lia_print_log(lua_State* l);
 int lia_print_ready(lua_State* l);
 int lia_print_assert(lua_State* l);
 int lua_register_component(lua_State* l);
+int lua_require_component(lua_State* l);
 
 //Wrapper
 void clean_refs(lua_State* l);

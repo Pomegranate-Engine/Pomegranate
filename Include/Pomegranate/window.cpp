@@ -72,3 +72,23 @@ void Window::make_current()
 {
     Window::current = this;
 }
+
+void Window::set_title(const char *title)
+{
+    this->title = title;
+    SDL_SetWindowTitle(this->window, title);
+}
+
+void Window::set_size(int width, int height)
+{
+    this->width = width;
+    this->height = height;
+    SDL_SetWindowSize(this->window, width, height);
+}
+
+void Window::set_icon(const char *path)
+{
+    SDL_Surface* icon = IMG_Load(path);
+    SDL_SetWindowIcon(this->window, icon);
+    SDL_DestroySurface(icon);
+}
