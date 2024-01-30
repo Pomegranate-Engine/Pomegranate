@@ -197,9 +197,10 @@ EntityGroup* build_scene()
     lua_system->load_script("res/scripts/CameraControllerSystem.lua");
     System::add_global_system(lua_system);
     auto* camera_controller_system = new CameraControllerSystem();
+    camera_controller_system->active = !use_lua_camera_controller;
     System::add_global_system(camera_controller_system);
 
-    lua_system->active = false;
+    lua_system->active = use_lua_camera_controller;
     //ui.add_system(new UIController());
 
     auto* scene = new EntityGroup("SCENE");
