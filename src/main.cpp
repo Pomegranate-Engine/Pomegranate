@@ -1,12 +1,14 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL3/SDL_vulkan.h>
 #include <Pomegranate/pomegranate.h>
 #include<Pomegranate/lua_wrapper.h>
 #include<imgui.h>
 #include<backends/imgui_impl_sdl3.h>
 #include<backends/imgui_impl_sdlrenderer3.h>
-#include <chrono>
+
+#include <vulkan/vulkan.hpp>
 
 //Main window
 Window main_window = Window("Window", 1024, 720);
@@ -22,7 +24,26 @@ bool use_lua_camera_controller = true;
 
 int main(int argc, char* argv[])
 {
+    //Init vulkan
+    SDL_Vulkan_LoadLibrary(nullptr);
     init();
+
+    uint32_t extensionCount;
+    Uint32 extcount = 0;
+    char* extensionNames = (char *) SDL_Vulkan_GetInstanceExtensions(&extcount, &extensionCount, nullptr);
+    const VkInstanceCreateInfo instInfo = {
+            VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO, // sType
+            nullptr,                                // pNext
+            0,                                      // flags
+            nullptr,                                // pApplicationInfo
+            0,                                      // enabledLayerCount
+            nullptr,                                // ppEnabledLayerNames
+            extensionCount,                         // enabledExtensionCount
+            reinterpret_cast<const char *const *>(extensionNames),                         // ppEnabledExtensionNames
+    };
+    VkInstance vkInst;
+    vkCreateInstance(&instInfo, nullptr,&vkInst);
+
 
     auto* scene = build_scene();
 

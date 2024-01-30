@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 project(Pomegranate_Engine)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 # Set the path to the SDL library directory
 set(SDL_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/Lib/x64)

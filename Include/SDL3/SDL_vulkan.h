@@ -157,7 +157,8 @@ extern DECLSPEC void SDLCALL SDL_Vulkan_UnloadLibrary(void);
  *
  * \sa SDL_Vulkan_CreateSurface
  */
-extern DECLSPEC char const* const* SDLCALL SDL_Vulkan_GetInstanceExtensions(Uint32 *pCount);
+extern DECLSPEC const char * const* SDLCALL SDL_Vulkan_GetInstanceExtensions(Uint32 *pCount, uint32_t *pInt,
+                                                                             nullptr_t pVoid);
 
 /**
  * Create a Vulkan rendering surface for a window.
