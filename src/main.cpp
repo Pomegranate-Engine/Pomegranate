@@ -241,9 +241,6 @@ static void button_pressed(Entity* entity)
     print_debug("Button pressed!");
 }
 
-//Deltatime
-float delta = 0.0;
-
 //Main window
 Window main_window = Window("Window", 1024, 720);
 
@@ -296,6 +293,7 @@ int main(int argc, char* argv[])
 
     Component::register_component<Camera>();
     Component::register_component<Transform>();
+    Component::register_component<UIText>();
 
 //region Physics Example
     EntityGroup group = EntityGroup("PHYSICS");
@@ -489,6 +487,11 @@ int main(int argc, char* argv[])
     lua_system->active = false;
     //ui.add_system(new UIController());
 
+    auto scene = EntityGroup("SCENE");
+    scene.add_group(&group);
+    scene.add_group(&world);
+    scene.add_group(&ui);
+
     bool f1pressed = false;
     bool camera_mode = false;
 
@@ -528,9 +531,7 @@ int main(int argc, char* argv[])
 
             //tick systems
             System::global_system_tick();
-            group.tick();
-            world.tick();
-            ui.tick();
+            scene.tick();
         }
 
         if(InputManager::get_key(SDL_SCANCODE_F1))
@@ -568,9 +569,7 @@ int main(int argc, char* argv[])
 
         //Draw
         System::global_system_draw(Transform::draw_sort);
-        group.draw(Transform::draw_sort);
-        world.draw(Transform::draw_sort);
-        ui.draw(Transform::draw_sort);
+        scene.draw(Transform::draw_sort);
 
 
         //Draw imgui
@@ -582,8 +581,8 @@ int main(int argc, char* argv[])
         //Calculate delta time
         Uint64 end = SDL_GetPerformanceCounter();
         float secondsElapsed = (float)(end - start) / (float)SDL_GetPerformanceFrequency();
-        delta = secondsElapsed;
-        tick_time += delta;
+        delta_time = secondsElapsed;
+        tick_time += delta_time;
     }
 
     pomegranate_quit(); //Cleanup

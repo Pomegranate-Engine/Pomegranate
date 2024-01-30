@@ -126,7 +126,6 @@ void System::global_system_draw(std::function<bool(Entity*, Entity*)> sortingFun
 {
     //TODO: Sort entities based on transform component
 
-
     for (auto& system : System::global_systems)
     {
         if(system->active)
@@ -148,7 +147,7 @@ EntityGroup::EntityGroup(std::string name)
 {
     this->entities = std::vector<Entity*>();
     this->systems = std::vector<System*>();
-    this->child_groups = std::vector<EntityGroup>();
+    this->child_groups = std::vector<EntityGroup*>();
     this->name = name;
     groups.emplace(name,this);
 }
@@ -178,7 +177,7 @@ void EntityGroup::remove_entity(Entity* entity)
     }
     for(auto & child_group : this->child_groups)
     {
-        child_group.remove_entity(entity);
+        child_group->remove_entity(entity);
     }
 }
 
@@ -192,7 +191,7 @@ void EntityGroup::remove_system(System * system)
 
 }
 
-void EntityGroup::add_group(const EntityGroup& entityGroup)
+void EntityGroup::add_group(EntityGroup* entityGroup)
 {
     this->child_groups.push_back(entityGroup);
 }
@@ -210,6 +209,7 @@ void EntityGroup::tick()
         {
             system->pre_tick();
             Entity::apply_destruction_queue();
+
             for (auto &entitie: this->entities)
             {
                 system->tick(entitie);
@@ -219,19 +219,16 @@ void EntityGroup::tick()
             Entity::apply_destruction_queue();
         }
     }
-//#pragma omp parallel for
     for(auto & child_group : this->child_groups)
     {
-        child_group.tick();
+        child_group->tick();
     }
-//#pragma omp barrier
 }
 
 void EntityGroup::draw(const std::function<bool(Entity*, Entity*)>& sortingFunction)
 {
     // Sort entities using the provided sorting function
     std::sort(this->entities.begin(), this->entities.end(), sortingFunction);
-
     for(auto & system : this->systems)
     {
         if(system->active)
@@ -249,7 +246,7 @@ void EntityGroup::draw(const std::function<bool(Entity*, Entity*)>& sortingFunct
     }
     for(auto & group : this->child_groups)
     {
-        group.draw(sortingFunction);
+        group->draw(sortingFunction);
     }
 }
 

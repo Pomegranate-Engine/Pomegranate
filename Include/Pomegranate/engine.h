@@ -22,5 +22,6 @@ void print_ready(const std::string&);
 void print_assert(const std::string&);
 int pomegranate_init(bool input = true, bool video = true, bool audio = true, bool img = true, bool ttf = true);
 void pomegranate_quit();
+extern float delta_time;
 
 #endif // ENGINE_H

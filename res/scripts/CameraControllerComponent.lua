@@ -12,4 +12,6 @@ function init(entity)
     print("Camera")
     require_component(entity,"Transform")
     print("Transform")
+    require_component(entity,"UIText")
+    print("UIText")
 end

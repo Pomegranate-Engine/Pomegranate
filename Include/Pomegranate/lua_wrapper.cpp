@@ -443,7 +443,7 @@ void clean_refs(lua_State* l)
                 lua_gettable(l, -3);
                 vec2->y = lua_tonumber(l, -1);
             }
-            else if(d.second.first == &typeid(Vec2i*))
+            else if(d.second.first == &typeid(Vec2i))
             {
                 Vec2i* vec2 = (Vec2i*)d.second.second;
                 lua_pushstring(l, "x");
@@ -453,25 +453,13 @@ void clean_refs(lua_State* l)
                 lua_gettable(l, -3);
                 vec2->y = lua_tonumber(l, -1);
             }
-            else if(d.second.first == &typeid(Color*))
+            else if(d.second.first == &typeid(Color))
             {
-                Color* color = (Color*)d.second.second;
-                lua_pushstring(l, "r");
-                lua_gettable(l, -2);
-                color->r = lua_tonumber(l, -1);
-                lua_pushstring(l, "g");
-                lua_gettable(l, -3);
-                color->g = lua_tonumber(l, -1);
-                lua_pushstring(l, "b");
-                lua_gettable(l, -4);
-                color->b = lua_tonumber(l, -1);
-                lua_pushstring(l, "a");
-                lua_gettable(l, -5);
-                color->a = lua_tonumber(l, -1);
+                //TODO: figure out wtf is going on with colors
             }
             else
             {
-                print_error("Unknown type");
+                print_error("Unknown type: " + d.first + " " + std::string(d.second.first->name()));
             }
             lua_pop(l, 1);
         }
@@ -491,6 +479,9 @@ void LuaSystem::tick(Entity *entity)
     if (!this->loaded) return;
 
     lua_State *l = this->state;
+    lua_pushnumber(l, 0.016);
+    lua_setglobal(l, "delta_time");
+
     lua_getglobal(l, "tick");
     if (!lua_isfunction(l, -1)) return;
 
@@ -504,7 +495,7 @@ void LuaSystem::tick(Entity *entity)
     // Print error if there is one
     if (res != LUA_OK)
     {
-        print_error(lua_tostring(l, -1));
+        print_error(std::string("Lua Error: ") + lua_tostring(l, -1));
     }
 
     // Clear the stack
@@ -520,6 +511,9 @@ void LuaSystem::draw(Entity *entity)
     if (!this->loaded) return;
 
     lua_State *l = this->state;
+    lua_pushnumber(l, delta_time);
+    lua_setglobal(l, "delta_time");
+
     lua_getglobal(l, "draw");
     if (!lua_isfunction(l, -1)) return;
 
@@ -533,7 +527,7 @@ void LuaSystem::draw(Entity *entity)
     // Print error if there is one
     if (res != LUA_OK)
     {
-        print_error(lua_tostring(l, -1));
+        print_error(std::string("Lua Error: ") + lua_tostring(l, -1));
     }
 
     // Clear the stack
@@ -548,6 +542,9 @@ void LuaSystem::pre_tick()
     if (!this->loaded) return;
 
     lua_State *l = this->state;
+    lua_pushnumber(l, 0.016);
+    lua_setglobal(l, "delta_time");
+
     lua_getglobal(l, "pre_tick");
     if (!lua_isfunction(l, -1)) return;
 
@@ -558,7 +555,7 @@ void LuaSystem::pre_tick()
     // Print error if there is one
     if (res != LUA_OK)
     {
-        print_error(lua_tostring(l, -1));
+        print_error(std::string("Lua Error: ") + lua_tostring(l, -1));
     }
 
     // Clear the stack
@@ -573,6 +570,9 @@ void LuaSystem::post_tick()
     if (!this->loaded) return;
 
     lua_State *l = this->state;
+    lua_pushnumber(l, 0.016);
+    lua_setglobal(l, "delta_time");
+
     lua_getglobal(l, "post_tick");
     if (!lua_isfunction(l, -1)) return;
 
@@ -583,7 +583,7 @@ void LuaSystem::post_tick()
     // Print error if there is one
     if (res != LUA_OK)
     {
-        print_error(lua_tostring(l, -1));
+        print_error(std::string("Lua Error: ") + lua_tostring(l, -1));
     }
 
     // Clear the stack
@@ -598,6 +598,9 @@ void LuaSystem::pre_draw()
     if (!this->loaded) return;
 
     lua_State *l = this->state;
+    lua_pushnumber(l, delta_time);
+    lua_setglobal(l, "delta_time");
+
     lua_getglobal(l, "pre_draw");
     if (!lua_isfunction(l, -1)) return;
 
@@ -608,7 +611,7 @@ void LuaSystem::pre_draw()
     // Print error if there is one
     if (res != LUA_OK)
     {
-        print_error(lua_tostring(l, -1));
+        print_error(std::string("Lua Error: ") + lua_tostring(l, -1));
     }
 
     // Clear the stack
@@ -623,6 +626,9 @@ void LuaSystem::post_draw()
     if (!this->loaded) return;
 
     lua_State *l = this->state;
+    lua_pushnumber(l, delta_time);
+    lua_setglobal(l, "delta_time");
+
     lua_getglobal(l, "post_draw");
     if (!lua_isfunction(l, -1)) return;
 
@@ -633,7 +639,7 @@ void LuaSystem::post_draw()
     // Print error if there is one
     if (res != LUA_OK)
     {
-        print_error(lua_tostring(l, -1));
+        print_error(std::string("Lua Error: ") + lua_tostring(l, -1));
     }
 
     // Clear the stack
@@ -678,6 +684,9 @@ void add_wrapper_functions(lua_State* l)
     lua_setglobal(l, "COLLISION_SHAPE_TYPE_RECTANGLE");
     lua_pushnumber(l, 1);
     lua_setglobal(l, "COLLISION_SHAPE_TYPE_CIRCLE");
+    //Time
+    lua_pushnumber(l, delta_time);
+    lua_setglobal(l, "delta_time");
 }
 
 LuaSystem::LuaSystem()
@@ -727,7 +736,7 @@ void LuaComponent::init(Entity *entity)
     // Print error if there is one
     if (res != LUA_OK)
     {
-        print_error(lua_tostring(l, -1));
+        print_error(std::string("Lua Error: ") + lua_tostring(l, -1));
     }
 
     // Clear the stack

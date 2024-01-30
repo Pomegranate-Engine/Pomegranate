@@ -1,5 +1,7 @@
 #include"engine.h"
 
+float delta_time = 0.0f;
+
 void print_pass(const std::string& text)
 {
     std::cout << "\033[37m" << "\033[42m" << " PASS " << "\033[0m" << " " << text << std::endl;

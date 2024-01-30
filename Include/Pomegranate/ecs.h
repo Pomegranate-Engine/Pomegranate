@@ -120,7 +120,7 @@ private:
     /* data */
     std::vector<Entity*> entities;
     std::vector<System*> systems;
-    std::vector<EntityGroup> child_groups;
+    std::vector<EntityGroup*> child_groups;
 public:
     std::string name;
     EntityGroup(std::string name);
@@ -129,7 +129,7 @@ public:
     void remove_entity(Entity*);
     void add_system(System*);
     void remove_system(System*);
-    void add_group(const EntityGroup&);
+    void add_group(EntityGroup*);
     void remove_group(const EntityGroup&);
     void tick();
     void draw(const std::function<bool(Entity*, Entity*)>& sortingFunction);

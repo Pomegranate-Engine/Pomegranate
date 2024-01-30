@@ -18,13 +18,15 @@ function tick(entity)
     end
 end
 
-function draw(entity)
-    if(has_component(entity, "Transform")) then
-        local t = get_component(entity,"Transform")
-        if(camera ~= nil) then
-            t.pos.x = t.pos.x - camera.pos.x
-            t.pos.y = t.pos.y - camera.pos.y
+function pre_draw()
+    if(camera~=nil) then
+        if has_component(camera,"UIText") then
+            local text = get_component(camera,"UIText")
+            text.text = "FPS: "..tostring(1.0/delta_time)
+
+            local transform = get_component(camera,"UITransform")
+            transform.position.x = 0
+            transform.position.y = 512
         end
-        draw_pixel(t.pos,{r=255,g=255,b=255,a=255})
     end
 end
