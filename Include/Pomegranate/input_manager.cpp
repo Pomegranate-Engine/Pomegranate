@@ -1,12 +1,11 @@
 #include "input_manager.h"
 
-InputManager::InputManager()
-= default;
+InputManager::InputManager() = default;
 
-InputManager::~InputManager()
-= default;
+InputManager::~InputManager() = default;
 
-void InputManager::process_event(SDL_Event event) {
+void InputManager::process_event(SDL_Event event)
+{
     InputManager::mouse_delta = Vec2();
     InputManager::mouse_moved = false;
     InputManager::mouse_scrolled = false;

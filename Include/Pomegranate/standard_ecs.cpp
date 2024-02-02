@@ -1,5 +1,8 @@
 #include "standard_ecs.h"
 
+//Globals
+std::unordered_map<std::string, std::vector<Entity*>> Tag::tags = std::unordered_map<std::string, std::vector<Entity*>>();
+
 Transform::Transform()
 {
     this->pos = Vec2(0.0, 0.0);
@@ -80,4 +83,49 @@ void TransformLinkages::tick(Entity *entity)
 TransformLinkages::TransformLinkages()
 {
     register_system<TransformLinkages>();
+}
+
+Tag::Tag()
+{
+
+}
+
+Tag::~Tag()
+{
+
+}
+
+Entity *Tag::get_entity(const std::string &tag)
+{
+    return tags[tag].front();
+}
+
+std::vector<Entity *> Tag::get_entities(const std::string &tag)
+{
+    return tags[tag];
+}
+
+void Tag::set_tag(const std::string &t)
+{
+    this->tag = t;
+    if(tags[t].empty())
+    {
+        tags[t] = std::vector<Entity*>();
+    }
+    if(std::find(tags[t].begin(), tags[t].end(), reinterpret_cast<Entity *const>(this)) == tags[t].end())
+    {
+        tags[t].push_back(reinterpret_cast<Entity *const>(this));
+    }
+    //Remove it from other tags
+    for(auto & tag : tags)
+    {
+        if(tag.first == t)
+        {
+            continue;
+        }
+        if(std::find(tag.second.begin(), tag.second.end(), reinterpret_cast<Entity *const>(this)) != tag.second.end())
+        {
+            tag.second.erase(std::remove(tag.second.begin(), tag.second.end(), reinterpret_cast<Entity *const>(this)), tag.second.end());
+        }
+    }
 }

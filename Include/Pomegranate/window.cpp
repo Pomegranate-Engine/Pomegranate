@@ -38,7 +38,7 @@ SDL_Renderer* Window::get_sdl_renderer() const
 
 int Window::open()
 {
-    this->window = SDL_CreateWindow(this->title, this->width, this->height, SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_VULKAN | SDL_WINDOW_TRANSPARENT);
+    this->window = SDL_CreateWindow(this->title, this->width, this->height, SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE | SDL_WINDOW_TRANSPARENT);
 
     if (!this->window)
     {

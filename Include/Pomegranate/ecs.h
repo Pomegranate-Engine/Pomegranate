@@ -88,7 +88,7 @@ private:
     std::vector<EntityGroup*> parents;
     std::vector<Entity*> refs;
 public:
-    uint64_t id;
+    uint32_t id;
     template <typename T> void add_component(const char* lua_type = nullptr);
     void add_component(const char* name);
     void remove_component(Component*);
@@ -102,10 +102,10 @@ public:
     bool has_component(const char*);
     Entity();
     ~Entity();
-    uint64_t get_id() const;
+    uint32_t get_id() const;
     //Add a static list of all entities
-    static std::unordered_map<uint64_t,Entity*> entities;
-    static uint64_t entity_count;
+    static std::unordered_map<uint32_t,Entity*> entities;
+    static uint32_t entity_count;
     static std::vector<Entity*> destroy_queue;
     void orphan();
     void destroy();
@@ -123,7 +123,7 @@ private:
     std::vector<EntityGroup*> child_groups;
 public:
     std::string name;
-    EntityGroup(std::string name);
+    explicit EntityGroup(std::string name);
     ~EntityGroup();
     void add_entity(Entity*);
     void remove_entity(Entity*);

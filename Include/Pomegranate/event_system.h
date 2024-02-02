@@ -3,6 +3,8 @@
 #include "ecs.h"
 #include <functional>
 
-// If anyone wants to help that would be greatly appreciated!
+//TODO: Create a way to handle events in the engine
+
+#include "event_system.inl"
 
 #endif //POMEGRANATE_ENGINE_EVENT_SYSTEM_H

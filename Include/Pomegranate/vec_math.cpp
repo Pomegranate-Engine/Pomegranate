@@ -243,3 +243,138 @@ float Vec2i::angle_to(const Vec2i& other) const
 {
     return atan2((float)other.y - (float)this->y, (float)other.x - (float)this->x);
 }
+
+
+Vec3::Vec3()
+{
+    this->x = 0.0;
+    this->y = 0.0;
+    this->z = 0.0;
+}
+Vec3::Vec3(float x, float y, float z)
+{
+    this->x = x;
+    this->y = y;
+    this->z = z;
+}
+Vec3 Vec3::operator+(const Vec3& other) const
+{
+    return {this->x + other.x, this->y + other.y, this->z + other.z};
+}
+Vec3 Vec3::operator-(const Vec3& other) const
+{
+    return {this->x - other.x, this->y - other.y, this->z - other.z};
+}
+Vec3 Vec3::operator*(const Vec3& other) const
+{
+    return {this->x * other.x, this->y * other.y, this->z * other.z};
+}
+Vec3 Vec3::operator*(const float& other) const
+{
+    return {this->x * other, this->y * other, this->z * other};
+}
+Vec3 Vec3::operator/(const Vec3& other) const
+{
+    return {this->x / other.x, this->y / other.y, this->z / other.z};
+}
+Vec3 Vec3::operator/(const float& other) const
+{
+    return {this->x / other, this->y / other, this->z / other};
+}
+Vec3 Vec3::operator+=(const Vec3& other)
+{
+    this->x += other.x;
+    this->y += other.y;
+    this->z += other.z;
+    return *this;
+}
+Vec3 Vec3::operator-=(const Vec3& other)
+{
+    this->x -= other.x;
+    this->y -= other.y;
+    this->z -= other.z;
+    return *this;
+}
+Vec3 Vec3::operator*=(const Vec3& other)
+{
+    this->x *= other.x;
+    this->y *= other.y;
+    this->z *= other.z;
+    return *this;
+}
+Vec3 Vec3::operator*=(const float& other)
+{
+    this->x *= other;
+    this->y *= other;
+    this->z *= other;
+    return *this;
+}
+Vec3 Vec3::operator/=(const Vec3& other)
+{
+    this->x /= other.x;
+    this->y /= other.y;
+    this->z /= other.z;
+    return *this;
+}
+Vec3 Vec3::operator/=(const float& other)
+{
+    this->x /= other;
+    this->y /= other;
+    this->z /= other;
+    return *this;
+}
+bool Vec3::operator==(const Vec3& other) const
+{
+    return this->x == other.x && this->y == other.y && this->z == other.z;
+}
+bool Vec3::operator!=(const Vec3& other) const
+{
+    return this->x != other.x || this->y != other.y || this->z != other.z;
+}
+float Vec3::dot(const Vec3& other) const
+{
+    return this->x * other.x + this->y * other.y + this->z * other.z;
+}
+Vec3 Vec3::cross(const Vec3& other) const
+{
+    return {this->y * other.z - this->z * other.y, this->z * other.x - this->x * other.z, this->x * other.y - this->y * other.x};
+}
+float Vec3::length() const
+{
+    return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
+}
+Vec3 Vec3::normalized() const
+{
+    float l = this->length();
+    return {this->x / l, this->y / l, this->z / l};
+}
+Vec3 Vec3::rotate(float angle, const Vec3& axis) const
+{
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0f - c;
+    return {this->x * (oc * axis.x * axis.x + c) + this->y * (oc * axis.x * axis.y - axis.z * s) + this->z * (oc * axis.x * axis.z + axis.y * s),
+            this->x * (oc * axis.x * axis.y + axis.z * s) + this->y * (oc * axis.y * axis.y + c) + this->z * (oc * axis.y * axis.z - axis.x * s),
+            this->x * (oc * axis.x * axis.z - axis.y * s) + this->y * (oc * axis.y * axis.z + axis.x * s) + this->z * (oc * axis.z * axis.z + c)};
+}
+Vec3 Vec3::lerp(const Vec3& other, float t) const
+{
+    return {this->x + (other.x - this->x) * t, this->y + (other.y - this->y) * t, this->z + (other.z - this->z) * t};
+}
+Vec3 Vec3::slerp(const Vec3& other, float t) const
+{
+    float theta = acos(this->dot(other) / (this->length() * other.length()));
+    return (this->rotate(theta * t, this->cross(other)) * (1.0f - t)) + (other * t);
+}
+Vec3 Vec3::direction_to(const Vec3& other) const
+{
+    return (other - *this).normalized();
+}
+float Vec3::distance_to(const Vec3& other) const
+{
+    return (other - *this).length();
+}
+float Vec3::angle_to(const Vec3& other) const
+{
+    return atan2(other.y - this->y, other.x - this->x);
+}

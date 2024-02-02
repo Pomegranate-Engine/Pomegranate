@@ -6,6 +6,7 @@
 #include "engine.h"
 #include "window.h"
 #include "color.h"
+#include <map>
 
 class Transform : public Component
 {
@@ -49,5 +50,16 @@ public:
     void tick(Entity* entity) override;
 };
 
+class Tag : public Component
+{
+    std::string tag;
+public:
+    Tag();
+    ~Tag();
+    static Entity* get_entity(const std::string& tag);
+    static std::vector<Entity*> get_entities(const std::string& tag);
+    void set_tag(const std::string& tag);
+    static std::unordered_map<std::string, std::vector<Entity*>> tags;
+};
 
 #endif //POMEGRANATE_ENGINE_STANDARD_ECS_H

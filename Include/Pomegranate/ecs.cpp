@@ -1,12 +1,13 @@
 #include "ecs.h"
 
+//Globals
 std::vector<System*> System::global_systems = std::vector<System*>();
-std::unordered_map<uint64_t,Entity*> Entity::entities = std::unordered_map<uint64_t,Entity*>();
+std::unordered_map<uint32_t ,Entity*> Entity::entities = std::unordered_map<uint32_t,Entity*>();
 std::unordered_map<std::string, std::function<Component*()>> Component::component_types = std::unordered_map<std::string, std::function<Component*()>>();
 std::unordered_map<const char*, std::function<System*()>> System::system_types = std::unordered_map<const char*, std::function<System*()>>();
 std::unordered_map<std::string, int> LuaComponent::lua_component_types = std::unordered_map<std::string, int>();
 LuaComponent* LuaComponent::current = nullptr;
-
+uint32_t Entity::entity_count = 0;
 std::unordered_map<std::string, EntityGroup*> EntityGroup::groups = std::unordered_map<std::string, EntityGroup*>();
 std::vector<Entity*> Entity::destroy_queue = std::vector<Entity*>();
 
@@ -19,7 +20,7 @@ Entity::Entity()
     this->refs = std::vector<Entity*>();
 }
 
-uint64_t Entity::get_id() const
+uint32_t Entity::get_id() const
 {
     return this->id;
 }
@@ -70,8 +71,6 @@ void Entity::remove_component(Component* component)
 {
     //this->components.erase(std::remove(this->components.begin(), this->components.end(), component), this->components.end());
 }
-
-uint64_t Entity::entity_count = 0;
 
 
 System::System() = default;
@@ -188,7 +187,7 @@ void EntityGroup::add_system(System * system)
 
 void EntityGroup::remove_system(System * system)
 {
-
+    //TODO: Implement system removal
 }
 
 void EntityGroup::add_group(EntityGroup* entityGroup)
@@ -198,7 +197,14 @@ void EntityGroup::add_group(EntityGroup* entityGroup)
 
 void EntityGroup::remove_group(const EntityGroup& entityGroup)
 {
-
+    for (int i = 0; i < child_groups.size(); ++i)
+    {
+        if(child_groups[i] == &entityGroup)
+        {
+            child_groups.erase(child_groups.begin() + i);
+            return;
+        }
+    }
 }
 
 void EntityGroup::tick()
@@ -321,7 +327,4 @@ void Entity::get_ref(Entity * &e)
     this->refs.push_back(e);
 }
 
-void Component::init(Entity *)
-{
-
-}
+void Component::init(Entity *){}

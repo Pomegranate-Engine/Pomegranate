@@ -23,7 +23,6 @@ bool use_lua_camera_controller = true;
 int main(int argc, char* argv[])
 {
     init();
-
     auto* scene = build_scene();
 
     float tick_time = 0.0;
