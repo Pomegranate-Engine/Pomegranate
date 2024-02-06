@@ -187,6 +187,18 @@ EntityGroup* build_scene()
     checkbox->get_component<UICheckbox>()->background_color = Color(0, 0, 0, 255);
     ui->add_entity(checkbox);
 
+    auto* slider = new Entity();
+    slider->add_component<UITransform>();
+    slider->get_component<UITransform>()->position = Vec2(0, 224);
+    slider->get_component<UITransform>()->size = Vec2(128, 32);
+    slider->add_component<UISlider>();
+    slider->get_component<UISlider>()->min = 0.0;
+    slider->get_component<UISlider>()->max = 1.0;
+    slider->get_component<UISlider>()->value = 0.5;
+    slider->get_component<UISlider>()->background_color = Color(0, 0, 0, 255);
+    slider->get_component<UISlider>()->slider_color = Color(255, 255, 255, 255);
+    ui->add_entity(slider);
+
     //Add global systems
     System::add_global_system(new TransformLinkages());
     System::add_global_system(new Render());

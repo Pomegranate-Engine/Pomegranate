@@ -1,8 +1,5 @@
 #include "standard_ecs.h"
 
-//Globals
-std::unordered_map<std::string, std::vector<Entity*>> Tag::tags = std::unordered_map<std::string, std::vector<Entity*>>();
-
 Transform::Transform()
 {
     this->pos = Vec2(0.0, 0.0);

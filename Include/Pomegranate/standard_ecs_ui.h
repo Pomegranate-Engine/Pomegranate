@@ -75,6 +75,20 @@ public:
     void init(Entity* entity) override;
 };
 
+class UISlider : public Component
+{
+public:
+    float value;
+    float min;
+    float max;
+    Color background_color;
+    Color slider_color;
+    UISlider();
+    void init(Entity* entity) override;
+};
+
+
+
 class UIController : public System
 {
 public:

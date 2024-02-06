@@ -3,7 +3,15 @@
 #include "ecs.h"
 #include <functional>
 
-//TODO: Create a way to handle events in the engine
+class Event
+{
+public:
+    std::vector<std::pair<Entity*,std::function<void(Entity*)>>> callbacks;
+    Event();
+    void trigger();
+    void add_listener(std::function<void(Entity*)> callback);
+    void remove_listener(std::function<void(Entity*)> callback);
+};
 
 #include "event_system.inl"
 

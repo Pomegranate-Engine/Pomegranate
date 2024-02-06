@@ -18,10 +18,10 @@ Vec2 lua_get_vec2(lua_State* l, int idx)
     Vec2 vec2;
     lua_pushstring(l, "x");
     lua_gettable(l, idx);
-    vec2.x = lua_tonumber(l, -1);
+    vec2.x = (float)lua_tonumber(l, -1);
     lua_pushstring(l, "y");
     lua_gettable(l, idx);
-    vec2.y = lua_tonumber(l, -1);
+    vec2.y = (float)lua_tonumber(l, -1);
     return vec2;
 }
 
@@ -30,16 +30,16 @@ Color lua_get_color(lua_State* l, int idx)
     Color color;
     lua_pushstring(l, "r");
     lua_gettable(l, idx);
-    color.r = lua_tonumber(l, -1);
+    color.r = (uint8_t)lua_tonumber(l, -1);
     lua_pushstring(l, "g");
     lua_gettable(l, idx);
-    color.g = lua_tonumber(l, -1);
+    color.g = (uint8_t)lua_tonumber(l, -1);
     lua_pushstring(l, "b");
     lua_gettable(l, idx);
-    color.b = lua_tonumber(l, -1);
+    color.b = (uint8_t)lua_tonumber(l, -1);
     lua_pushstring(l, "a");
     lua_gettable(l, idx);
-    color.a = lua_tonumber(l, -1);
+    color.a = (uint8_t)lua_tonumber(l, -1);
     return color;
 }
 
@@ -69,7 +69,7 @@ void lua_push_component(Component* component,lua_State* l)
     }
     //Create a table
     lua_newtable(l);
-    for (auto d : component->component_data)
+    for (const auto& d : component->component_data)
     {
         //Push the name of the variable
         lua_pushstring(l, d.first.c_str());
@@ -98,11 +98,11 @@ void lua_push_component(Component* component,lua_State* l)
         {
             lua_push_vec2((Vec2*)d.second.second, l);
         }
-        else if(d.second.first == &typeid(Vec2i*))
+        else if(d.second.first == &typeid(Vec2i))
         {
             lua_push_vec2((Vec2*)d.second.second, l);
         }
-        else if(d.second.first == &typeid(Color*))
+        else if(d.second.first == &typeid(Color))
         {
             lua_push_color((Color*)d.second.second, l);
         }
@@ -160,7 +160,7 @@ int lua_require_component(lua_State* l)
     double d = lua_tonumber(l, 1);
     Entity* e = Entity::entities[(int)d];
     const char* name = lua_tostring(l, 2);
-    bool has = false;
+    bool has;
     if(LuaComponent::lua_component_types.find(std::string(name)) != LuaComponent::lua_component_types.end())
     {
         has = e->has_component<LuaComponent>(name);
@@ -213,7 +213,7 @@ int lua_get_axis(lua_State* l)
 
 int lua_get_mouse(lua_State* l)
 {
-    int i = lua_tonumber(l, 1);
+    int i = (int)lua_tonumber(l, 1);
     lua_pushboolean(l, InputManager::get_mouse_button(i));
     return 1;
 }
@@ -405,7 +405,7 @@ void clean_refs(lua_State* l)
     for(auto & ref : ref_map)
     {
         Component* c = ref.first;
-        for (auto d : c->component_data)
+        for (const auto& d : c->component_data)
         {
             lua_rawgeti(l, LUA_REGISTRYINDEX, ref.second);
             //Push the name of the variable
@@ -415,47 +415,59 @@ void clean_refs(lua_State* l)
             //Check type
             if(d.second.first == &typeid(int))
             {
-                *(int*)d.second.second = lua_tonumber(l, -1);
+                *(int*)d.second.second = (int)lua_tonumber(l, -1);
             }
             else if(d.second.first == &typeid(float))
             {
-                *(float*)d.second.second = lua_tonumber(l, -1);
+                *(float*)d.second.second = (float)lua_tonumber(l, -1);
             }
             else if(d.second.first == &typeid(double))
             {
-                *(double*)d.second.second = lua_tonumber(l, -1);
+                *(double*)d.second.second = (double)lua_tonumber(l, -1);
             }
             else if(d.second.first == &typeid(bool))
             {
-                *(bool*)d.second.second = lua_toboolean(l, -1);
+                *(bool*)d.second.second = (bool)lua_toboolean(l, -1);
             }
             else if(d.second.first == &typeid(std::string))
             {
-                *(std::string*)d.second.second = lua_tostring(l, -1);
+                *(std::string*)d.second.second = (std::string)lua_tostring(l, -1);
             }
             else if(d.second.first == &typeid(Vec2))
             {
-                Vec2* vec2 = (Vec2*)d.second.second;
+                auto* vec2 = (Vec2*)d.second.second;
                 lua_pushstring(l, "x");
                 lua_gettable(l, -2);
-                vec2->x = lua_tonumber(l, -1);
+                vec2->x = (float)lua_tonumber(l, -1);
                 lua_pushstring(l, "y");
                 lua_gettable(l, -3);
-                vec2->y = lua_tonumber(l, -1);
+                vec2->y = (float)lua_tonumber(l, -1);
             }
             else if(d.second.first == &typeid(Vec2i))
             {
-                Vec2i* vec2 = (Vec2i*)d.second.second;
+                auto* vec2 = (Vec2i*)d.second.second;
                 lua_pushstring(l, "x");
                 lua_gettable(l, -2);
-                vec2->x = lua_tonumber(l, -1);
+                vec2->x = (int)lua_tonumber(l, -1);
                 lua_pushstring(l, "y");
                 lua_gettable(l, -3);
-                vec2->y = lua_tonumber(l, -1);
+                vec2->y = (int)lua_tonumber(l, -1);
             }
             else if(d.second.first == &typeid(Color))
             {
-                //TODO: figure out wtf is going on with colors
+                auto* color = (Color*)d.second.second;
+                lua_pushstring(l, "r");
+                lua_gettable(l, -2);
+                color->r = (int)lua_tonumber(l, -1);
+                lua_pushstring(l, "g");
+                lua_gettable(l, -3);
+                color->g = (int)lua_tonumber(l, -1);
+                lua_pushstring(l, "b");
+                lua_gettable(l, -4);
+                color->b = (int)lua_tonumber(l, -1);
+                lua_pushstring(l, "a");
+                lua_gettable(l, -5);
+                color->a = (int)lua_tonumber(l, -1);
             }
             else
             {

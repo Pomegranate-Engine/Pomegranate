@@ -2,6 +2,7 @@
 #define POMEGRANATE_ENGINE_VEC_MATH_H
 #include<cstdio>
 #include <iostream>
+#include <cmath>
 
 struct Vec2
 {

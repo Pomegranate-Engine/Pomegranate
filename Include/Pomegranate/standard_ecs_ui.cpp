@@ -88,6 +88,13 @@ void UIController::draw(Entity *entity)
             ImGui::SetNextItemWidth(transform->size.x);
             ImGui::Checkbox((std::string(checkbox->text)+"##Checkbox"+std::to_string(transform->id)).c_str(), &checkbox->checked);
         }
+        if (entity->has_component<UISlider>())
+        {
+            auto slider = entity->get_component<UISlider>();
+            //Set size
+            ImGui::SetNextItemWidth(transform->size.x);
+            ImGui::SliderFloat((std::string("##Slider")+std::to_string(transform->id)).c_str(), &slider->value, slider->min, slider->max);
+        }
     }
 }
 
@@ -198,6 +205,21 @@ UICheckbox::UICheckbox()
 }
 
 void UICheckbox::init(Entity *entity)
+{
+    entity->require_component<UITransform>();
+}
+
+UISlider::UISlider()
+{
+    register_component<UISlider>();
+    push_data<float>("value", &this->value);
+    push_data<float>("min", &this->min);
+    push_data<float>("max", &this->max);
+    push_data<Color>("slider_color", &this->slider_color);
+    push_data<Color>("background_color", &this->background_color);
+}
+
+void UISlider::init(Entity *entity)
 {
     entity->require_component<UITransform>();
 }
