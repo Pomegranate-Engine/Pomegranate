@@ -3,7 +3,9 @@
 #include <typeinfo>
 #include <iostream>
 #include <vector>
+#if defined(_OPENMP)
 #include <omp.h>
+#endif
 #include<string>
 #include "engine.h"
 #include <unordered_map>

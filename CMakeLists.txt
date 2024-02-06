@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
+
 project(Pomegranate_Engine)
+
 set(CMAKE_CXX_STANDARD 17)
 
 # Set the path to the SDL library directory
@@ -8,7 +10,10 @@ set(SDL_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/Lib/x64)
 link_directories("${CMAKE_SOURCE_DIR}/bin/")
 
 # Include directories
-include_directories("Include/" "Include/Imgui")
+include_directories(
+        "Include/"
+        "Include/Imgui"
+)
 
 # Source files
 set(SOURCE_FILES src/main.cpp)
@@ -48,19 +53,28 @@ set(IMGUI_SOURCES
 # Add executable
 add_executable(Pomegranate_Engine ${SOURCE_FILES} ${POMEGRANATE_SOURCES} ${IMGUI_SOURCES})
 
+# Set the path to LuaJIT (Mac)
+set(LUAJIT_LIBRARY ${CMAKE_SOURCE_DIR}/Lib/Arm/libluajit-5.1.dylib)  # Adjust the library name if necessary
 
-
-# Link SDL2 libraries
-target_link_libraries(Pomegranate_Engine PRIVATE
-        ${SDL_LIBRARY_DIR}/SDL3.lib
-        ${SDL_LIBRARY_DIR}/SDL3_ttf.lib
-        ${SDL_LIBRARY_DIR}/SDL3_image.lib
-        ${SDL_LIBRARY_DIR}/SDL3_mixer.lib
-        ${SDL_LIBRARY_DIR}/lua51.lib
-        Pomegranate_Library.lib
-)
-
-
+# Link SDL libraries
+if(APPLE)
+    target_link_libraries(Pomegranate_Engine PRIVATE
+            ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3.dylib
+            ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3_image.dylib
+            ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3_mixer.dylib
+            ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3_ttf.dylib
+            ${LUAJIT_LIBRARY}
+    )
+elseif(WIN32)
+    target_link_libraries(Pomegranate_Engine PRIVATE
+            ${SDL_LIBRARY_DIR}/SDL3.lib
+            ${SDL_LIBRARY_DIR}/SDL3_ttf.lib
+            ${SDL_LIBRARY_DIR}/SDL3_image.lib
+            ${SDL_LIBRARY_DIR}/SDL3_mixer.lib
+            ${SDL_LIBRARY_DIR}/lua51.lib
+            Pomegranate_Library.lib
+    )
+endif()
 
 # Set the output directory for the executable
 set_target_properties(Pomegranate_Engine PROPERTIES
@@ -68,7 +82,6 @@ set_target_properties(Pomegranate_Engine PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
 )
-
 
 # Copy SDL DLL files to the output directory
 file(GLOB SDL_DLLS ${SDL_LIBRARY_DIR}/*.dll)
@@ -78,5 +91,3 @@ foreach(DLL ${SDL_DLLS})
             ${DLL}
             $<TARGET_FILE_DIR:Pomegranate_Engine>)
 endforeach()
-
-
