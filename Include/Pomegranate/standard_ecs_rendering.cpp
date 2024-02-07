@@ -8,6 +8,7 @@ Sprite::Sprite()
     this->color = Color(255, 255, 255, 255);
     register_component<Sprite>();
     //TODO: Add texture support to lua
+    push_data<SDL_Texture*>("texture", &this->texture);
     push_data<Color>("color", &this->color);
 }
 

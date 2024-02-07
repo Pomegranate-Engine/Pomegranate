@@ -40,6 +40,7 @@ public:
     template<typename T> void push_data(std::string name, void* data);
     template<typename T> T get(std::string name);
     template<typename T> void set(const char* name, T value);
+    void set(const char* name, void* value);
 };
 
 //For lua wrapper
@@ -114,6 +115,7 @@ public:
     void force_destroy();
     void clean_refs();
     void get_ref(Entity*&e);
+    Entity* duplicate();
     static void apply_destruction_queue();
 };
 class EntityGroup
@@ -123,9 +125,11 @@ private:
     std::vector<Entity*> entities;
     std::vector<System*> systems;
     std::vector<EntityGroup*> child_groups;
+    uint32_t id;
+    static uint32_t group_count;
 public:
     std::string name;
-    explicit EntityGroup(std::string name);
+    explicit EntityGroup(std::string name = "Unnamed Group");
     ~EntityGroup();
     void add_entity(Entity*);
     void remove_entity(Entity*);
@@ -134,9 +138,12 @@ public:
     void add_group(EntityGroup*);
     void remove_group(const EntityGroup&);
     void tick();
+    std::vector<Entity*> get_contained_entities();
     void draw(const std::function<bool(Entity*, Entity*)>& sortingFunction);
     static std::unordered_map<std::string,EntityGroup*> groups;
+    static std::unordered_map<uint32_t,EntityGroup*> group_ids;
     static EntityGroup* get_group(const std::string& name);
+    static EntityGroup* get_group(uint32_t id);
 };
 
 #include "ecs.inl"

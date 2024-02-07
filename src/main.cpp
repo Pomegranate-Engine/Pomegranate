@@ -8,9 +8,10 @@
 #include<backends/imgui_impl_sdlrenderer3.h>
 #include <chrono>
 
-//Main window
+//Globals
 Window main_window = Window("Window", 1024, 720);
 bool use_lua_camera_controller = true;
+Entity* ball_template = nullptr;
 
 //Example program
 #include "entities.cpp"
@@ -19,6 +20,7 @@ bool use_lua_camera_controller = true;
 //Game example
 #include "init.cpp"
 #include "game.cpp"
+
 
 int main(int argc, char* argv[])
 {

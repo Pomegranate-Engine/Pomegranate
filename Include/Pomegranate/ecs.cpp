@@ -1,5 +1,7 @@
 #include "ecs.h"
 
+#include <utility>
+
 //Globals
 std::vector<System*> System::global_systems = std::vector<System*>();
 std::unordered_map<uint32_t ,Entity*> Entity::entities = std::unordered_map<uint32_t,Entity*>();
@@ -9,7 +11,10 @@ std::unordered_map<std::string, int> LuaComponent::lua_component_types = std::un
 LuaComponent* LuaComponent::current = nullptr;
 uint32_t Entity::entity_count = 0;
 std::unordered_map<std::string, EntityGroup*> EntityGroup::groups = std::unordered_map<std::string, EntityGroup*>();
+std::unordered_map<uint32_t, EntityGroup*> EntityGroup::group_ids = std::unordered_map<uint32_t, EntityGroup*>();
 std::vector<Entity*> Entity::destroy_queue = std::vector<Entity*>();
+uint32_t EntityGroup::group_count = 0;
+
 
 Entity::Entity()
 {
@@ -28,7 +33,7 @@ Component* Entity::get_component(const char* name)
 {
     for (auto c : components)
     {
-        if (std::string(c.first->name()) == "class " + std::string(name))
+        if (std::string(c.first->name()) == "class " + std::string(name) || std::string(c.first->name()) == std::string(name))
         {
             return c.second;
         }
@@ -38,10 +43,21 @@ Component* Entity::get_component(const char* name)
 
 void Entity::add_component(const char *name)
 {
-    auto component = Component::component_types["class " + std::string(name)]();
-    component->init(this);
-    std::pair<const std::type_info *, Component *> pair(&typeid(*component), component);
-    this->components.insert(pair);
+    //Check if it starts with class:
+    if(Component::component_types.find("class " + std::string(name)) != Component::component_types.end())
+    {
+        auto component = Component::component_types["class " + std::string(name)]();
+        component->init(this);
+        std::pair<const std::type_info *, Component *> pair(&typeid(*component), component);
+        this->components.insert(pair);
+    }
+    else
+    {
+        auto component = Component::component_types[std::string(name)]();
+        component->init(this);
+        std::pair<const std::type_info *, Component *> pair(&typeid(*component), component);
+        this->components.insert(pair);
+    }
 }
 
 bool Entity::has_component(const char * name)
@@ -64,6 +80,23 @@ Entity::~Entity()
     }
     this->components.clear();
     Entity::entities.erase(this->id);
+}
+Entity *Entity::duplicate()
+{
+    //Clone the entity along with component data
+    auto *e = new Entity();
+    for (auto & component : this->components)
+    {
+        print_debug("Adding componenent %s", component.first->name());
+        e->add_component(component.first->name());
+        Component* c = e->get_component(component.first->name());
+        for (auto & data : component.second->component_data)
+        {
+            print_debug("Setting data: %s", data.first.c_str());
+            c->set(data.first.c_str(), data.second.second);
+        }
+    }
+    return e;
 }
 
 
@@ -148,6 +181,8 @@ EntityGroup::EntityGroup(std::string name)
     this->systems = std::vector<System*>();
     this->child_groups = std::vector<EntityGroup*>();
     this->name = name;
+    this->id = EntityGroup::group_count++;
+    EntityGroup::group_ids.emplace(this->id,this);
     groups.emplace(name,this);
 }
 
@@ -215,10 +250,9 @@ void EntityGroup::tick()
         {
             system->pre_tick();
             Entity::apply_destruction_queue();
-
-            for (auto &entitie: this->entities)
+            for (auto &entity: get_contained_entities())
             {
-                system->tick(entitie);
+                system->tick(entity);
             }
             Entity::apply_destruction_queue();
             system->post_tick();
@@ -230,18 +264,31 @@ void EntityGroup::tick()
         child_group->tick();
     }
 }
-
+std::vector<Entity*> EntityGroup::get_contained_entities()
+{
+    std::vector<Entity*> e = std::vector<Entity*>();
+    for (auto & entity : entities)
+    {
+        e.push_back(entity);
+    }
+    //Get childrens entities
+    for (auto & group : this->child_groups)
+    {
+        auto child_entities = group->get_contained_entities();
+        e.insert(e.end(), child_entities.begin(), child_entities.end());
+    }
+    return e;
+}
 void EntityGroup::draw(const std::function<bool(Entity*, Entity*)>& sortingFunction)
 {
     // Sort entities using the provided sorting function
-    std::sort(this->entities.begin(), this->entities.end(), sortingFunction);
     for(auto & system : this->systems)
     {
         if(system->active)
         {
             system->pre_draw();
             Entity::apply_destruction_queue();
-            for (auto &entity: this->entities)
+            for (auto &entity: get_contained_entities())
             {
                 system->draw(entity);
             }
@@ -328,3 +375,8 @@ void Entity::get_ref(Entity * &e)
 }
 
 void Component::init(Entity *){}
+
+void Component::set(const char* name, void* value)
+{
+    component_data[std::string(name)].second = value;
+}
