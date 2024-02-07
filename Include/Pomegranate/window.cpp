@@ -71,8 +71,8 @@ int Window::open()
 
 void Window::close()
 {
-    SDL_DestroyRenderer(this->renderer);
     SDL_DestroyWindow(this->window);
+    SDL_DestroyRenderer(this->renderer);
 }
 
 const char *Window::get_title() const

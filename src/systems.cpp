@@ -141,7 +141,24 @@ public:
         {
             if (!clicked)
             {
-                auto *e = ball_template->duplicate();
+                auto *e = new Entity();
+                e->add_component<PhysicsObject>();
+                e->add_component<Transform>();
+                e->get_component<Transform>()->pos = mousepos;
+                e->get_component<Transform>()->scale = Vec2(0.25f, 0.25f);
+                e->add_component<Sprite>();
+                auto *s = e->get_component<Sprite>();
+                s->load_texture("res/pomegranate.png");
+
+                e->add_component<CollisionShape>();
+                auto *c = e->get_component<CollisionShape>();
+                c->radius = 128.0;
+                c->restitution = 0.0;
+
+                e->add_component<DestroyAfterTime>();
+                auto *d = e->get_component<DestroyAfterTime>();
+                d->length = 5.0;
+                d->time = 0.0;
 
                 EntityGroup::get_group("PHYSICS")->add_entity(e);
                 clicked = true;

@@ -53,6 +53,9 @@ set(IMGUI_SOURCES
 # Add executable
 add_executable(Pomegranate_Engine ${SOURCE_FILES} ${POMEGRANATE_SOURCES} ${IMGUI_SOURCES})
 
+# Set the path to LuaJIT (Mac)
+set(LUAJIT_LIBRARY ${CMAKE_SOURCE_DIR}/Lib/Arm/libluajit-5.1.dylib)  # Adjust the library name if necessary
+
 # Link SDL libraries
 if(APPLE)
     target_link_libraries(Pomegranate_Engine PRIVATE
@@ -60,7 +63,7 @@ if(APPLE)
             ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3_image.dylib
             ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3_mixer.dylib
             ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3_ttf.dylib
-            ${CMAKE_SOURCE_DIR}/Lib/Arm/libluajit-5.1.dylib
+            ${LUAJIT_LIBRARY}
     )
 elseif(WIN32)
     target_link_libraries(Pomegranate_Engine PRIVATE
@@ -69,6 +72,7 @@ elseif(WIN32)
             ${SDL_LIBRARY_DIR}/SDL3_image.lib
             ${SDL_LIBRARY_DIR}/SDL3_mixer.lib
             ${SDL_LIBRARY_DIR}/lua51.lib
+            Pomegranate_Library.lib
     )
 endif()
 

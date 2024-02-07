@@ -11,7 +11,7 @@ EntityGroup* build_scene()
     Component::register_component<UIText>();
 
     //region Physics Example
-    auto* group = new EntityGroup("PHYSICS");
+    EntityGroup* group = new EntityGroup("PHYSICS");
     auto camera = new Entity();
     camera->add_component<Camera>();
     camera->add_component<Transform>();
@@ -132,7 +132,7 @@ EntityGroup* build_scene()
 //endregion
     print_pass("Added UI");
 
-    auto* ui = new EntityGroup("UI");
+    EntityGroup* ui = new EntityGroup("UI");
     auto* text = new Entity();
     text->add_component<UIText>();
     text->get_component<UIText>()->text = "Hello World!";
@@ -200,52 +200,25 @@ EntityGroup* build_scene()
     ui->add_entity(slider);
 
     //Add global systems
-
+    System::add_global_system(new TransformLinkages());
+    System::add_global_system(new Render());
+    System::add_global_system(new UIController());
+    System::add_global_system(new Spawn());
+    System::add_global_system(new Destroy());
     auto* lua_system = new LuaSystem();
     lua_system->load_script("res/scripts/CameraControllerSystem.lua");
+    System::add_global_system(lua_system);
     auto* camera_controller_system = new CameraControllerSystem();
     camera_controller_system->active = !use_lua_camera_controller;
-
+    System::add_global_system(camera_controller_system);
 
     lua_system->active = use_lua_camera_controller;
+    //ui.add_system(new UIController());
 
     auto* scene = new EntityGroup("SCENE");
     scene->add_group(group);
     scene->add_group(world);
     scene->add_group(ui);
-
-    //Add systems
-    scene->add_system(lua_system);
-    scene->add_system(camera_controller_system);
-    scene->add_system(new TransformLinkages());
-    scene->add_system(new Render());
-    scene->add_system(new UIController());
-    scene->add_system(new Spawn());
-    scene->add_system(new Destroy());
-
-    //Create ball template
-    auto* ball = new Entity();
-
-    ball->add_component<PhysicsObject>();
-    ball->add_component<Transform>();
-    ball->get_component<Transform>()->pos = Vec2(0.0f,0.0f);
-    ball->get_component<Transform>()->scale = Vec2(0.25f, 0.25f);
-    ball->add_component<Sprite>();
-    auto *spr = ball->get_component<Sprite>();
-    spr->load_texture("res/pomegranate.png");
-
-    ball->add_component<CollisionShape>();
-    auto *c = ball->get_component<CollisionShape>();
-    c->radius = 128.0;
-    c->restitution = 0.0;
-
-    ball->add_component<DestroyAfterTime>();
-    auto *d = ball->get_component<DestroyAfterTime>();
-    d->length = 5.0;
-    d->time = 0.0;
-
-    ball_template = ball;
-
     return scene;
 }
 
