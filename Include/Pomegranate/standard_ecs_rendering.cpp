@@ -94,6 +94,7 @@ void Render::sprite(Entity*e) {
     auto* center = new SDL_FPoint();
     center->x = r.w/2;
     center->y = r.h/2;
+    SDL_SetTextureColorMod(s->texture, s->color.r, s->color.g, s->color.b);
     SDL_RenderTextureRotated(Window::current->get_sdl_renderer(), s->texture, nullptr, &r, t->rot*180.0/3.14159, center, SDL_FLIP_NONE);
 }
 

@@ -149,6 +149,7 @@ public:
                 e->add_component<Sprite>();
                 auto *s = e->get_component<Sprite>();
                 s->load_texture("res/pomegranate.png");
+                s->color = Color((float)rand()/RAND_MAX*360, 1.0);
 
                 e->add_component<CollisionShape>();
                 auto *c = e->get_component<CollisionShape>();
@@ -157,7 +158,7 @@ public:
 
                 e->add_component<DestroyAfterTime>();
                 auto *d = e->get_component<DestroyAfterTime>();
-                d->length = 5.0;
+                d->length = 20.0;
                 d->time = 0.0;
 
                 EntityGroup::get_group("PHYSICS")->add_entity(e);

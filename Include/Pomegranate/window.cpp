@@ -38,16 +38,16 @@ SDL_Renderer* Window::get_sdl_renderer() const
 
 int Window::open()
 {
-    bool HIDPI = false;
-#if defined(__APPLE__) //TODO: Implement better solution for HIDPI
-    HIDPI = true;
+    bool HIGH_DPI = false;
+#if defined(__APPLE__) //TODO: Implement better solution for HIGH_DPI
+    HIGH_DPI = true;
 #endif
     int flags = 0;
-    if(HIDPI)
+    if(HIGH_DPI)
     {
         flags += SDL_WINDOW_HIGH_PIXEL_DENSITY;
     }
-    this->window = SDL_CreateWindow(this->title, this->width, this->height, flags); //TODO: Add HIDPI support
+    this->window = SDL_CreateWindow(this->title, this->width, this->height, flags); //TODO: Add HIGH_DPI support
     if (!this->window)
     {
         std::cout << "Failed to create window\n" << std::endl;
@@ -55,7 +55,7 @@ int Window::open()
     }
 
     this->renderer = SDL_CreateRenderer(this->window, nullptr, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if(HIDPI)
+    if(HIGH_DPI)
     {
         SDL_SetRenderScale(renderer, 2, 2);
     }

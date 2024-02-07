@@ -1,4 +1,3 @@
-#include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <Pomegranate/pomegranate.h>
@@ -6,11 +5,10 @@
 #include<imgui.h>
 #include<backends/imgui_impl_sdl3.h>
 #include<backends/imgui_impl_sdlrenderer3.h>
-#include <chrono>
 
 //Main window
 Window main_window = Window("Window", 1024, 720);
-bool use_lua_camera_controller = true;
+bool use_lua_camera_controller = false;
 
 //Example program
 #include "entities.cpp"
