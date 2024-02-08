@@ -60,43 +60,49 @@ Color Color::mix(const Color &other, float amount) const
 Color::Color(float hue, float brightness, float a)
 {
     float c = brightness;
-    float x = c * (1 - abs(fmod(hue / 60.0, 2) - 1));
+    float x = c * (1.0f - fabsf(fmod(hue / 60.0f, 2.0f) - 1.0f));
     float m = brightness - c;
-    if (hue >= 0 && hue < 60)
+    float r = 0;
+    float g = 0;
+    float b = 0;
+    if (hue >= 0.0f && hue < 60.0f)
     {
-        this->r = (c + m) * 255;
-        this->g = (x + m) * 255;
-        this->b = m * 255;
+        r = (c + m) * 255.0f;
+        g = (x + m) * 255.0f;
+        b = m * 255.0f;
     }
-    else if (hue >= 60 && hue < 120)
+    else if (hue >= 60.0f && hue < 120.0f)
     {
-        this->r = (x + m) * 255;
-        this->g = (c + m) * 255;
-        this->b = m * 255;
+        r = (x + m) * 255.0f;
+        g = (c + m) * 255.0f;
+        b = m * 255.0f;
     }
-    else if (hue >= 120 && hue < 180)
+    else if (hue >= 120.0f && hue < 180.0f)
     {
-        this->r = m * 255;
-        this->g = (c + m) * 255;
-        this->b = (x + m) * 255;
+        r = m * 255.0f;
+        g = (c + m) * 255.0f;
+        b = (x + m) * 255.0f;
     }
-    else if (hue >= 180 && hue < 240)
+    else if (hue >= 180.0f && hue < 240.0f)
     {
-        this->r = m * 255;
-        this->g = (x + m) * 255;
-        this->b = (c + m) * 255;
+        r = m * 255.0f;
+        g = (x + m) * 255.0f;
+        b = (c + m) * 255.0f;
     }
-    else if (hue >= 240 && hue < 300)
+    else if (hue >= 240.0f && hue < 300.0f)
     {
-        this->r = (x + m) * 255;
-        this->g = m * 255;
-        this->b = (c + m) * 255;
+        r = (x + m) * 255.0f;
+        g = m * 255.0f;
+        b = (c + m) * 255.0f;
     }
-    else if (hue >= 300 && hue < 360)
+    else if (hue >= 300.0f && hue < 360.0f)
     {
-        this->r = (c + m) * 255;
-        this->g = m * 255;
-        this->b = (x + m) * 255;
+        r = (c + m) * 255.0f;
+        g = m * 255.0f;
+        b = (x + m) * 255.0f;
     }
-    this->a = a * 255;
+    this->r = (int)r;
+    this->g = (int)g;
+    this->b = (int)b;
+    this->a = (int)(a * 255);
 }
