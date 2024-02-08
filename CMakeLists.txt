@@ -58,6 +58,7 @@ set(LUAJIT_LIBRARY ${CMAKE_SOURCE_DIR}/Lib/Arm/libluajit-5.1.dylib)  # Adjust th
 
 # Link SDL libraries
 if(APPLE)
+    # OpenMP is not supported on Apple Silicon to my knowledge.
     target_link_libraries(Pomegranate_Engine PRIVATE
             ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3.dylib
             ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3_image.dylib
@@ -66,12 +67,14 @@ if(APPLE)
             ${LUAJIT_LIBRARY}
     )
 elseif(WIN32)
+    find_package(OpenMP)
     target_link_libraries(Pomegranate_Engine PRIVATE
             ${SDL_LIBRARY_DIR}/SDL3.lib
             ${SDL_LIBRARY_DIR}/SDL3_ttf.lib
             ${SDL_LIBRARY_DIR}/SDL3_image.lib
             ${SDL_LIBRARY_DIR}/SDL3_mixer.lib
             ${SDL_LIBRARY_DIR}/lua51.lib
+            OpenMP::OpenMP_CXX
     )
 endif()
 

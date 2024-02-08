@@ -2,7 +2,7 @@
 
 Vec2 PhysicsObject::gravity = Vec2(0.0f, 980.0f);
 std::vector<Entity*> PhysicsObject::objects = std::vector<Entity*>();
-int RigidBody::sub_steps = 8;
+int RigidBody::sub_steps = 6;
 
 PhysicsObject::PhysicsObject()
 {
@@ -74,29 +74,42 @@ void RigidBody::tick(Entity *entity)
             }
 
             //Collisions
+            omp_set_num_threads(omp_get_num_threads()/2);
+#pragma omp parallel for
             for (int j = 0; j < PhysicsObject::objects.size(); ++j)
             {
-                if(PhysicsObject::objects[j]!=entity)
+                if (PhysicsObject::objects[j] != entity)
                 {
                     auto *other = PhysicsObject::objects[j];
                     auto* other_p = other->get_component<PhysicsObject>();
                     auto *other_c = other->get_component<CollisionShape>();
-                    if(other_p != nullptr && other_c!= nullptr) {
+                    if (other_p != nullptr && other_c != nullptr) {
                         float our_radius = c->radius * (abs(t->scale.x + t->scale.y) * 0.5f);
                         float other_radius = other_c->radius * (abs(other->get_component<Transform>()->scale.x +
-                                                                    other->get_component<Transform>()->scale.y) * 0.5f);
-                        Vec2 collision_axis = p->cur_pos-other_p->cur_pos;
+                            other->get_component<Transform>()->scale.y) * 0.5f);
+                        Vec2 collision_axis = p->cur_pos - other_p->cur_pos;
                         float dist = collision_axis.length();
-                        if(dist < our_radius + other_radius)
+
+                        if (dist < our_radius + other_radius)
                         {
                             Vec2 normal = collision_axis.normalized();
                             float overlap = (our_radius + other_radius) - dist;
-                            p->cur_pos += normal * (overlap * 0.5f);
-                            other_p->cur_pos -= normal * (overlap * 0.5f);
+
+                            // Separate critical sections for each object
+#pragma omp critical (update_position)
+                            {
+                                p->cur_pos += normal * (overlap * 0.5f);
+                            }
+
+#pragma omp critical (update_other_position)
+{
+    other_p->cur_pos -= normal * (overlap * 0.5f);
+}
                         }
                     }
                 }
             }
+
 
             //Gravity
             p->acceleration += PhysicsObject::gravity * p->gravity_scale;

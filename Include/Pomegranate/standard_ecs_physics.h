@@ -4,7 +4,7 @@
 #include "ecs.h"
 #include "vec_math.h"
 #include "standard_ecs.h"
-
+#include <omp.h>
 
 enum PhysicsBodyType
 {
