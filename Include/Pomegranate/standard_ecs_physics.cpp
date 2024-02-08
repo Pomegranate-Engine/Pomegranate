@@ -2,7 +2,7 @@
 
 Vec2 PhysicsObject::gravity = Vec2(0.0f, 980.0f);
 std::vector<Entity*> PhysicsObject::objects = std::vector<Entity*>();
-int RigidBody::sub_steps = 6;
+int RigidBody::sub_steps = 8;
 
 PhysicsObject::PhysicsObject()
 {

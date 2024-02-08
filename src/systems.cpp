@@ -128,7 +128,8 @@ public:
                 e->add_component<PhysicsObject>();
                 e->add_component<Transform>();
                 e->get_component<Transform>()->pos = mousepos;
-                e->get_component<Transform>()->scale = Vec2(0.25f, 0.25f);
+                float ransize = (float)rand()/RAND_MAX*0.2+0.1f;
+                e->get_component<Transform>()->scale = Vec2(ransize,ransize);
                 e->add_component<Sprite>();
                 auto *s = e->get_component<Sprite>();
                 s->load_texture("res/pomegranate.png");
@@ -145,7 +146,7 @@ public:
                 d->time = 0.0;
                 */
                 EntityGroup::get_group("PHYSICS")->add_entity(e);
-                clicked = true;
+                //clicked = true;
             }
         } else
         {
