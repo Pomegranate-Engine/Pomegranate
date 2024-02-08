@@ -43,6 +43,13 @@ EntityGroup* build_scene()
 
     EntityGroup* world = new EntityGroup("WORLD");
 
+    auto* debug_circle = new Entity();
+    debug_circle->add_component<DebugCircle>();
+    debug_circle->add_component<Transform>();
+    debug_circle->get_component<Transform>()->pos = Vec2(0.0f,0.0f);
+    debug_circle->get_component<DebugCircle>()->color = Color(255, 0, 0, 255);
+    debug_circle->get_component<DebugCircle>()->radius = 512.0f;
+
     for (int i = -32; i <= 32; ++i)
     {
         auto *collision_body = new Entity();

@@ -63,8 +63,7 @@ public:
         {
             auto *p = currently_dragged->get_component<PhysicsObject>();
             auto *t = currently_dragged->get_component<Transform>();
-            p->linear_velocity = t->pos.direction_to(mousepos) * t->pos.distance_to(mousepos) * 10.0;
-            p->angular_velocity = 0.0;
+            //p->linear_velocity = t->pos.direction_to(mousepos) * t->pos.distance_to(mousepos) * 10.0;
 
             if (currently_dragged->has_component<DestroyAfterTime>())
             {
@@ -76,7 +75,7 @@ public:
         {
             if (currently_dragged != nullptr)
             {
-                currently_dragged->get_component<PhysicsObject>()->drag /= 5.0;
+                //currently_dragged->get_component<PhysicsObject>()->drag /= 5.0;
             }
             currently_dragged = nullptr;
         }
@@ -100,7 +99,7 @@ public:
                             if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
                             {
                                 entity->get_ref(currently_dragged);
-                                currently_dragged->get_component<PhysicsObject>()->drag *= 5.0;
+                                //currently_dragged->get_component<PhysicsObject>()->drag *= 5.0;
                             }
                         }
                     }
@@ -114,7 +113,7 @@ public:
                     {
                         auto *p = entity->get_component<PhysicsObject>();
                         auto *t = entity->get_component<Transform>();
-                        p->linear_velocity = t->pos.direction_to(mousepos) * 10000.0;
+                        //p->linear_velocity = t->pos.direction_to(mousepos) * 10000.0;
                     }
                 }
                 clicked = true;
@@ -156,11 +155,11 @@ public:
                 c->radius = 128.0;
                 c->restitution = 0.0;
 
-                e->add_component<DestroyAfterTime>();
+                /*e->add_component<DestroyAfterTime>();
                 auto *d = e->get_component<DestroyAfterTime>();
                 d->length = 20.0;
                 d->time = 0.0;
-
+                */
                 EntityGroup::get_group("PHYSICS")->add_entity(e);
                 clicked = true;
             }

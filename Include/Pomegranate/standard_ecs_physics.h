@@ -21,16 +21,19 @@ enum CollisionShapeType
 class PhysicsObject : public Component
 {
 public:
-    Vec2 linear_velocity;
-    float angular_velocity;
+    Vec2 cur_pos;
+    Vec2 old_pos;
+    Vec2 acceleration;
     float mass;
     float gravity_scale;
-    float drag;
-    bool continuous_collision_detection;
     bool use_collision;
+    bool initialized = false;
     PhysicsBodyType body_type;
     PhysicsObject();
+    void init(Entity *) override;
+
     static Vec2 gravity;
+    static std::vector<Entity*> objects;
 };
 
 class CollisionShape : public Component
@@ -54,8 +57,6 @@ class RigidBody: public System
 public:
     RigidBody();
     void tick(Entity* entity) override;
-    static bool check_collision(Entity* a, Entity* b);
-    static void resolve_collision(Entity* a, Entity* b);
     static int sub_steps;
 };
 
