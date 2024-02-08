@@ -26,6 +26,7 @@ public:
     Vec2 acceleration;
     float mass;
     float gravity_scale;
+    float drag = 0.0;
     bool use_collision;
     bool initialized = false;
     PhysicsBodyType body_type;
@@ -34,6 +35,10 @@ public:
 
     static Vec2 gravity;
     static std::vector<Entity*> objects;
+    void add_force(Vec2 force);
+    void add_impulse(Vec2 impulse);
+    void set_velocity(Vec2 velocity);
+    Vec2 get_velocity();
 };
 
 class CollisionShape : public Component

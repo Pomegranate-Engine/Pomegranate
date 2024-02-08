@@ -21,7 +21,22 @@ PhysicsObject::PhysicsObject()
     push_data<bool>("use_collision", &this->use_collision);
     push_data<int>("body_type", &this->body_type);
 }
-
+void PhysicsObject::add_force(Vec2 force)
+{
+    this->acceleration += force / this->mass;
+}
+void PhysicsObject::add_impulse(Vec2 impulse)
+{
+    this->acceleration += impulse / this->mass;
+}
+void PhysicsObject::set_velocity(Vec2 velocity)
+{
+    this->old_pos = cur_pos - velocity;
+}
+Vec2 PhysicsObject::get_velocity()
+{
+    return cur_pos - old_pos;
+}
 void PhysicsObject::init(Entity * e)
 {
     e->require_component<Transform>();
@@ -70,18 +85,22 @@ void RigidBody::tick(Entity *entity)
                         float our_radius = c->radius * (abs(t->scale.x + t->scale.y) * 0.5f);
                         float other_radius = other_c->radius * (abs(other->get_component<Transform>()->scale.x +
                                                                     other->get_component<Transform>()->scale.y) * 0.5f);
-                        if (other_p->use_collision) {
-                            Vec2 to_obj = p->cur_pos - other_p->cur_pos;
-                            float distance = to_obj.length();
-                            if (distance < our_radius + other_radius) {
-                                Vec2 normal = to_obj.normalized();
-                                p->cur_pos = other_p->cur_pos + normal * (our_radius + other_radius);
-                            }
+                        Vec2 collision_axis = p->cur_pos-other_p->cur_pos;
+                        float dist = collision_axis.length();
+                        if(dist < our_radius + other_radius)
+                        {
+                            Vec2 normal = collision_axis.normalized();
+                            float overlap = (our_radius + other_radius) - dist;
+                            p->cur_pos += normal * (overlap * 0.5f);
+                            other_p->cur_pos -= normal * (overlap * 0.5f);
                         }
                     }
                 }
             }
-            
+
+            //Gravity
+            p->acceleration += PhysicsObject::gravity * p->gravity_scale;
+
             //Move
             Vec2 linear_velocity = p->cur_pos - p->old_pos;
             p->old_pos = p->cur_pos;
@@ -92,7 +111,6 @@ void RigidBody::tick(Entity *entity)
             }
 
             float delta = 0.016f/(float)RigidBody::sub_steps;
-            p->acceleration += PhysicsObject::gravity * p->gravity_scale;
             t->pos = p->cur_pos + linear_velocity + p->acceleration * (delta * delta);
             //Apply gravity
             p->acceleration = Vec2(0,0);

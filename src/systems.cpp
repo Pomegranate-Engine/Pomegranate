@@ -63,7 +63,7 @@ public:
         {
             auto *p = currently_dragged->get_component<PhysicsObject>();
             auto *t = currently_dragged->get_component<Transform>();
-            //p->linear_velocity = t->pos.direction_to(mousepos) * t->pos.distance_to(mousepos) * 10.0;
+            p->set_velocity(t->pos.direction_to(mousepos) * 0.5);
 
             if (currently_dragged->has_component<DestroyAfterTime>())
             {
@@ -75,7 +75,7 @@ public:
         {
             if (currently_dragged != nullptr)
             {
-                //currently_dragged->get_component<PhysicsObject>()->drag /= 5.0;
+                currently_dragged->get_component<PhysicsObject>()->drag /= 5.0;
             }
             currently_dragged = nullptr;
         }
@@ -99,27 +99,11 @@ public:
                             if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
                             {
                                 entity->get_ref(currently_dragged);
-                                //currently_dragged->get_component<PhysicsObject>()->drag *= 5.0;
+                                currently_dragged->get_component<PhysicsObject>()->drag *= 5.0;
                             }
                         }
                     }
                 }
-            }
-            if (InputManager::get_mouse_button(SDL_BUTTON_RIGHT))
-            {
-                if (!clicked)
-                {
-                    if (entity->has_component<PhysicsObject>() && entity->has_component<Transform>())
-                    {
-                        auto *p = entity->get_component<PhysicsObject>();
-                        auto *t = entity->get_component<Transform>();
-                        //p->linear_velocity = t->pos.direction_to(mousepos) * 10000.0;
-                    }
-                }
-                clicked = true;
-            } else
-            {
-                clicked = false;
             }
         }
     }
@@ -136,7 +120,7 @@ public:
     void pre_tick() override
     {
         Vec2 mousepos = InputManager::get_mouse_position() + Camera::current->get_component<Transform>()->pos;
-        if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
+        if (InputManager::get_mouse_button(SDL_BUTTON_RIGHT))
         {
             if (!clicked)
             {

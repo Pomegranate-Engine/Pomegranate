@@ -50,7 +50,7 @@ EntityGroup* build_scene()
     debug_circle->get_component<DebugCircle>()->color = Color(255, 0, 0, 255);
     debug_circle->get_component<DebugCircle>()->radius = 512.0f;
 
-    for (int i = -32; i <= 32; ++i)
+    /*for (int i = -32; i <= 32; ++i)
     {
         auto *collision_body = new Entity();
         collision_body->add_component<CollisionShape>();
@@ -65,7 +65,7 @@ EntityGroup* build_scene()
         d->color = Color(34, 221, 255, 255);
 
         world->add_entity(collision_body);
-    }
+    }*/
 
 
     group->add_system(new RigidBody());
