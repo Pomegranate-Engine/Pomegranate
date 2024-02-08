@@ -74,7 +74,6 @@ void RigidBody::tick(Entity *entity)
             }
 
             //Collisions
-            omp_set_num_threads(omp_get_num_threads());
 #pragma omp parallel for
             for (int j = 0; j < PhysicsObject::objects.size(); ++j)
             {
@@ -95,11 +94,12 @@ void RigidBody::tick(Entity *entity)
                             Vec2 normal = collision_axis.normalized();
                             float overlap = (our_radius + other_radius) - dist;
 
+                            // Separate critical sections for each object
 #pragma omp critical
-                            {
+{
                                 p->cur_pos += normal * (overlap * 0.5f);
                                 other_p->cur_pos -= normal * (overlap * 0.5f);
-                            }
+}
                         }
                     }
                 }
