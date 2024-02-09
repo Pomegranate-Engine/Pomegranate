@@ -15,3 +15,4 @@ function init(entity)
     require_component(entity,"UIText")
     print("UIText")
 end
+

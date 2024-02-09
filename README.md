@@ -1,5 +1,5 @@
 # Pomegranate-Engine
-A simple customizable 2D Game Engine. Currently very WIP.
+A simple customizable 2D Game Engine. Still WIP.
 
 # About
 
@@ -14,13 +14,17 @@ because there are no windows-specific dependencies. (Although some stuff will ha
 Currently, it is being developed as a non-graphical, headless engine, in order to make sure that all features are working correctly, and are easy to use.
 A graphical editor will be created in the future.
 
-![Tilemap Demo](img/physics_demo.png) *Physics Demo*
+![Tilemap Demo](img/physics_demo_new.png) *Physics Demo*
+
+The engine comes with a Lua Wrapper so that systems/components can be written in lua. This will be more important when the graphical editor is created.
+
+![Lua Demo](img/lua_script_demo.png) *Lua Demo*
 
 ## Features
-- Hybrid Gameobject-ECS System
+- Hybrid GameObject-ECS System
 - Lua scripting support
-- Builtin Multithreading (Disabled ATM)
-- Neat Debugging Tools
+- Physics Engine with Multithreading
+- Neat Debugging functions
 - <details>
   <summary>Standard ECS library</summary>
 
@@ -39,7 +43,7 @@ A graphical editor will be created in the future.
 ## Planned Features
 - Graphical Editor
 - Optimizations
-- Scripting Languages Support ([Teascript](https://github.com/RevengerWizard/teascript))
+- Scripting Languages Support ([Teascript](https://github.com/RevengerWizard/teascript), CSharp)
 - Shaders/Post Processing
 - 2D Lighting
 - ECS Standard Library Navigation
@@ -55,11 +59,9 @@ A graphical editor will be created in the future.
 
 Figure it out. Good luck! 🥰
 
-
-
 # Contribution Guidelines
 
-Thank you for considering contributing to Pomegranate Engine! 🙌
+I need help.
 
 ## Bug Reports
 
