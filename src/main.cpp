@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
         delta_time = secondsElapsed;
         tick_time += delta_time;
     }
-
+    main_window.close();
     pomegranate_quit(); //Cleanup
     return 0;
 }
