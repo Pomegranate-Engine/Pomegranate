@@ -25,7 +25,10 @@ class PhysicsObject : public Component
 public:
     Vec2 cur_pos;
     Vec2 old_pos;
+    float cur_rot;
+    float old_rot;
     Vec2 acceleration;
+    float rotational_acceleration;
     float mass;
     float gravity_scale;
     float drag = 0.0;
@@ -64,6 +67,7 @@ class RigidBody: public System
 public:
     RigidBody();
     void tick(Entity* entity) override;
+    void solve_collisions(Entity* entity);
     static int sub_steps;
 };
 

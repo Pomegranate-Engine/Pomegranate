@@ -169,6 +169,14 @@ EntityGroup* build_scene()
     text_field->get_component<UITextField>()->background_color = Color(0, 0, 0, 255);
     ui->add_entity(text_field);
 
+    Info_Text = new Entity();
+    Info_Text->add_component<UITransform>();
+    Info_Text->get_component<UITransform>()->position = Vec2(512, 0);
+    Info_Text->get_component<UITransform>()->size = Vec2(128, 128);
+    Info_Text->add_component<UIText>();
+    Info_Text->get_component<UIText>()->text = "Text Field";
+    ui->add_entity(Info_Text);
+
     //Create dropdown
     auto* dropdown = new Entity();
     dropdown->add_component<UITransform>();

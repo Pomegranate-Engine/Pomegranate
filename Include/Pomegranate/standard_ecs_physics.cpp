@@ -2,13 +2,18 @@
 
 Vec2 PhysicsObject::gravity = Vec2(0.0f, 980.0f);
 std::vector<Entity*> PhysicsObject::objects = std::vector<Entity*>();
-int RigidBody::sub_steps = 6;
+int RigidBody::sub_steps = 2;
 
 PhysicsObject::PhysicsObject()
 {
     this->cur_pos = Vec2(0.0f, 0.0f);
     this->old_pos = Vec2(0.0f, 0.0f);
+    this->cur_rot = 0.0f;
+    this->old_rot = 0.0f;
+
     this->acceleration = Vec2(0,0);
+    this->rotational_acceleration = 0.0f;
+
     this->mass = 1.0f;
     this->gravity_scale = 1.0f;
     this->use_collision = true;
@@ -59,7 +64,9 @@ void RigidBody::tick(Entity *entity)
 
         for (int i = 0; i < RigidBody::sub_steps; ++i)
         {
+            float delta = 0.016f/(float)RigidBody::sub_steps;
             p->cur_pos = t->pos;
+            p->cur_rot = t->rot;
 
             //Constraint
             Vec2 constraint_position = Vec2(0,0);
@@ -74,43 +81,14 @@ void RigidBody::tick(Entity *entity)
             }
 
             //Collisions
-#pragma omp parallel for
-            for (int j = 0; j < PhysicsObject::objects.size(); ++j)
-            {
-                if (PhysicsObject::objects[j] != entity)
-                {
-                    auto *other = PhysicsObject::objects[j];
-                    auto* other_p = other->get_component<PhysicsObject>();
-                    auto *other_c = other->get_component<CollisionShape>();
-                    if (other_p != nullptr && other_c != nullptr) {
-                        float our_radius = c->radius * (abs(t->scale.x + t->scale.y) * 0.5f);
-                        float other_radius = other_c->radius * (abs(other->get_component<Transform>()->scale.x +
-                            other->get_component<Transform>()->scale.y) * 0.5f);
-                        Vec2 collision_axis = p->cur_pos - other_p->cur_pos;
-                        float dist = collision_axis.length();
+            solve_collisions(entity);
 
-                        if (dist < our_radius + other_radius)
-                        {
-                            Vec2 normal = collision_axis.normalized();
-                            float overlap = (our_radius + other_radius) - dist;
-
-                            // Separate critical sections for each object
-#pragma omp critical
-{
-                                p->cur_pos += normal * (overlap * 0.5f);
-                                other_p->cur_pos -= normal * (overlap * 0.5f);
-}
-                        }
-                    }
-                }
-            }
-
-
+            Vec2 linear_velocity = p->cur_pos - p->old_pos;
+            float angular_velocity = p->cur_rot - p->old_rot;
             //Gravity
             p->acceleration += PhysicsObject::gravity * p->gravity_scale;
 
             //Move
-            Vec2 linear_velocity = p->cur_pos - p->old_pos;
             p->old_pos = p->cur_pos;
             if(!p->initialized)
             {
@@ -118,10 +96,13 @@ void RigidBody::tick(Entity *entity)
                 continue;
             }
 
-            float delta = 0.016f/(float)RigidBody::sub_steps;
             t->pos = p->cur_pos + linear_velocity + p->acceleration * (delta * delta);
+            t->rot = p->cur_rot + angular_velocity + p->rotational_acceleration * (delta * delta);
+
+
             //Apply gravity
             p->acceleration = Vec2(0,0);
+            p->rotational_acceleration = 0.0f;
             //print_info("Velocity: " + std::to_string(p->cur_pos.x) + ", " + std::to_string(p->cur_pos.y));
         }
     }
@@ -144,4 +125,107 @@ CollisionShape::CollisionShape()
 RigidBody::RigidBody()
 {
     register_system<RigidBody>();
+}
+
+void RigidBody::solve_collisions(Entity *entity)
+{
+    auto *t = entity->get_component<Transform>();
+    auto *p = entity->get_component<PhysicsObject>();
+    auto *c = entity->get_component<CollisionShape>();
+#pragma omp parallel for
+    for (int j = 0; j < PhysicsObject::objects.size(); ++j)
+    {
+        if (PhysicsObject::objects[j] != entity)
+        {
+            auto *other = PhysicsObject::objects[j];
+            auto* other_p = other->get_component<PhysicsObject>();
+            auto *other_c = other->get_component<CollisionShape>();
+            if (other_c->shape_type == COLLISION_SHAPE_TYPE_CIRCLE && c->shape_type == COLLISION_SHAPE_TYPE_CIRCLE)
+            {
+                float our_radius = c->radius * (abs(t->scale.x + t->scale.y) * 0.5f);
+                float other_radius = other_c->radius * (abs(other->get_component<Transform>()->scale.x +
+                                                            other->get_component<Transform>()->scale.y) * 0.5f);
+                Vec2 collision_axis = p->cur_pos - other_p->cur_pos;
+                float dist = collision_axis.length();
+
+                if (dist < our_radius + other_radius)
+                {
+                    Vec2 normal = collision_axis.normalized();
+                    float overlap = (our_radius + other_radius) - dist;
+
+                    // Separate critical sections for each object
+#pragma omp critical
+                    {
+                        p->cur_pos += normal * (overlap * 0.5f);
+                        other_p->cur_pos -= normal * (overlap * 0.5f);
+                    }
+                }
+            }
+            else if(other_c->shape_type == COLLISION_SHAPE_TYPE_RECTANGLE && c->shape_type == COLLISION_SHAPE_TYPE_CIRCLE)
+            {
+                Vec2 other_pos = other->get_component<Transform>()->pos;
+                Vec2 other_size = other_c->size * (abs(other->get_component<Transform>()->scale.x + other->get_component<Transform>()->scale.y) * 0.5f);
+                Vec2 our_pos = t->pos;
+                float our_radius = c->radius * (abs(t->scale.x + t->scale.y) * 0.5f);
+                Vec2 other_min = other_pos - other_size;
+                Vec2 other_max = other_pos + other_size;
+                Vec2 closest = Vec2(0,0);
+                closest.x = std::max(other_min.x, std::min(our_pos.x, other_max.x));
+                closest.y = std::max(other_min.y, std::min(our_pos.y, other_max.y));
+                Vec2 normal = our_pos - closest;
+                float dist = normal.length();
+                if(dist < our_radius)
+                {
+                    normal = normal.normalized();
+                    float overlap = our_radius - dist;
+                    p->cur_pos += normal * (overlap*0.5f);
+                    other_p->cur_pos -= normal * (overlap*0.5f);
+                }
+            }
+            else if(other_c->shape_type == COLLISION_SHAPE_TYPE_CIRCLE && c->shape_type == COLLISION_SHAPE_TYPE_RECTANGLE)
+            {
+                Vec2 other_pos = other->get_component<Transform>()->pos;
+                Vec2 other_size = other_c->size * (abs(other->get_component<Transform>()->scale.x + other->get_component<Transform>()->scale.y) * 0.5f);
+                Vec2 our_pos = t->pos;
+                float other_radius = other_c->radius * (abs(other->get_component<Transform>()->scale.x + other->get_component<Transform>()->scale.y) * 0.5f);
+                Vec2 our_min = our_pos - c->size;
+                Vec2 our_max = our_pos + c->size;
+                Vec2 closest = Vec2(0,0);
+                closest.x = std::max(our_min.x, std::min(other_pos.x, our_max.x));
+                closest.y = std::max(our_min.y, std::min(other_pos.y, our_max.y));
+                Vec2 normal = other_pos - closest;
+                float dist = normal.length();
+                if(dist < other_radius)
+                {
+                    normal = normal.normalized();
+                    float overlap = other_radius - dist;
+                    p->cur_pos -= normal * (overlap*0.5f);
+                    other_p->cur_pos += normal * (overlap*0.5f);
+                }
+            }
+            else if(other_c->shape_type == COLLISION_SHAPE_TYPE_RECTANGLE && c->shape_type == COLLISION_SHAPE_TYPE_RECTANGLE) {
+                Vec2 other_pos = other->get_component<Transform>()->pos;
+                Vec2 other_size = other_c->size * (abs(other->get_component<Transform>()->scale.x +
+                                                       other->get_component<Transform>()->scale.y) * 0.5f);
+                Vec2 our_pos = t->pos;
+                Vec2 our_size = c->size * (abs(t->scale.x + t->scale.y) * 0.5f);
+                Vec2 our_min = our_pos - our_size;
+                Vec2 our_max = our_pos + our_size;
+                Vec2 other_min = other_pos - other_size;
+                Vec2 other_max = other_pos + other_size;
+                Vec2 closest = Vec2(0, 0);
+                closest.x = std::max(other_min.x, std::min(our_pos.x, other_max.x));
+                closest.y = std::max(other_min.y, std::min(our_pos.y, other_max.y));
+                Vec2 normal = our_pos - closest;
+                float dist = normal.length();
+                if (dist < 0) {
+                    normal = normal.normalized();
+                    float overlap = -dist;
+                    p->cur_pos += normal * (overlap * 0.5f);
+                    other_p->cur_pos -= normal * (overlap * 0.5f);
+                }
+            }
+        }
+    }
+#pragma omp barrier
 }

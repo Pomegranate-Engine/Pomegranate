@@ -9,6 +9,7 @@
 //Main window
 Window main_window = Window("Window", 1024, 720);
 bool use_lua_camera_controller = false;
+Entity* Info_Text;
 
 //Example program
 #include "entities.cpp"

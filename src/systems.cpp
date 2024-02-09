@@ -63,7 +63,7 @@ public:
         {
             auto *p = currently_dragged->get_component<PhysicsObject>();
             auto *t = currently_dragged->get_component<Transform>();
-            p->set_velocity(t->pos.direction_to(mousepos) * 0.5);
+            p->set_velocity(t->pos.direction_to(mousepos) * 25.0);
 
             if (currently_dragged->has_component<DestroyAfterTime>())
             {
@@ -75,7 +75,7 @@ public:
         {
             if (currently_dragged != nullptr)
             {
-                currently_dragged->get_component<PhysicsObject>()->drag /= 5.0;
+                currently_dragged->get_component<PhysicsObject>()->drag -= 5.0;
             }
             currently_dragged = nullptr;
         }
@@ -99,7 +99,7 @@ public:
                             if (InputManager::get_mouse_button(SDL_BUTTON_LEFT))
                             {
                                 entity->get_ref(currently_dragged);
-                                currently_dragged->get_component<PhysicsObject>()->drag *= 5.0;
+                                currently_dragged->get_component<PhysicsObject>()->drag += 5.0;
                             }
                         }
                     }
@@ -128,13 +128,13 @@ public:
                 e->add_component<PhysicsObject>();
                 e->add_component<Transform>();
                 e->get_component<Transform>()->pos = mousepos;
-                float ransize = (float)rand()/RAND_MAX*0.2+0.1f;
+                float ransize = (float)rand()/RAND_MAX*0.2+0.05;
                 e->get_component<Transform>()->scale = Vec2(ransize,ransize);
                 e->add_component<Sprite>();
                 auto *s = e->get_component<Sprite>();
                 s->load_texture("res/pomegranate.png");
                 s->color = Color((float)rand()/RAND_MAX*360, 1.0);
-
+                e->get_component<PhysicsObject>()->mass = ransize;
                 e->add_component<CollisionShape>();
                 auto *c = e->get_component<CollisionShape>();
                 c->radius = 128.0;
