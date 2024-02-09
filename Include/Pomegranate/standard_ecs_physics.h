@@ -4,6 +4,7 @@
 #include "ecs.h"
 #include "vec_math.h"
 #include "standard_ecs.h"
+#include <dispatch/dispatch.h>
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
