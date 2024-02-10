@@ -135,6 +135,7 @@ void RigidBody::solve_collisions(Entity *entity)
 #pragma omp parallel for
     for (int j = 0; j < PhysicsObject::objects.size(); ++j)
     {
+        print_info("OMP Thread: %d", omp_get_thread_num());
         if (PhysicsObject::objects[j] != entity)
         {
             auto *other = PhysicsObject::objects[j];

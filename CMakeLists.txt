@@ -58,6 +58,28 @@ set(LUAJIT_LIBRARY ${CMAKE_SOURCE_DIR}/Lib/Arm/libluajit-5.1.dylib)  # Adjust th
 
 # Link SDL libraries
 if(APPLE)
+    set(OPENMP_LIBRARIES "/usr/local/Cellar/llvm/5.0.1/lib")
+    set(OPENMP_INCLUDES "/usr/local/Cellar/llvm/5.0.1/include")
+
+    set(OpenMP_C "${CMAKE_C_COMPILER}")
+    set(OpenMP_C_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument")
+    set(OpenMP_C_LIB_NAMES "libomp" "libgomp" "libiomp5")
+    set(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+    set(OpenMP_libgomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+    set(OpenMP_libiomp5_LIBRARY ${OpenMP_C_LIB_NAMES})
+
+    set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
+    set(OpenMP_CXX_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument")
+    set(OpenMP_CXX_LIB_NAMES "libomp" "libgomp" "libiomp5")
+    set(OpenMP_libomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+    set(OpenMP_libgomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+    set(OpenMP_libiomp5_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+
+    find_package(OpenMP)
+
+    include_directories(${OPENMP_INCLUDES})
+    link_directories(${OPENMP_LIBRARIES})
+    message(STATUS "OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
     # OpenMP is not supported on Apple Silicon to my knowledge.
     target_link_libraries(Pomegranate_Engine PRIVATE
             ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3.dylib
@@ -65,6 +87,10 @@ if(APPLE)
             ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3_mixer.dylib
             ${CMAKE_SOURCE_DIR}/Lib/Arm/libSDL3_ttf.dylib
             ${LUAJIT_LIBRARY}
+            ${OpenMP_CXX_LIBRARIES}/libomp.dylib
+            ${OpenMP_CXX_LIBRARIES}/libiomp5.dylib
+            ${OpenMP_CXX_LIBRARIES}/libgomp.dylib1
+
     )
 elseif(WIN32)
     find_package(OpenMP)
