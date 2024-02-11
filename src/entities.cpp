@@ -2,8 +2,8 @@ class CameraController : public Component
 {
 public:
     Vec2 velocity;
-    float speed = 3.0;
-    float drag = 0.9;
+    float speed = 3.0f;
+    float drag = 0.9f;
     CameraController()
     {
         register_component<CameraController>();

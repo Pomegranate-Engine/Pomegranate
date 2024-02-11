@@ -13,7 +13,7 @@ public:
             auto* t = entity->get_component<Transform>();
             auto vx = c->get<double>("vx");
             auto vy = c->get<double>("vy");
-            Vec2 v = Vec2(vx, vy);
+            Vec2 v = Vec2((float)vx, (float)vy);
             Vec2 m = Vec2(0,0);
             if(InputManager::get_key(SDL_SCANCODE_W))
             {
@@ -128,12 +128,12 @@ public:
                 e->add_component<PhysicsObject>();
                 e->add_component<Transform>();
                 e->get_component<Transform>()->pos = mousepos;
-                float ransize = (float)rand()/RAND_MAX*0.2+0.05;
+                float ransize = (float)rand()/RAND_MAX*0.2f+0.05f;
                 e->get_component<Transform>()->scale = Vec2(ransize,ransize);
                 e->add_component<Sprite>();
                 auto *s = e->get_component<Sprite>();
                 s->load_texture("res/pomegranate.png");
-                s->color = Color((float)rand()/RAND_MAX*360, 1.0);
+                s->color = Color((float)rand()/RAND_MAX*360.0f, 1.0);
                 e->get_component<PhysicsObject>()->mass = ransize;
                 e->add_component<CollisionShape>();
                 auto *c = e->get_component<CollisionShape>();
@@ -167,7 +167,7 @@ public:
         if(entity->has_component<DestroyAfterTime>())
         {
             auto* d = entity->get_component<DestroyAfterTime>();
-            d->time += 0.016;
+            d->time += 0.016f;
             if(d->time >= d->length)
             {
                 entity->destroy();

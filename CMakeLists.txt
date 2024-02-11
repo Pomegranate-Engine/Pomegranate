@@ -33,10 +33,13 @@ set(POMEGRANATE_SOURCES
         ${POMEGRANATE_DIR}/event_system.cpp
         ${POMEGRANATE_DIR}/color.cpp
         ${POMEGRANATE_DIR}/standard_ecs_rendering.cpp
-        ${POMEGRANATE_DIR}/standard_ecs_audio.cpp
         ${POMEGRANATE_DIR}/standard_ecs_physics.cpp
         ${POMEGRANATE_DIR}/standard_ecs_ui.cpp
         ${POMEGRANATE_DIR}/resource_manager.cpp
+        ${POMEGRANATE_DIR}/texture.cpp
+        ${POMEGRANATE_DIR}/audio.cpp
+        ${POMEGRANATE_DIR}/ttf_font.cpp
+        ${POMEGRANATE_DIR}/debug.cpp
         Include/Pomegranate/lua_wrapper.cpp
 )
 
@@ -51,6 +54,15 @@ set(IMGUI_SOURCES
         ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
         Include/Pomegranate/resource_manager.cpp
         Include/Pomegranate/resource_manager.h
+        Include/Pomegranate/Texture.cpp
+        Include/Pomegranate/Texture.h
+        Include/Pomegranate/Audio.cpp
+        Include/Pomegranate/Audio.h
+        Include/Pomegranate/ttf_font.cpp
+        Include/Pomegranate/ttf_font.h
+        Include/Pomegranate/pomegranate_type_names.h
+        Include/Pomegranate/debug.cpp
+        Include/Pomegranate/debug.h
 )
 
 # Add executable

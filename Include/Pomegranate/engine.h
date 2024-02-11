@@ -8,30 +8,13 @@
 #include <iostream>
 #include<string>
 #include "input_manager.h"
+#include "debug.h"
 /*----------> DEBUGGING <----------*/
-
-void print_pass(const std::string&);
-void print_pass(const char*, ...);
-void print_fail(const std::string&);
-void print_fail(const char*, ...);
-void print_error(const std::string&);
-void print_error(const char*, ...);
-void print_warn(const std::string&);
-void print_warn(const char*, ...);
-void print_info(const std::string&);
-void print_info(const char*, ...);
-void print_debug(const std::string&);
-void print_debug(const char*, ...);
-void print_notice(const std::string&);
-void print_notice(const char*, ...);
-void print_log(const std::string&);
-void print_log(const char*, ...);
-void print_ready(const std::string&);
-void print_ready(const char*, ...);
-void print_assert(const std::string&);
-void print_assert(const char*, ...);
-int pomegranate_init(bool input = true, bool video = true, bool audio = true, bool img = true, bool ttf = true);
-void pomegranate_quit();
-extern float delta_time;
+namespace Pomegranate
+{
+	int pomegranate_init(bool input = true, bool video = true, bool audio = true, bool img = true, bool ttf = true);
+	void pomegranate_quit();
+	extern float delta_time;
+}
 
 #endif // ENGINE_H

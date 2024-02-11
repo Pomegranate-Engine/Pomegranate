@@ -1,20 +1,23 @@
-template <typename T> T* ResourceManager::load(std::string path)
+namespace Pomegranate
 {
-    if(resources.find(path)!=resources.end())
+    template <typename T> T* ResourceManager::load(std::string path)
     {
-        return (T*)resources[path];
+        if(resources.find(path)!=resources.end())
+        {
+            return (T*)resources[path];
+        }
+        else
+        {
+            auto* r = new T(path.c_str());
+            resources[path] = r;
+            return r;
+        }
+        return nullptr;
     }
-    else
-    {
-        auto* r = new T(path.c_str());
-        resources[path] = r;
-        return r;
-    }
-    return nullptr;
-}
 
-template <typename T> void ResourceManager::unload(std::string path)
-{
-    delete (T)resources[path];
-    resources.erase(path);
+    template <typename T> void ResourceManager::unload(std::string path)
+    {
+        delete (T)resources[path];
+        resources.erase(path);
+    }
 }

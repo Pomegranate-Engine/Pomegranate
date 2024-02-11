@@ -1,21 +1,22 @@
 #include "input_manager.h"
-
-InputManager::InputManager() = default;
-
-InputManager::~InputManager() = default;
-
-void InputManager::process_event(SDL_Event event)
+namespace Pomegranate
 {
-    InputManager::mouse_delta = Vec2();
-    InputManager::mouse_moved = false;
-    InputManager::mouse_scrolled = false;
-    InputManager::mouse_scroll = Vec2();
+    InputManager::InputManager() = default;
 
-    InputManager::press = -1;
-    switch (event.type)
+    InputManager::~InputManager() = default;
+
+    void InputManager::process_event(SDL_Event event)
     {
-        case SDL_EVENT_KEY_DOWN:
-            InputManager::keys[event.key.keysym.scancode] = true;
+        InputManager::mouse_delta = Vec2();
+        InputManager::mouse_moved = false;
+        InputManager::mouse_scrolled = false;
+        InputManager::mouse_scroll = Vec2();
+
+        InputManager::press = -1;
+        switch (event.type)
+        {
+            case SDL_EVENT_KEY_DOWN:
+                InputManager::keys[event.key.keysym.scancode] = true;
             //Set press to char form of key pressed
             if(event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
                 press = 8;
@@ -35,73 +36,74 @@ void InputManager::process_event(SDL_Event event)
             break;case SDL_EVENT_MOUSE_WHEEL:InputManager::mouse_scroll = Vec2(event.wheel.x, event.wheel.y);
             InputManager::mouse_scrolled = true;
             break;default:break;
+        }
     }
-}
 
-bool InputManager::get_key(int key_code)
-{
-    return InputManager::keys[key_code];
-}
-
-bool InputManager::get_mouse_button(int mouse_code)
-{
-    return InputManager::mouse_buttons[mouse_code];
-}
-
-Vec2 InputManager::get_mouse_position()
-{
-    return InputManager::mouse_position;
-}
-
-Vec2 InputManager::get_mouse_delta()
-{
-    return InputManager::mouse_delta;
-}
-
-bool InputManager::get_mouse_moved()
-{
-    return InputManager::mouse_moved;
-}
-
-bool InputManager::get_mouse_scrolled()
-{
-    return InputManager::mouse_scrolled;
-}
-
-Vec2 InputManager::get_mouse_scroll()
-{
-    return InputManager::mouse_scroll;
-}
-
-int InputManager::get_text()
-{
-    return InputManager::press;
-}
-
-void InputManager::init()
-{
-    InputManager::keys = new bool[SDL_NUM_SCANCODES];
-    InputManager::mouse_buttons = new bool[8];
-    for (int i = 0; i < SDL_NUM_SCANCODES; ++i)
+    bool InputManager::get_key(int key_code)
     {
-        InputManager::keys[i] = false;
+        return InputManager::keys[key_code];
     }
-    for (int i = 0; i < 8; ++i)
-    {
-        InputManager::mouse_buttons[i] = false;
-    }
-    InputManager::mouse_position = Vec2();
-    InputManager::mouse_delta = Vec2();
-    InputManager::mouse_moved = false;
-    InputManager::mouse_scrolled = false;
-    InputManager::mouse_scroll = Vec2();
-}
 
-bool* InputManager::keys;
-bool* InputManager::mouse_buttons;
-Vec2 InputManager::mouse_position;
-Vec2 InputManager::mouse_delta;
-bool InputManager::mouse_moved;
-bool InputManager::mouse_scrolled;
-Vec2 InputManager::mouse_scroll;
-int InputManager::press;
+    bool InputManager::get_mouse_button(int mouse_code)
+    {
+        return InputManager::mouse_buttons[mouse_code];
+    }
+
+    Vec2 InputManager::get_mouse_position()
+    {
+        return InputManager::mouse_position;
+    }
+
+    Vec2 InputManager::get_mouse_delta()
+    {
+        return InputManager::mouse_delta;
+    }
+
+    bool InputManager::get_mouse_moved()
+    {
+        return InputManager::mouse_moved;
+    }
+
+    bool InputManager::get_mouse_scrolled()
+    {
+        return InputManager::mouse_scrolled;
+    }
+
+    Vec2 InputManager::get_mouse_scroll()
+    {
+        return InputManager::mouse_scroll;
+    }
+
+    int InputManager::get_text()
+    {
+        return InputManager::press;
+    }
+
+    void InputManager::init()
+    {
+        InputManager::keys = new bool[SDL_NUM_SCANCODES];
+        InputManager::mouse_buttons = new bool[8];
+        for (int i = 0; i < SDL_NUM_SCANCODES; ++i)
+        {
+            InputManager::keys[i] = false;
+        }
+        for (int i = 0; i < 8; ++i)
+        {
+            InputManager::mouse_buttons[i] = false;
+        }
+        InputManager::mouse_position = Vec2();
+        InputManager::mouse_delta = Vec2();
+        InputManager::mouse_moved = false;
+        InputManager::mouse_scrolled = false;
+        InputManager::mouse_scroll = Vec2();
+    }
+
+    bool* InputManager::keys;
+    bool* InputManager::mouse_buttons;
+    Vec2 InputManager::mouse_position;
+    Vec2 InputManager::mouse_delta;
+    bool InputManager::mouse_moved;
+    bool InputManager::mouse_scrolled;
+    Vec2 InputManager::mouse_scroll;
+    int InputManager::press;
+}

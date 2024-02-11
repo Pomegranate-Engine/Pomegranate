@@ -5,7 +5,7 @@
 #include<imgui.h>
 #include<backends/imgui_impl_sdl3.h>
 #include<backends/imgui_impl_sdlrenderer3.h>
-
+using namespace Pomegranate;
 //Main window
 Window main_window = Window("Window", 1024, 720);
 bool use_lua_camera_controller = false;
