@@ -4,7 +4,7 @@ Entity* Camera::current = nullptr;
 
 Sprite::Sprite()
 {
-    this->texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), "res/none.png");
+    this->texture = ResourceManager::load<Texture>("res/none.png");
     this->color = Color(255, 255, 255, 255);
     register_component<Sprite>();
     //TODO: Add texture support to lua
@@ -12,7 +12,7 @@ Sprite::Sprite()
 }
 
 void Sprite::load_texture(const char *path) {
-    this->texture = IMG_LoadTexture(Window::current->get_sdl_renderer(), path);
+    this->texture = ResourceManager::load<Texture>(path);
 }
 
 AnimatedSprite::AnimatedSprite()
@@ -86,7 +86,7 @@ void Render::sprite(Entity*e) {
     SDL_FRect r;
     int w = 0;
     int h = 0;
-    SDL_QueryTexture(s->texture, nullptr, nullptr, &w, &h);
+    SDL_QueryTexture(s->texture->get_sdl_texture(), nullptr, nullptr, &w, &h);
     r.w = (float)w*t->scale.x;
     r.h = (float)h*t->scale.y;
     r.x = t->pos.x-r.w/2-Camera::current->get_component<Transform>()->pos.x;
@@ -94,8 +94,8 @@ void Render::sprite(Entity*e) {
     auto* center = new SDL_FPoint();
     center->x = r.w/2;
     center->y = r.h/2;
-    SDL_SetTextureColorMod(s->texture, s->color.r, s->color.g, s->color.b);
-    SDL_RenderTextureRotated(Window::current->get_sdl_renderer(), s->texture, nullptr, &r, t->rot*180.0/3.14159, center, SDL_FLIP_NONE);
+    SDL_SetTextureColorMod(s->texture->get_sdl_texture(), s->color.r, s->color.g, s->color.b);
+    SDL_RenderTextureRotated(Window::current->get_sdl_renderer(), s->texture->get_sdl_texture(), nullptr, &r, t->rot*180.0/3.14159, center, SDL_FLIP_NONE);
 }
 
 void Render::animated_sprite(Entity*e) {

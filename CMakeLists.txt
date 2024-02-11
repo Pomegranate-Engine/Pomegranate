@@ -36,6 +36,7 @@ set(POMEGRANATE_SOURCES
         ${POMEGRANATE_DIR}/standard_ecs_audio.cpp
         ${POMEGRANATE_DIR}/standard_ecs_physics.cpp
         ${POMEGRANATE_DIR}/standard_ecs_ui.cpp
+        ${POMEGRANATE_DIR}/resource_manager.cpp
         Include/Pomegranate/lua_wrapper.cpp
 )
 
@@ -48,6 +49,8 @@ set(IMGUI_SOURCES
         ${IMGUI_DIR}/backends/imgui_impl_sdlrenderer3.cpp
         ${IMGUI_DIR}/imgui_tables.cpp
         ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
+        Include/Pomegranate/resource_manager.cpp
+        Include/Pomegranate/resource_manager.h
 )
 
 # Add executable

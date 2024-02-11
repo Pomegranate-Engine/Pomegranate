@@ -6,6 +6,7 @@
 #include "color.h"
 #include "window.h"
 #include "standard_ecs.h"
+#include "resource_manager.h"
 
 class DebugCircle : public Component
 {
@@ -18,7 +19,7 @@ public:
 class Sprite : public Component
 {
 public:
-    SDL_Texture* texture;
+    Texture* texture;
     Color color;
     Sprite();
     void load_texture(const char* path);
