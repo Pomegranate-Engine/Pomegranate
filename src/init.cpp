@@ -191,12 +191,12 @@ EntityGroup* build_scene()
     ui->add_entity(dropdown);
 
     //Create checkbox
-    auto* checkbox = new Entity();
+    checkbox = new Entity();
     checkbox->add_component<UITransform>();
-    checkbox->get_component<UITransform>()->position = Vec2(0, 192);
+    checkbox->get_component<UITransform>()->position = Vec2(0, 194);
     checkbox->get_component<UITransform>()->size = Vec2(128, 32);
     checkbox->add_component<UICheckbox>();
-    checkbox->get_component<UICheckbox>()->text = "Checkbox";
+    checkbox->get_component<UICheckbox>()->text = "Light mode?";
     checkbox->get_component<UICheckbox>()->checked = false;
     checkbox->get_component<UICheckbox>()->text_color = Color(255, 255, 255, 255);
     checkbox->get_component<UICheckbox>()->background_color = Color(0, 0, 0, 255);

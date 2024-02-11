@@ -10,6 +10,7 @@ using namespace Pomegranate;
 Window main_window = Window("Window", 1024, 720);
 bool use_lua_camera_controller = false;
 Entity* Info_Text;
+Entity* checkbox;
 
 //Example program
 #include "entities.cpp"
@@ -56,7 +57,18 @@ int main(int argc, char* argv[])
         //- - - - - # RENDERING # - - - - -
 
         //Clear
-        SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), 7, 14, 14, SDL_ALPHA_OPAQUE);
+        if(checkbox->get_component<UICheckbox>()->checked)
+        {
+            //Set imgui theme
+            ImGui::StyleColorsLight();
+            SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), 222, 222, 222, SDL_ALPHA_OPAQUE);
+        }
+        else
+        {
+            //Set imgui theme
+            ImGui::StyleColorsDark();
+            SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), 7, 14, 14, SDL_ALPHA_OPAQUE);
+        }
         SDL_RenderClear(Window::current->get_sdl_renderer());
         SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), 255, 255, 255, 255);
 
