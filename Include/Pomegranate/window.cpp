@@ -85,16 +85,16 @@ namespace Pomegranate
         Window::current = this;
     }
 
-    void Window::set_title(const char *title)
+    void Window::set_title(const char *new_title)
     {
-        this->title = title;
-        SDL_SetWindowTitle(this->window, title);
+        this->title = new_title;
+        SDL_SetWindowTitle(this->window, new_title);
     }
 
-    void Window::set_size(int width, int height)
+    void Window::set_size(int new_width, int new_height)
     {
-        this->width = width;
-        this->height = height;
+        this->width = new_width;
+        this->height = new_height;
         SDL_SetWindowSize(this->window, width, height);
     }
 

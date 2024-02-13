@@ -16,14 +16,14 @@ namespace Pomegranate
 
         Window(const char* title,int width, int height);
         ~Window();
-        int get_width() const;
-        int get_height() const;
-        const char* get_title() const;
-        void set_title(const char* title);
+        [[nodiscard]] int get_width() const;
+        [[nodiscard]] int get_height() const;
+        [[nodiscard]] const char* get_title() const;
+        void set_title(const char* new_title);
         void set_size(int width, int height);
         void set_icon(const char* path);
-        SDL_Window* get_sdl_window() const;
-        SDL_Renderer* get_sdl_renderer() const;
+        [[nodiscard]] SDL_Window* get_sdl_window() const;
+        [[nodiscard]] SDL_Renderer* get_sdl_renderer() const;
         int open();
         void close();
         void make_current();

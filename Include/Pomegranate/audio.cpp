@@ -2,7 +2,7 @@
 
 namespace Pomegranate
 {
-	Audio::Audio(Mix_Chunk *chunk)
+    Audio::Audio(Mix_Chunk *chunk)
 	{
 		this->audio = chunk;
 	}

@@ -38,8 +38,8 @@ namespace Pomegranate
         std::unordered_map<std::string,std::pair<const std::type_info*, void*>> component_data;
         static std::unordered_map<std::string, std::function<Component*()>> component_types;
         template<typename T> static void register_component();
-        template<typename T> void push_data(std::string name, void* data);
-        template<typename T> T get(std::string name);
+        template<typename T> void push_data(const std::string& name, void* data);
+        template<typename T> T get(const std::string& name);
         template<typename T> void set(const char* name, T value);
     };
 
@@ -78,7 +78,7 @@ namespace Pomegranate
         static void add_global_system(System*);
         static void remove_global_system(System*);
         static void global_system_tick();
-        static void global_system_draw(std::function<bool(Entity*, Entity*)> sortingFunction);
+        static void global_system_draw(const std::function<bool(Entity*, Entity*)>& sortingFunction);
         static std::unordered_map<const char*, std::function<System*()>> system_types;
         template<typename T> static void register_system();
     };
@@ -105,7 +105,7 @@ namespace Pomegranate
         bool has_component(const char*);
         Entity();
         ~Entity();
-        uint32_t get_id() const;
+        [[nodiscard]] uint32_t get_id() const;
         //Add a static list of all entities
         static std::unordered_map<uint32_t,Entity*> entities;
         static uint32_t entity_count;
@@ -126,7 +126,7 @@ namespace Pomegranate
         std::vector<EntityGroup*> child_groups;
     public:
         std::string name;
-        explicit EntityGroup(std::string name);
+        explicit EntityGroup(const std::string& name);
         ~EntityGroup();
         void add_entity(Entity*);
         void remove_entity(Entity*);

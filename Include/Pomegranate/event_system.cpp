@@ -8,18 +8,18 @@ namespace Pomegranate
 
     void Event::trigger()
     {
-        for (auto c : this->callbacks)
+        for (const auto& c : this->callbacks)
         {
             c.second(c.first);
         }
     }
 
-    void Event::add_listener(std::function<void(Entity *)> callback)
+    void Event::add_listener(const std::function<void(Entity *)>& callback)
     {
 
     }
 
-    void Event::remove_listener(std::function<void(Entity *)> callback)
+    void Event::remove_listener(const std::function<void(Entity *)>& callback)
     {
 
     }

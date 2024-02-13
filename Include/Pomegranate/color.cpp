@@ -63,48 +63,48 @@ namespace Pomegranate
         float c = brightness;
         float x = c * (1.0f - fabsf(fmod(hue / 60.0f, 2.0f) - 1.0f));
         float m = brightness - c;
-        float r = 0;
-        float g = 0;
-        float b = 0;
+        float _r = 0.0f;
+        float _g = 0.0f;
+        float _b = 0.0f;
         if (hue >= 0.0f && hue < 60.0f)
         {
-            r = (c + m) * 255.0f;
-            g = (x + m) * 255.0f;
-            b = m * 255.0f;
+            _r = (c + m) * 255.0f;
+            _g = (x + m) * 255.0f;
+            _b = m * 255.0f;
         }
         else if (hue >= 60.0f && hue < 120.0f)
         {
-            r = (x + m) * 255.0f;
-            g = (c + m) * 255.0f;
-            b = m * 255.0f;
+            _r = (x + m) * 255.0f;
+            _g = (c + m) * 255.0f;
+            _b = m * 255.0f;
         }
         else if (hue >= 120.0f && hue < 180.0f)
         {
-            r = m * 255.0f;
-            g = (c + m) * 255.0f;
-            b = (x + m) * 255.0f;
+            _r = m * 255.0f;
+            _g = (c + m) * 255.0f;
+            _b = (x + m) * 255.0f;
         }
         else if (hue >= 180.0f && hue < 240.0f)
         {
-            r = m * 255.0f;
-            g = (x + m) * 255.0f;
-            b = (c + m) * 255.0f;
+            _r = m * 255.0f;
+            _g = (x + m) * 255.0f;
+            _b = (c + m) * 255.0f;
         }
         else if (hue >= 240.0f && hue < 300.0f)
         {
-            r = (x + m) * 255.0f;
-            g = m * 255.0f;
-            b = (c + m) * 255.0f;
+            _r = (x + m) * 255.0f;
+            _g = m * 255.0f;
+            _b = (c + m) * 255.0f;
         }
         else if (hue >= 300.0f && hue < 360.0f)
         {
-            r = (c + m) * 255.0f;
-            g = m * 255.0f;
-            b = (x + m) * 255.0f;
+            _r = (c + m) * 255.0f;
+            _g = m * 255.0f;
+            _b = (x + m) * 255.0f;
         }
-        this->r = (int)r;
-        this->g = (int)g;
-        this->b = (int)b;
+        this->r = (int)_r;
+        this->g = (int)_g;
+        this->b = (int)_b;
         this->a = (int)(a * 255);
     }
 }

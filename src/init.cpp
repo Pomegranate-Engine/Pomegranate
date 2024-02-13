@@ -11,7 +11,7 @@ EntityGroup* build_scene()
     Component::register_component<UIText>();
 
     //region Physics Example
-    EntityGroup* group = new EntityGroup("PHYSICS");
+    auto* group = new EntityGroup("PHYSICS");
     auto camera = new Entity();
     camera->add_component<Camera>();
     camera->add_component<Transform>();
@@ -41,7 +41,7 @@ EntityGroup* build_scene()
         }
     }
 
-    EntityGroup* world = new EntityGroup("WORLD");
+    auto* world = new EntityGroup("WORLD");
 
     auto* debug_circle = new Entity();
     debug_circle->add_component<DebugCircle>();
@@ -139,7 +139,7 @@ EntityGroup* build_scene()
 //endregion
     print_pass("Added UI");
 
-    EntityGroup* ui = new EntityGroup("UI");
+    auto* ui = new EntityGroup("UI");
     auto* text = new Entity();
     text->add_component<UIText>();
     text->get_component<UIText>()->text = "Hello World!";

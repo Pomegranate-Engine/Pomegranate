@@ -16,7 +16,7 @@ namespace Pomegranate
         Color operator-(const Color& other) const;
         Color operator*(float other) const;
         Color operator/(float other) const;
-        Color mix(const Color& other, float amount) const;
+        [[nodiscard]] Color mix(const Color& other, float amount) const;
     };
 }
 

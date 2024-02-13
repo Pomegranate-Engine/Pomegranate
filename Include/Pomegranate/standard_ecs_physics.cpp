@@ -39,7 +39,7 @@ namespace Pomegranate
     {
         this->old_pos = cur_pos - velocity;
     }
-    Vec2 PhysicsObject::get_velocity()
+    Vec2 PhysicsObject::get_velocity() const
     {
         return cur_pos - old_pos;
     }
@@ -134,11 +134,11 @@ namespace Pomegranate
         auto *p = entity->get_component<PhysicsObject>();
         auto *c = entity->get_component<CollisionShape>();
 #pragma omp parallel for
-        for (int j = 0; j < PhysicsObject::objects.size(); ++j)
+        for (auto & object : PhysicsObject::objects) //TODO: test range-based loop on windows may break OMP
         {
-            if (PhysicsObject::objects[j] != entity)
+            if (object != entity)
             {
-                auto *other = PhysicsObject::objects[j];
+                auto *other = object;
                 auto* other_p = other->get_component<PhysicsObject>();
                 auto *other_c = other->get_component<CollisionShape>();
                 if (other_c->shape_type == COLLISION_SHAPE_TYPE_CIRCLE && c->shape_type == COLLISION_SHAPE_TYPE_CIRCLE)

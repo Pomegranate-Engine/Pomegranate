@@ -123,7 +123,7 @@ namespace Pomegranate
         }
     }
 
-    void System::global_system_draw(std::function<bool(Entity*, Entity*)> sortingFunction)
+    void System::global_system_draw(const std::function<bool(Entity*, Entity*)>& sortingFunction)
     {
         //TODO: Sort entities based on transform component
 
@@ -144,7 +144,7 @@ namespace Pomegranate
         }
     }
 
-    EntityGroup::EntityGroup(std::string name)
+    EntityGroup::EntityGroup(const std::string& name)
     {
         this->entities = std::vector<Entity*>();
         this->systems = std::vector<System*>();
