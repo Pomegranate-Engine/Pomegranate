@@ -102,7 +102,7 @@ typedef enum
 {
     SDL_TEXTUREACCESS_STATIC,    /**< Changes rarely, not lockable */
     SDL_TEXTUREACCESS_STREAMING, /**< Changes frequently, lockable */
-    SDL_TEXTUREACCESS_TARGET     /**< Texture can be used as a render target */
+    SDL_TEXTUREACCESS_TARGET     /**< texture can be used as a render target */
 } SDL_TextureAccess;
 
 /**
