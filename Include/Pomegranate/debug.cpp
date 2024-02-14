@@ -121,4 +121,15 @@ namespace Pomegranate
         va_end(args);
         std::cout << std::endl;
     }
+    std::chrono::time_point<std::chrono::high_resolution_clock> start;
+    std::chrono::time_point<std::chrono::high_resolution_clock> end;
+    void start_timer()
+    {
+        start = std::chrono::high_resolution_clock::now();
+    }
+    long long end_timer()
+    {
+        end = std::chrono::high_resolution_clock::now();
+        return std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    }
 }

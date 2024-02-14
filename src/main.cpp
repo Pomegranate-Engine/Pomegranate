@@ -5,6 +5,7 @@
 #include<imgui.h>
 #include<backends/imgui_impl_sdl3.h>
 #include<backends/imgui_impl_sdlrenderer3.h>
+#include <chrono>
 using namespace Pomegranate;
 //Main window
 Window main_window = Window("Window", 1024, 720);
@@ -25,6 +26,7 @@ int main(int argc, char* argv[])
     init();
     auto* scene = build_scene();
 
+
     float tick_time = 0.0;
     bool is_running = true;
     SDL_Event event;
@@ -40,6 +42,7 @@ int main(int argc, char* argv[])
         {
             ImGui_ImplSDL3_ProcessEvent(&event);
             InputManager::process_event(event);
+            Window::process_event(&event);
             if (event.type == SDL_EVENT_QUIT) {
                 is_running = false;
             }
@@ -69,6 +72,8 @@ int main(int argc, char* argv[])
             ImGui::StyleColorsDark();
             SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), 7, 14, 14, SDL_ALPHA_OPAQUE);
         }
+
+        SDL_SetRenderTarget(Window::current->get_sdl_renderer(), Window::current->get_render_texture());
         SDL_RenderClear(Window::current->get_sdl_renderer());
         SDL_SetRenderDrawColor(Window::current->get_sdl_renderer(), 255, 255, 255, 255);
 
@@ -79,12 +84,11 @@ int main(int argc, char* argv[])
 
         draw(scene);
 
-
         //Draw imgui
         ImGui::Render();
         ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData());
-
-        SDL_RenderPresent(Window::current->get_sdl_renderer()); //Present
+        //Copy the render texture to the window
+        Window::current->display();
 
         //- - - - - # AFTER FRAME # - - - - -
 

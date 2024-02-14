@@ -12,6 +12,7 @@ namespace Pomegranate
         const char* title;
         SDL_Window* window;
         SDL_Renderer* renderer;
+        SDL_Texture* render_texture;
     public:
 
         Window(const char* title,int width, int height);
@@ -24,10 +25,13 @@ namespace Pomegranate
         void set_icon(const char* path);
         SDL_Window* get_sdl_window() const;
         SDL_Renderer* get_sdl_renderer() const;
+        SDL_Texture* get_render_texture() const;
+        void display();
         int open();
         void close();
         void make_current();
-        static const Window* current;
+        static Window* current;
+        static void process_event(SDL_Event* event);
     };
 }
 

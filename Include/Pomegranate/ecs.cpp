@@ -38,12 +38,13 @@ namespace Pomegranate
         return nullptr;
     }
 
-    void Entity::add_component(const char *name)
+    Component* Entity::add_component(const char *name)
     {
         auto component = Component::component_types["class " + std::string(name)]();
         component->init(this);
-        std::pair<const std::type_info *, Component *> pair(&typeid(*component), component);
+        std::pair pair(&typeid(*component), component);
         this->components.insert(pair);
+        return component;
     }
 
     bool Entity::has_component(const char * name)

@@ -1,6 +1,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <chrono>
 #include <iostream>
 #include<string>
 #include<cstdarg>
@@ -26,6 +27,10 @@ namespace Pomegranate
 	void print_ready(const char*, ...);
 	void print_assert(const std::string&);
 	void print_assert(const char*, ...);
+	extern std::chrono::time_point<std::chrono::high_resolution_clock> start;
+	extern std::chrono::time_point<std::chrono::high_resolution_clock> end;
+	void start_timer();
+	long long end_timer();
 }
 
 #endif //DEBUG_H

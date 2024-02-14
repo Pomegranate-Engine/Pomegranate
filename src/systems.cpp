@@ -63,7 +63,7 @@ public:
         {
             auto *p = currently_dragged->get_component<PhysicsObject>();
             auto *t = currently_dragged->get_component<Transform>();
-            p->set_velocity(t->pos.direction_to(mousepos) * 25.0);
+            p->set_velocity(t->pos.direction_to(mousepos) * 5.0);
 
             if (currently_dragged->has_component<DestroyAfterTime>())
             {
@@ -125,28 +125,20 @@ public:
             if (!clicked)
             {
                 auto *e = new Entity();
-                e->add_component<PhysicsObject>();
-                e->add_component<Transform>();
-                e->get_component<Transform>()->pos = mousepos;
+                auto* p = e->add_component<PhysicsObject>();
+                auto* t = e->add_component<Transform>();
+                t->pos = mousepos;
                 float ransize = (float)rand()/RAND_MAX*0.2f+0.05f;
-                e->get_component<Transform>()->scale = Vec2(ransize,ransize);
-                e->add_component<Sprite>();
-                auto *s = e->get_component<Sprite>();
+                t->scale = Vec2(ransize,ransize);
+                auto* s = e->add_component<Sprite>();
                 s->load_texture("res/pomegranate.png");
                 s->color = Color((float)rand()/RAND_MAX*360.0f, 1.0);
-                e->get_component<PhysicsObject>()->mass = ransize;
-                e->add_component<CollisionShape>();
-                auto *c = e->get_component<CollisionShape>();
+                p->mass = ransize;
+                auto *c = e->add_component<CollisionShape>();
                 c->radius = 128.0;
                 c->restitution = 0.0;
 
-                /*e->add_component<DestroyAfterTime>();
-                auto *d = e->get_component<DestroyAfterTime>();
-                d->length = 20.0;
-                d->time = 0.0;
-                */
                 EntityGroup::get_group("PHYSICS")->add_entity(e);
-                //clicked = true;
             }
         } else
         {
