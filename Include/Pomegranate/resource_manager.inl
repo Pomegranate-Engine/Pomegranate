@@ -1,6 +1,6 @@
 namespace Pomegranate
 {
-    template <typename T> T* ResourceManager::load(std::string path)
+    template <typename T> T* ResourceManager::load(const std::string& path)
     {
         if(resources.find(path)!=resources.end())
         {
@@ -16,7 +16,7 @@ namespace Pomegranate
         return nullptr;
     }
 
-    template <typename T> void ResourceManager::unload(std::string path)
+    template <typename T> void ResourceManager::unload(const std::string& path)
     {
         delete (T)resources[path];
         resources.erase(path);

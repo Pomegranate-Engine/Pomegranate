@@ -54,8 +54,8 @@ set(IMGUI_SOURCES
         ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
         Include/Pomegranate/resource_manager.cpp
         Include/Pomegranate/resource_manager.h
-        Include/Pomegranate/Texture.cpp
-        Include/Pomegranate/Texture.h
+        Include/Pomegranate/texture.cpp
+        Include/Pomegranate/texture.h
         Include/Pomegranate/Audio.cpp
         Include/Pomegranate/Audio.h
         Include/Pomegranate/ttf_font.cpp

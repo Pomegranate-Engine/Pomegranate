@@ -5,7 +5,6 @@ void tick(EntityGroup* scene)
     //tick systems
     System::global_system_tick();
     scene->tick();
-    std::cout << "Tick time: " << end_timer() << "ms" << std::endl;
 }
 
 void draw(EntityGroup* scene)
@@ -14,5 +13,4 @@ void draw(EntityGroup* scene)
     start_timer();
     System::global_system_draw(Transform::draw_sort);
     scene->draw(Transform::draw_sort);
-    std::cout << "Draw time: " << end_timer() << "ms" << std::endl;
 }

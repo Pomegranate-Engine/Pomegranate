@@ -1,11 +1,11 @@
 namespace Pomegranate
 {
-    template <typename T> void Component::push_data(std::string name, void *data)
+    template <typename T> void Component::push_data(const std::string& name, void *data)
     {
         auto p = std::pair<const std::type_info*, void*>(&typeid(T), data);
         this->component_data[name] = p;
     }
-    template <typename T> T Component::get(std::string name)
+    template <typename T> T Component::get(const std::string& name)
     {
         if(this->component_data[name].second != nullptr)
         {
@@ -88,7 +88,7 @@ namespace Pomegranate
         {
             if(!has_component<T>())
             {
-                LuaComponent* component = new LuaComponent();
+                auto* component = new LuaComponent();
                 component->real_type = LuaComponent::lua_component_types[lua_type];
                 component->load_script(lua_type);
                 component->init(this);

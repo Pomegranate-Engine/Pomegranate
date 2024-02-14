@@ -1,7 +1,7 @@
-#include "Texture.h"
+#include "texture.h"
 namespace Pomegranate
 {
-	Texture::Texture(const char *path)
+    Texture::Texture(const char *path)
 	{
 		SDL_Surface* s = IMG_Load(path);
 		SDL_Texture* t = SDL_CreateTextureFromSurface(Window::current->get_sdl_renderer(),s);
@@ -11,14 +11,14 @@ namespace Pomegranate
 		SDL_QueryTexture(texture, nullptr, nullptr,&width,&height);
 		SDL_DestroySurface(s);
 	}
-	Texture::Texture(int width, int height)
+    Texture::Texture(int width, int height)
 	{
 		this->width = width;
 		this->height = height;
 		this->texture = SDL_CreateTexture(Window::current->get_sdl_renderer(),SDL_PixelFormatEnum::SDL_PIXELFORMAT_RGBA32,SDL_TextureAccess::SDL_TEXTUREACCESS_STATIC,width,height);
 	}
 
-	Texture::Texture(SDL_Texture *tex)
+    Texture::Texture(SDL_Texture *tex)
 	{
 		texture = tex;
 		this->width = 0;
@@ -26,7 +26,7 @@ namespace Pomegranate
 		SDL_QueryTexture(texture, nullptr, nullptr,&width,&height);
 	}
 
-	Texture::~Texture()
+    Texture::~Texture()
 	{
 		SDL_DestroyTexture(texture);
 	}

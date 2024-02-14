@@ -214,6 +214,9 @@ namespace Pomegranate
     UISlider::UISlider()
     {
         register_component<UISlider>();
+        this->value = 0.0f;
+        this->min = 0.0f;
+        this->max = 1.0f;
         push_data<float>("value", &this->value);
         push_data<float>("min", &this->min);
         push_data<float>("max", &this->max);

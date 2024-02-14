@@ -44,7 +44,7 @@ namespace Pomegranate
         void add_force(Vec2 force);
         void add_impulse(Vec2 impulse);
         void set_velocity(Vec2 velocity);
-        Vec2 get_velocity();
+        Vec2 get_velocity() const;
     };
 
     class CollisionShape : public Component
@@ -68,7 +68,7 @@ namespace Pomegranate
     public:
         RigidBody();
         void tick(Entity* entity) override;
-        void solve_collisions(Entity* entity);
+        static void solve_collisions(Entity* entity);
         static int sub_steps;
     };
 }

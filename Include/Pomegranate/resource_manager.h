@@ -18,8 +18,8 @@ namespace Pomegranate
     private:
         static std::map<std::string,void*> resources;
     public:
-        template<typename T> static T* load(std::string path);
-        template<typename T> static void unload(std::string path); //Unsafe
+        template<typename T> static T* load(const std::string& path);
+        template<typename T> static void unload(const std::string& path); //Unsafe
     };
 }
 

@@ -95,11 +95,7 @@ namespace Pomegranate
             {
                 lua_pushstring(l, ((std::string*)d.second.second)->c_str());
             }
-            else if(d.second.first == &typeid(Vec2))
-            {
-                lua_push_vec2((Vec2*)d.second.second, l);
-            }
-            else if(d.second.first == &typeid(Vec2i))
+            else if(d.second.first == &typeid(Vec2) || d.second.first == &typeid(Vec2i)) //TODO: These should be pushed separately
             {
                 lua_push_vec2((Vec2*)d.second.second, l);
             }

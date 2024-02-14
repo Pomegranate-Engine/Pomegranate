@@ -10,8 +10,8 @@ namespace Pomegranate
         std::vector<std::pair<Entity*,std::function<void(Entity*)>>> callbacks;
         Event();
         void trigger();
-        void add_listener(std::function<void(Entity*)> callback);
-        void remove_listener(std::function<void(Entity*)> callback);
+        void add_listener(const std::function<void(Entity*)>& callback);
+        void remove_listener(const std::function<void(Entity*)>& callback);
     };
 }
 
