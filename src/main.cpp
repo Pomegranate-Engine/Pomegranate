@@ -2,6 +2,10 @@
 #include <SDL_image.h>
 #include <Pomegranate/pomegranate.h>
 #include<Pomegranate/lua_wrapper.h>
+#include<Pomegranate/standard_ecs.h>
+#include<Pomegranate/standard_ecs_rendering.h>
+#include<Pomegranate/standard_ecs_physics.h>
+#include<Pomegranate/standard_ecs_ui.h>
 #include<imgui.h>
 #include<backends/imgui_impl_sdl3.h>
 #include<backends/imgui_impl_sdlrenderer3.h>

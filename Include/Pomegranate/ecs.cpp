@@ -237,6 +237,7 @@ namespace Pomegranate
     void EntityGroup::draw(const std::function<bool(Entity*, Entity*)>& sortingFunction)
     {
         // Sort entities using the provided sorting function
+        if(sortingFunction!= nullptr)
         std::sort(this->entities.begin(), this->entities.end(), sortingFunction);
         for(auto & system : this->systems)
         {

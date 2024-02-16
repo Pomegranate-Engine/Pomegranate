@@ -46,6 +46,7 @@ namespace Pomegranate
 
     int Window::open()
     {
+        make_current();
         bool HIGH_DPI = false;
 #if defined(__APPLE__) //TODO: Implement better solution for HIGH_DPI
         HIGH_DPI = true;
