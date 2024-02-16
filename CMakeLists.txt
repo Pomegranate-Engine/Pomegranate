@@ -40,7 +40,9 @@ set(POMEGRANATE_SOURCES
         ${POMEGRANATE_DIR}/audio.cpp
         ${POMEGRANATE_DIR}/ttf_font.cpp
         ${POMEGRANATE_DIR}/debug.cpp
-        Include/Pomegranate/lua_wrapper.cpp
+        ${POMEGRANATE_DIR}/resource_manager.cpp
+        ${POMEGRANATE_DIR}/pomegranate_type_names.h
+        ${POMEGRANATE_DIR}/lua_wrapper.cpp
 )
 
 set(IMGUI_SOURCES
@@ -52,17 +54,6 @@ set(IMGUI_SOURCES
         ${IMGUI_DIR}/backends/imgui_impl_sdlrenderer3.cpp
         ${IMGUI_DIR}/imgui_tables.cpp
         ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
-        Include/Pomegranate/resource_manager.cpp
-        Include/Pomegranate/resource_manager.h
-        Include/Pomegranate/texture.cpp
-        Include/Pomegranate/texture.h
-        Include/Pomegranate/Audio.cpp
-        Include/Pomegranate/Audio.h
-        Include/Pomegranate/ttf_font.cpp
-        Include/Pomegranate/ttf_font.h
-        Include/Pomegranate/pomegranate_type_names.h
-        Include/Pomegranate/debug.cpp
-        Include/Pomegranate/debug.h
 )
 
 # Add executable
