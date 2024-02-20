@@ -141,6 +141,8 @@ namespace Pomegranate
     };
 }
 
+#define tag(name) struct name : public Component { name() { Component::register_component<name>(); } }
+
 #include "ecs.inl"
 
 #endif //POMEGRANATE_ENGINE_ECS_H
