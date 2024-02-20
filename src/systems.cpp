@@ -125,20 +125,25 @@ public:
             if (!clicked)
             {
                 auto *e = new Entity();
-                auto* p = e->add_component<PhysicsObject>();
-                auto* t = e->add_component<Transform>();
-                t->pos = mousepos;
+                e->add_component<PhysicsObject,CollisionShape,Transform,Sprite>();
+                e->get_component<Transform>()->pos = mousepos;
                 float ransize = (float)rand()/RAND_MAX*0.2f+0.05f;
-                t->scale = Vec2(ransize,ransize);
-                auto* s = e->add_component<Sprite>();
+                e->get_component<Transform>()->scale = Vec2(ransize,ransize);
+                auto *s = e->get_component<Sprite>();
                 s->load_texture("res/pomegranate.png");
                 s->color = Color((float)rand()/RAND_MAX*360.0f, 1.0);
-                p->mass = ransize;
-                auto *c = e->add_component<CollisionShape>();
+                e->get_component<PhysicsObject>()->mass = ransize;
+                auto *c = e->get_component<CollisionShape>();
                 c->radius = 128.0;
                 c->restitution = 0.0;
 
+                /*e->add_component<DestroyAfterTime>();
+                auto *d = e->get_component<DestroyAfterTime>();
+                d->length = 20.0;
+                d->time = 0.0;
+                */
                 EntityGroup::get_group("PHYSICS")->add_entity(e);
+                //clicked = true;
             }
         } else
         {
