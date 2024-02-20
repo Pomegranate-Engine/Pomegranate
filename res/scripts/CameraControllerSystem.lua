@@ -5,9 +5,9 @@ print_info("The camera can be controlled via LuaSystem with WASD keys.\n"..
 camera = nil
 
 function tick(entity)
-    if has_component(entity, "Camera") and has_component(entity,"CameraController") then
+    if has_component(entity, "Pomegranate::Camera") and has_component(entity,"CameraController") then
         local cc = get_component(entity,"CameraController")
-        local t = get_component(entity,"Transform")
+        local t = get_component(entity,"Pomegranate::Transform")
         cc.vx = cc.vx + input_get_axis("a","d")*cc.speed
         cc.vy = cc.vy + input_get_axis("w","s")*cc.speed
         t.pos.x = t.pos.x + cc.vx
