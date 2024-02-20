@@ -92,7 +92,8 @@ namespace Pomegranate
         std::vector<Entity*> refs;
     public:
         uint32_t id;
-        template <typename T> void add_component(const char* lua_type = nullptr);
+        template <typename T> void add_single_component(const char* lua_type = nullptr);
+        template <typename... T> void add_component(const char* lua_type = nullptr);
         void add_component(const char* name);
         void remove_component(Component*);
         void add_to_group(EntityGroup*);

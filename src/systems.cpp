@@ -125,17 +125,14 @@ public:
             if (!clicked)
             {
                 auto *e = new Entity();
-                e->add_component<PhysicsObject>();
-                e->add_component<Transform>();
+                e->add_component<PhysicsObject,CollisionShape,Transform,Sprite>();
                 e->get_component<Transform>()->pos = mousepos;
                 float ransize = (float)rand()/RAND_MAX*0.2f+0.05f;
                 e->get_component<Transform>()->scale = Vec2(ransize,ransize);
-                e->add_component<Sprite>();
                 auto *s = e->get_component<Sprite>();
                 s->load_texture("res/pomegranate.png");
                 s->color = Color((float)rand()/RAND_MAX*360.0f, 1.0);
                 e->get_component<PhysicsObject>()->mass = ransize;
-                e->add_component<CollisionShape>();
                 auto *c = e->get_component<CollisionShape>();
                 c->radius = 128.0;
                 c->restitution = 0.0;

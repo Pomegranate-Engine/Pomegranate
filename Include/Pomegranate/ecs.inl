@@ -82,7 +82,7 @@ namespace Pomegranate
         }
     }
 
-    template<typename T> inline void Entity::add_component(const char* lua_type)
+    template<typename T> inline void Entity::add_single_component(const char* lua_type)
     {
         if(typeid(T) == typeid(LuaComponent))
         {
@@ -114,6 +114,10 @@ namespace Pomegranate
                 print_warn("Entity already has component of type " + std::string(typeid(T).name()) + "! Component not added.");
             }
         }
+    }
+    template<typename... T> inline void Entity::add_component(const char *lua_type)
+    {
+        (add_single_component<T>(lua_type), ...);
     }
 
     template<typename T> inline void Component::register_component()
