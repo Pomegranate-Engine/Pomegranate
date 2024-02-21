@@ -19,8 +19,7 @@ namespace Pomegranate
         this->gravity_scale = 1.0f;
         this->use_collision = true;
         this->body_type = PHYSICS_BODY_TYPE_RIGID;
-        register_component<PhysicsObject>();
-
+        register_component(PhysicsObject);
         push_data<Vec2>("acceleration", &this->acceleration);
         push_data<float>("mass", &this->mass);
         push_data<float>("gravity_scale", &this->gravity_scale);
@@ -115,7 +114,7 @@ namespace Pomegranate
         this->radius = 16.0;
         this->restitution = 0.0;
         this->size = Vec2(32.0, 32.0);
-        register_component<CollisionShape>();
+        register_component(CollisionShape);
 
         push_data<int>("shape_type", &this->shape_type);
         push_data<float>("radius", &this->radius);

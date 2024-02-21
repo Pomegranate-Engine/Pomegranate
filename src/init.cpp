@@ -6,9 +6,9 @@ static void button_pressed(Entity* entity)
 
 EntityGroup* build_scene()
 {
-    Component::register_component<Camera>();
-    Component::register_component<Transform>();
-    Component::register_component<UIText>();
+    Component::register_component(Camera);
+    Component::register_component(Transform);
+    Component::register_component(UIText);
 
     //region Physics Example
     auto* group = new EntityGroup("PHYSICS");

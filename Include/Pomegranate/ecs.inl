@@ -120,9 +120,9 @@ namespace Pomegranate
         (add_single_component<T>(lua_type), ...);
     }
 
-    template<typename T> inline void Component::register_component()
+    template<typename T> inline void Component::register_component_with_name(std::string name)
     {
-        Component::component_types[typeid(T).name()] = []() -> Component* { return new T(); };
+        Component::component_types[name] = []() -> Component* { return new T(); };
     }
 
     template<typename T> inline void System::register_system()

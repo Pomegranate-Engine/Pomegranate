@@ -7,7 +7,7 @@ namespace Pomegranate
     {
         this->texture = ResourceManager::load<Texture>("res/none.png");
         this->color = Color(255, 255, 255, 255);
-        register_component<Sprite>();
+        register_component(Sprite);
         //TODO: Add texture support to lua
         push_data<Color>("color", &this->color);
     }
@@ -25,7 +25,7 @@ namespace Pomegranate
         this->x_offset = 0;
         this->y_offset = 0;
         this->color = Color(255, 255, 255, 255);
-        register_component<AnimatedSprite>();
+        register_component(AnimatedSprite);
         //TODO: Add texture support to lua
         push_data<Color>("color", &this->color);
         push_data<int>("frame", &this->frame);
@@ -43,7 +43,7 @@ namespace Pomegranate
 
     Camera::Camera()
     {
-        register_component<Camera>();
+        register_component(Camera);
     }
 
     void Camera::make_current(Entity*entity)
@@ -55,7 +55,7 @@ namespace Pomegranate
     {
         this->radius = 16.0;
         this->color = Color(255, 255, 255, 255);
-        register_component<DebugCircle>();
+        register_component(DebugCircle);
         push_data<float>("radius", &this->radius);
         push_data<Color>("color", &this->color);
     }
@@ -203,7 +203,7 @@ namespace Pomegranate
             tiles[0][i] = Vec2i(-1, -1);
         }
         this->tileset_texture = nullptr;
-        register_component<Tilemap>();
+        register_component(Tilemap);
         //TODO: Add texture support to lua
         //TODO: add vector support to lua
         push_data<int>("width", &this->width);
