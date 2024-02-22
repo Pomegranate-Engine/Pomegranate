@@ -47,7 +47,7 @@ namespace Pomegranate
         int flags = 0;
         if(HIGH_DPI)
         {
-            flags += SDL_WINDOW_HIGH_PIXEL_DENSITY;
+            flags = flags | SDL_WINDOW_HIGH_PIXEL_DENSITY;
         }
         this->window = SDL_CreateWindow(this->title, this->width, this->height, flags); //TODO: Add HIGH_DPI support
         if (!this->window)
