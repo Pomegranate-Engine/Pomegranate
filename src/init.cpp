@@ -15,7 +15,13 @@ EntityGroup* build_scene()
     auto camera = new Entity();
     camera->add_component<Camera>();
     camera->add_component<Transform>();
-    camera->add_component<LuaComponent>("res/scripts/CameraControllerComponent.lua");
+    if(use_lua_camera_controller) {
+        camera->add_component<LuaComponent>("res/scripts/CameraControllerComponent.lua");
+    }
+    else
+    {
+        camera->add_component<CameraController>();
+    }
 
 
     Camera::make_current(camera);
