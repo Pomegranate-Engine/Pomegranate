@@ -6,16 +6,22 @@ static void button_pressed(Entity* entity)
 
 EntityGroup* build_scene()
 {
-    Component::register_component<Camera>();
-    Component::register_component<Transform>();
-    Component::register_component<UIText>();
+    Component::register_component(Camera);
+    Component::register_component(Transform);
+    Component::register_component(UIText);
 
     //region Physics Example
     auto* group = new EntityGroup("PHYSICS");
     auto camera = new Entity();
     camera->add_component<Camera>();
     camera->add_component<Transform>();
-    camera->add_component<LuaComponent>("res/scripts/CameraControllerComponent.lua");
+    if(use_lua_camera_controller) {
+        camera->add_component<LuaComponent>("res/scripts/CameraControllerComponent.lua");
+    }
+    else
+    {
+        camera->add_component<CameraController>();
+    }
 
 
     Camera::make_current(camera);

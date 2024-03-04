@@ -37,10 +37,12 @@ namespace Pomegranate
         virtual void init(Entity*);
         std::unordered_map<std::string,std::pair<const std::type_info*, void*>> component_data;
         static std::unordered_map<std::string, std::function<Component*()>> component_types;
-        template<typename T> static void register_component();
+        template<typename T> static void register_component_with_name(std::string name);
         template<typename T> void push_data(const std::string& name, void* data);
         template<typename T> T get(const std::string& name);
         template<typename T> void set(const char* name, T value);
+
+#define register_component(T) register_component_with_name<T>(#T)
     };
 
     //For lua wrapper

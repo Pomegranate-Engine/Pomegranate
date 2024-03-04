@@ -115,7 +115,7 @@ namespace Pomegranate
     {
         this->text = "";
         this->color = Color(255, 255, 255, 255);
-        register_component<UIText>();
+        register_component(UIText);
         push_data<std::string>("text", &this->text);
         push_data<Color>("color", &this->color);
     }
@@ -131,7 +131,7 @@ namespace Pomegranate
         this->text_color = Color(255, 255, 255, 255);
         this->background_color = Color(0, 0, 0, 255);
         this->callback = nullptr;
-        register_component<UIButton>();
+        register_component(UIButton);
         push_data<std::string>("text", &this->text);
         push_data<Color>("text_color", &this->text_color);
         push_data<Color>("background_color", &this->background_color);
@@ -147,7 +147,7 @@ namespace Pomegranate
         this->position = Vec2(0, 0);
         this->size = Vec2(64, 64);
         this->id = UITransform::UI_ID++;
-        register_component<UITransform>();
+        register_component(UITransform);
         push_data<Vec2>("position", &this->position);
         push_data<Vec2>("size", &this->size);
         push_data<int>("id", &this->id);
@@ -160,7 +160,7 @@ namespace Pomegranate
         this->text_color = Color(255, 255, 255, 255);
         this->background_color = Color(0, 0, 0, 255);
         this->multiline = false;
-        register_component<UITextField>();
+        register_component(UITextField);
         push_data<std::string>("text", &this->text);
         push_data<std::string>("placeholder_text", &this->placeholder_text);
         push_data<Color>("text_color", &this->text_color);
@@ -180,7 +180,7 @@ namespace Pomegranate
         this->selected_option = 0;
         this->text_color = Color(255, 255, 255, 255);
         this->background_color = Color(0, 0, 0, 255);
-        register_component<UIDropdown>();
+        register_component(UIDropdown);
         push_data<std::string>("text", &this->text);
         push_data<int>("selected_option", &this->selected_option);
         //TODO: Push data for options
@@ -199,7 +199,7 @@ namespace Pomegranate
         this->checked = false;
         this->text_color = Color(255, 255, 255, 255);
         this->background_color = Color(0, 0, 0, 255);
-        register_component<UICheckbox>();
+        register_component(UICheckbox);
         push_data<std::string>("text", &this->text);
         push_data<bool>("checked", &this->checked);
         push_data<Color>("text_color", &this->text_color);
@@ -213,7 +213,7 @@ namespace Pomegranate
 
     UISlider::UISlider()
     {
-        register_component<UISlider>();
+        register_component(UISlider);
         this->value = 0.0f;
         this->min = 0.0f;
         this->max = 1.0f;

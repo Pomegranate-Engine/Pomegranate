@@ -11,7 +11,7 @@ namespace Pomegranate
         push_data<Vec2>("scale", &this->scale);
         push_data<float>("rot",  &this->rot);
         push_data<int>("z_index",  &this->z_index);
-        register_component<Transform>();
+        register_component(Transform);
     }
 
     bool Transform::draw_sort(Entity* a, Entity* b)
@@ -30,7 +30,7 @@ namespace Pomegranate
     {
         this->link = nullptr;
         this->offset = Vec2(0.0, 0.0);
-        register_component<PositionLink>();
+        register_component(PositionLink);
         //TODO: Add support for entity links in lua
         push_data<Vec2>("offset", &this->offset);
     }
@@ -39,7 +39,7 @@ namespace Pomegranate
     {
         this->link = nullptr;
         this->offset = 0.0;
-        register_component<RotationLink>();
+        register_component(RotationLink);
         //TODO: Add support for entity links in lua
         push_data<float>("offset", &this->offset);
     }
@@ -48,7 +48,7 @@ namespace Pomegranate
     {
         this->link = nullptr;
         this->offset = Vec2(0.0, 0.0);
-        register_component<ScaleLink>();
+        register_component(ScaleLink);
         //TODO: Add support for entity links in lua
         push_data<Vec2>("offset", &this->offset);
     }
