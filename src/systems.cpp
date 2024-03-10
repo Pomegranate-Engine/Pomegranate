@@ -7,73 +7,41 @@ public:
     }
     void tick(Entity* entity) override
     {
-        if(use_lua_camera_controller)
+        if(entity->has_component<LuaComponent>("CameraController") && entity->has_component<Transform>())
         {
-            if (entity->has_component<LuaComponent>("CameraController") && entity->has_component<Transform>()) {
-                auto *c = entity->get_component<LuaComponent>("CameraController");
-                auto *t = entity->get_component<Transform>();
-                auto vx = c->get<double>("vx");
-                auto vy = c->get<double>("vy");
-                Vec2 v = Vec2((float) vx, (float) vy);
-                Vec2 m = Vec2(0, 0);
-                if (InputManager::get_key(SDL_SCANCODE_W)) {
-                    m.y -= 1;
-                }
-                if (InputManager::get_key(SDL_SCANCODE_S)) {
-                    m.y += 1;
-                }
-                if (InputManager::get_key(SDL_SCANCODE_A)) {
-                    m.x -= 1;
-                }
-                if (InputManager::get_key(SDL_SCANCODE_D)) {
-                    m.x += 1;
-                }
-
-                auto speed = c->get<double>("speed");
-                auto drag = c->get<double>("drag");
-                v += m * (float) speed;
-                v *= (float) drag;
-
-
-                c->set<double>("vx", v.x);
-                c->set<double>("vy", v.y);
-
-                t->pos += v;
+            auto* c = entity->get_component<LuaComponent>("CameraController");
+            auto* t = entity->get_component<Transform>();
+            auto vx = c->get<double>("vx");
+            auto vy = c->get<double>("vy");
+            Vec2 v = Vec2((float)vx, (float)vy);
+            Vec2 m = Vec2(0,0);
+            if(InputManager::get_key(SDL_SCANCODE_W))
+            {
+                m.y-=1;
             }
-        }
-        else
-        {
-            if (entity->has_component<CameraController>() && entity->has_component<Transform>()) {
-                auto *c = entity->get_component<CameraController>();
-                auto *t = entity->get_component<Transform>();
-                auto vx = c->velocity.x;
-                auto vy = c->velocity.y;
-                Vec2 v = Vec2((float) vx, (float) vy);
-                Vec2 m = Vec2(0, 0);
-                if (InputManager::get_key(SDL_SCANCODE_W)) {
-                    m.y -= 1;
-                }
-                if (InputManager::get_key(SDL_SCANCODE_S)) {
-                    m.y += 1;
-                }
-                if (InputManager::get_key(SDL_SCANCODE_A)) {
-                    m.x -= 1;
-                }
-                if (InputManager::get_key(SDL_SCANCODE_D)) {
-                    m.x += 1;
-                }
-
-                auto speed = c->speed;
-                auto drag = c->drag;
-                v += m * (float) speed;
-                v *= (float) drag;
-
-
-                c->velocity.x = v.x;
-                c->velocity.y = v.y;
-
-                t->pos += v;
+            if(InputManager::get_key(SDL_SCANCODE_S))
+            {
+                m.y+=1;
             }
+            if(InputManager::get_key(SDL_SCANCODE_A))
+            {
+                m.x-=1;
+            }
+            if(InputManager::get_key(SDL_SCANCODE_D))
+            {
+                m.x+=1;
+            }
+
+            auto speed = c->get<double>("speed");
+            auto drag = c->get<double>("drag");
+            v += m * (float)speed;
+            v *= (float)drag;
+
+
+            c->set<double>("vx", v.x);
+            c->set<double>("vy", v.y);
+
+            t->pos += v;
         }
     }
 };
