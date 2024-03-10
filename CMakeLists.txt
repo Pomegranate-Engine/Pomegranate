@@ -91,7 +91,6 @@ elseif(WIN32)
             ${SDL_LIBRARY_DIR}/SDL3_mixer.lib
             ${SDL_LIBRARY_DIR}/lua51.lib
             OpenMP::OpenMP_CXX
-
     )
     target_link_libraries(Pomegranate_Library PRIVATE
             ${SDL_LIBRARY_DIR}/SDL3.lib
