@@ -1,10 +1,7 @@
 #include "window.h"
-
-#include "resource_manager.h"
-
 namespace Pomegranate
 {
-    Window* Window::current = nullptr;
+    const Window* Window::current = nullptr;
 
     Window::Window(const char* title, int width, int height)
     {
@@ -39,10 +36,6 @@ namespace Pomegranate
     {
         return this->renderer;
     }
-    SDL_Texture* Window::get_render_texture() const
-    {
-        return this->render_texture;
-    }
 
     int Window::open()
     {
@@ -51,10 +44,10 @@ namespace Pomegranate
 #if defined(__APPLE__) //TODO: Implement better solution for HIGH_DPI
         HIGH_DPI = true;
 #endif
-        int flags = SDL_WINDOW_RESIZABLE;
+        int flags = 0;
         if(HIGH_DPI)
         {
-            flags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
+            flags += SDL_WINDOW_HIGH_PIXEL_DENSITY;
         }
         this->window = SDL_CreateWindow(this->title, this->width, this->height, flags); //TODO: Add HIGH_DPI support
         if (!this->window)
@@ -64,9 +57,6 @@ namespace Pomegranate
         }
 
         this->renderer = SDL_CreateRenderer(this->window, nullptr, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-        //Set render texture
-        this->render_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, this->width, this->height);
-
         if(HIGH_DPI)
         {
             SDL_SetRenderScale(renderer, 2, 2);
@@ -107,28 +97,12 @@ namespace Pomegranate
         this->width = new_width;
         this->height = new_height;
         SDL_SetWindowSize(this->window, width, height);
-        //Update the renderer
-        SDL_DestroyTexture(this->render_texture);
-        this->render_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, this->width, this->height);
     }
-    void Window::display()
-    {
-        SDL_SetRenderTarget(Window::current->get_sdl_renderer(), nullptr);
-        SDL_RenderTexture(Window::current->get_sdl_renderer(), Window::current->get_render_texture(), nullptr, nullptr);
-        SDL_RenderPresent(Window::current->get_sdl_renderer()); //Present
-    }
+
     void Window::set_icon(const char *path)
     {
         SDL_Surface* icon = IMG_Load(path);
         SDL_SetWindowIcon(this->window, icon);
         SDL_DestroySurface(icon);
-    }
-    void Window::process_event(SDL_Event* event)
-    {
-        if(event->type == SDL_EVENT_WINDOW_RESIZED)
-        {
-            print_info("Window resized");
-            Window::current->set_size(event->window.data1, event->window.data2);
-        }
     }
 }
